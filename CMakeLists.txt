@@ -7,7 +7,6 @@ project(GravSimm
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 
-file(COPY assets DESTINATION ${PROJECT_BINARY_DIR})
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/*.hh" "${PROJECT_SOURCE_DIR}/include/*.hh")
 list(REMOVE_ITEM HEADER_LIST "${PROJECT_SOURCE_DIR}/include/GravSim/meta.hh")
 
@@ -31,6 +30,11 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 
 add_executable(GravSim ${SOURCES} ${HEADER_LIST})
+# Copy assets folder on build
+add_custom_command(
+        TARGET GravSim PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets/ $<TARGET_FILE_DIR:GravSim>)
 
 target_include_directories(GravSim PUBLIC ${PROJECT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include/)
 target_link_libraries(GravSim PUBLIC spdlog::spdlog)
