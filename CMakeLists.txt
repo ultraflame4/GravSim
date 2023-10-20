@@ -23,11 +23,12 @@ set(SOURCES
 find_package(spdlog CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 add_executable(GravSim ${SOURCES} ${HEADER_LIST})
 
 target_include_directories(GravSim PUBLIC ${PROJECT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include/)
 target_link_libraries(GravSim PUBLIC spdlog::spdlog)
-target_link_libraries(GravSim PRIVATE glad::glad)
 target_link_libraries(GravSim PRIVATE glfw)
-
+target_link_libraries(GravSim PRIVATE glad::glad)
+target_link_libraries(GravSim PRIVATE glm::glm)

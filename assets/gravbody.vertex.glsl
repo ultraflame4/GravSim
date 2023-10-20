@@ -4,6 +4,10 @@ layout (location = 1) in float aRadius;
 layout (location = 2) in vec3 aColor;
 
 uniform vec2 viewport;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 proj;
+
 
 out vec3 vColor;
 out float pRadius;
@@ -14,7 +18,9 @@ void main()
     //    gl_PointSize = floatBitsToInt(aRadius);
     gl_PointSize = aRadius*2;
     pRadius = aRadius;
-    gl_Position = vec4(aPos, 0, 1.0);
+//    gl_Position = vec4(aPos, 0, 1.0);
+    gl_Position =  vec4(aPos, 0, 1.0);
+//    gl_Position = proj * view * model * vec4(aPos, -1, 1.0);
     vColor = aColor;
 
     vec2 ndcPos = gl_Position.xy / gl_Position.w;
