@@ -18,10 +18,28 @@ protected:
 
     int bodyPositions_location;
     int viewport_location;
+    VertexObject* bodies_draw;
 
     void Load() override {
         logger->info("Hello world!");
-        square = Square::CreateSquare();
+
+
+        bodies.push_back(GravBodyVertex{
+                0, 0,
+                10,
+                1, 1, 1
+        });
+
+        auto* bodiesArr = reinterpret_cast<float *>(bodies.data());
+        bodies_draw = new VertexObject(sizeof(GravBodyVertex) * bodies.size(),
+                                       bodiesArr, sizeof(GravBodyVertex));
+
+        bodies_draw->CreateAttrib(2); // Position attribute
+        bodies_draw->CreateAttrib(1); // radius attribute
+        bodies_draw->CreateAttrib(3); // color attribute
+
+
+
         shader.addShader("./assets/gravbody.vertex.glsl", ShaderType::VERTEX);
         shader.addShader("./assets/gravbody.fragment.glsl", ShaderType::FRAGMENT);
         shader.build();
@@ -38,16 +56,8 @@ protected:
 
     void Draw() override {
         shader.use();
-
-        float bodiesPos[] = {
-                0.5f, 0.5f,
-                -1.f, 0.f,
-        };
-
-        glUniform2fv(bodyPositions_location, sizeof(bodiesPos) / sizeof(float), bodiesPos);
         glUniform4f(viewport_location, 10,10, width, height);
-
-        square->drawPoints();
+        bodies_draw->drawPoints();
 
     }
 };
