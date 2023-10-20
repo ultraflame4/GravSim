@@ -6,7 +6,7 @@ uniform vec4 viewport;
 //uniform float[] bodies_r;
 
 in vec4 gl_FragCoord;
-in vec3 bgColor;
+in vec3 vColor;
 
 void main()
 {
@@ -29,7 +29,7 @@ void main()
 //            nearest_dist = current_dist;
 //        }
 //    }
-    FragColor = vec4(bgColor, 1.0);
+    FragColor = vec4(vColor, 1.0);
 //    if (nearest_dist < 0.1){
 //        FragColor = vec4(1f,1f,1f,1f);
 //    }

@@ -25,14 +25,21 @@ protected:
 
 
         bodies.push_back(GravBodyVertex{
+                0.5, 0.5,
+                50,
+                1, 1, 1
+        });
+
+        bodies.push_back(GravBodyVertex{
                 0, 0,
-                10,
+                50,
                 1, 1, 1
         });
 
         auto* bodiesArr = reinterpret_cast<float *>(bodies.data());
-        bodies_draw = new VertexObject(sizeof(GravBodyVertex) * bodies.size(),
-                                       bodiesArr, sizeof(GravBodyVertex));
+        int stride = sizeof(GravBodyVertex);
+        int size = stride * bodies.size();
+        bodies_draw = new VertexObject(size,bodiesArr, stride);
 
         bodies_draw->CreateAttrib(2); // Position attribute
         bodies_draw->CreateAttrib(1); // radius attribute
