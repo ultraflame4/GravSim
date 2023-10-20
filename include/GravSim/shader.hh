@@ -15,6 +15,7 @@ enum ShaderType{
 
 class Shader {
 public:
+    unsigned int shaderProgram;
     unsigned int vertexShader;
     unsigned int fragmentShader;
 
@@ -23,7 +24,10 @@ public:
     void addShader(const std::string &source_path, ShaderType shaderType);
 
     void build();
+
+    void use();
 private:
     static inline std::shared_ptr<spdlog::logger> logger = logging::get<ShaderType>();
     bool checkCompileSuccess(unsigned int shader);
+
 };

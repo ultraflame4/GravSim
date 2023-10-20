@@ -34,6 +34,7 @@ protected:
     }
 
     void Draw() override {
+        shader.use();
 
     }
 };

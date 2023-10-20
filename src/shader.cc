@@ -55,5 +55,22 @@ bool Shader::checkCompileSuccess(unsigned int shader) {
 }
 
 void Shader::build() {
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
 
+    int success;
+    char infoLog[512];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+        logger->error("Failed to link shaders (shaderProgram: {}) because of {}", shaderProgram, infoLog);
+        return;
+    }
+    logger->trace("Successfully linked shaders!");
+}
+
+void Shader::use() {
+    glUseProgram(shaderProgram);
 }
