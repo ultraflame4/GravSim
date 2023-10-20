@@ -21,6 +21,8 @@ set(SOURCES
         include/GravSim/GravitationalBody.hh
         src/shader.cc
         include/GravSim/shader.hh
+        src/VertexObject.cc
+        include/GravSim/VertexObject.hh
 )
 
 

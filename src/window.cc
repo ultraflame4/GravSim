@@ -45,8 +45,10 @@ void Window::run() {
     Load();
     while(!glfwWindowShouldClose(window))
     {
-        glfwSwapBuffers(window);
         glfwPollEvents();
+        Update();
+        Draw();
+        glfwSwapBuffers(window);
     }
     glfwTerminate();
 }

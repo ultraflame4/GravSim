@@ -3,6 +3,7 @@
 #include "GravSim/window.hh"
 #include "GravSim/GravitationalBody.hh"
 #include "GravSim/shader.hh"
+#include "GravSim/VertexObject.hh"
 
 
 class Game : public Window {
@@ -12,16 +13,25 @@ public:
 protected:
     std::vector<GravBodyVertex> bodies;
     Shader shader;
+    std::unique_ptr<VertexObject> vo;
 
     void Load() override {
         logger->info("Hello world!");
-        bodies.push_back(GravBodyVertex{0, 0, 10, 1, 1, 1});
 
-        int trueLength = sizeof(GravBodyVertex) / sizeof(float);
-        unsigned int VBO;
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, bodies.size() * trueLength, bodies.data(), GL_STATIC_DRAW);
+        float vertices[] = {
+                // positions         // colors
+                0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+                -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+                0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
+        };
+
+
+        vo = std::make_unique<VertexObject>( sizeof(vertices), vertices, 6 * sizeof(float));
+
+        vo->CreateAttrib(3); // Position attribute
+        vo->CreateAttrib(3); // Position attribute
+
+
 
         shader.addShader("./assets/gravbody.vertex.glsl", ShaderType::VERTEX);
         shader.addShader("./assets/gravbody.fragment.glsl", ShaderType::FRAGMENT);
@@ -35,6 +45,7 @@ protected:
 
     void Draw() override {
         shader.use();
+        vo->draw();
 
     }
 };
