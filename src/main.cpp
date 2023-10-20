@@ -29,12 +29,23 @@ protected:
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
+    glm::mat4 createOrtho(float size, float zNear = .1f, float zFar = 100.0f){
+        float halfW = size * width ;
+        float halfH = size * height ;
+        return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
+    }
+
+    void OnResize() override {
+        proj = createOrtho(5);
+        logger->info("Resized");
+    }
+
     void Load() override {
         logger->info("Hello world!");
 
 
         bodies.push_back(GravBodyVertex{
-                .9, 0,
+                0, 0,
                 50,
                 1, 1, 1
         });
@@ -54,8 +65,6 @@ protected:
         bodies_draw->CreateAttrib(1); // radius attribute
         bodies_draw->CreateAttrib(3); // color attribute
 
-
-        proj = glm::ortho(0.0f, (float) width, 0.0f, (float) height, 0.1f, 100.0f);
         shader.addShader("./assets/gravbody.vertex.glsl", ShaderType::VERTEX);
         shader.addShader("./assets/gravbody.fragment.glsl", ShaderType::FRAGMENT);
         shader.build();
@@ -75,8 +84,8 @@ protected:
             auto &body = bodies[i];
 
             auto time = glfwGetTime() + i *10;
-            body.x = sin(time) / 2;
-            body.y = cos(time) / 2;
+            body.x = sin(time) * 100;
+            body.y = cos(time) * 100;
         }
     }
 

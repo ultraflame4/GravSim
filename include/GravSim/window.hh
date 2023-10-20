@@ -19,6 +19,7 @@ protected:
     int width;
     int height;
 
+    virtual void OnResize(){};
     virtual void Load(){};
     virtual void Update(){};
     virtual void Draw(){};

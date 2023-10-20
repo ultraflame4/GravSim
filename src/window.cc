@@ -36,7 +36,6 @@ Window::Window(int width, int height, const std::string &title) {
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_POINT_SMOOTH);
-    glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -54,9 +53,11 @@ void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height
     this->width = width;
     this->height = height;
     glViewport(0, 0, width, height);
+    this->OnResize();
 }
 
 void Window::run() {
+    framebuffer_size_callback(window, width, height); // Call once at the start
     Load();
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
