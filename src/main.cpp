@@ -61,7 +61,7 @@ protected:
 
         AddBody(-500, 0, 50, 1);
         AddBody(0, 800, 50, 1);
-        AddBody(500, 0, 80, 5);
+        AddBody(500, 0, 80, 3);
         AddBody(0, -500, 50, 1);
 
 
@@ -87,7 +87,7 @@ protected:
 
     }
 
-    const float gravityConstant = 10.f;
+    const float gravityConstant = 100.f;
 
     void Update(float dt) override {
         // Make circles go in circle. this is temp for testing
