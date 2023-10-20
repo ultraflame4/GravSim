@@ -16,6 +16,7 @@ public:
 
     void bind();
     void draw();
+    void drawPoints();
 
 private:
 //    static inline std::shared_ptr<spdlog::logger> logger = logging::get<VertexObject>();
@@ -26,5 +27,6 @@ private:
     int attr_index = 0;
     int attr_offset = 0;
     int attr_stride = 0;
+    int vertex_count = 0;
     int triangles_count = 0;
 };

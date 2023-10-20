@@ -33,6 +33,8 @@ Window::Window(int width, int height, const std::string &title) {
         throw std::runtime_error("Failed to initialize GLAD!");
     }
 
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     glViewport(0, 0,width, height);
     this->width = width;
     this->height = height;

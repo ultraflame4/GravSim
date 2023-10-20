@@ -10,10 +10,10 @@
 class Square{
 public:
     static inline float vertices[] = {
-            -1, 1,
-            1, 1,
-            1, -1,
-            -1, -1
+            -0.5, 0.5,
+            0.5, 0.5,
+            0.5, -0.5,
+            -0.5, -0.5
 
     };
     static inline unsigned int indices[] = {

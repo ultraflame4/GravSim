@@ -26,13 +26,9 @@ protected:
         shader.addShader("./assets/gravbody.fragment.glsl", ShaderType::FRAGMENT);
         shader.build();
         shader.use();
+
         bodyPositions_location = shader.getUniformLoc("bodies_pos");
         viewport_location = shader.getUniformLoc("viewport");
-
-
-
-
-
 
     }
 
@@ -51,7 +47,7 @@ protected:
         glUniform2fv(bodyPositions_location, sizeof(bodiesPos) / sizeof(float), bodiesPos);
         glUniform4f(viewport_location, 10,10, width, height);
 
-        square->draw();
+        square->drawPoints();
 
     }
 };
