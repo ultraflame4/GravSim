@@ -47,6 +47,8 @@ void Window::run() {
     {
         glfwPollEvents();
         Update();
+        glClearColor(.0f, .0f, .0f, .0f);
+        glClear(GL_COLOR_BUFFER_BIT);
         Draw();
         glfwSwapBuffers(window);
     }
