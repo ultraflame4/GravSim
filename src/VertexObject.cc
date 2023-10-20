@@ -7,15 +7,16 @@
 
 VertexObject::VertexObject(int byteSize, const float *data, int stride) {
     glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
+    SetVertices(data, byteSize);
     attr_stride = stride;
     vertex_count= byteSize/attr_stride;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
-
-
+    glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_DYNAMIC_DRAW);
+}
+void VertexObject::SetVertices(const float *dataArr, int byteSize) {
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, byteSize, dataArr, GL_DYNAMIC_DRAW);
 }
 
 void VertexObject::CreateAttrib(int size) {
@@ -49,4 +50,5 @@ void VertexObject::SetTriangles(int byteSize, const unsigned int *indices) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indices, GL_STATIC_DRAW);
     triangles_count = byteSize / sizeof (unsigned int);
 }
+
 

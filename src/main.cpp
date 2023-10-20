@@ -58,10 +58,22 @@ protected:
     }
 
     void Update() override {
-
+        // Make circles go in circle. this is temp for testing
+        for (int i = 0; i < bodies.size(); ++i) {
+            auto &item = bodies[i];
+            auto time = glfwGetTime() + i *10;
+            item.x = sin(time) / 2;
+            item.y = cos(time) / 2;
+        }
     }
 
     void Draw() override {
+        auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
+        int stride = sizeof(GravBodyVertex);
+        int size = stride * bodies.size();
+        bodies_draw->SetVertices(bodiesArr, size);
+
+
         shader.use();
         glUniform2f(viewport_location, width, height);
         glUniform1f(feathering_location, 1);

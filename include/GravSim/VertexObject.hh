@@ -11,6 +11,7 @@ class VertexObject {
 public:
     VertexObject(int byteSize, const float *data, int stride);
 
+    void SetVertices( const float *dataArr, int dataCount);
     void SetTriangles(int byteSize, const unsigned int *indices);
     void CreateAttrib(int size);
 
