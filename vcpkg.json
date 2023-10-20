@@ -6,6 +6,11 @@
   "dependencies": [
     "glfw3",
     "spdlog",
-    "magic-enum"
+    "magic-enum",
+    {
+      "name": "glad",
+      "features": ["gl-api-33", "loader"]
+    }
   ]
+
 }
