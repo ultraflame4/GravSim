@@ -89,25 +89,35 @@ protected:
 
     const float gravityConstant = 100.f;
 
-    void ApplyGravityForce( GravBodyPhysical &bodyp,GravBodyPhysical &otherp){
+    void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         float distance = glm::distance(bodyp.pos, otherp.pos);
         float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
         glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
-        glm::vec2 forceVector = dirVector * ((sharedForce / 2) / bodyp.mass);
-        bodyp.vel += forceVector ;
+        bodyp.Accelerate(dirVector, sharedForce / 2);
     }
 
-    void ApplyCollisionForces(GravBodyPhysical &bodyp,GravBodyPhysical &otherp){
+    void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
+        glm::vec2 posA = bodyp.pos + bodyp.vel;
+        glm::vec2 posB = otherp.pos + bodyp.vel;
+        float collisionDist = bodyp.radius + otherp.radius;
+        float currentDist = glm::distance(posA, posB);
+        logger->info("COLLIDE DIST {} CURRENT DIST {}",collisionDist,currentDist);
+        if (currentDist < collisionDist) {
 
+            glm::vec2 colNormal = glm::normalize(posA-posB);
+            float colForce = glm::length(bodyp.vel);
+            bodyp.vel = glm::vec2(0, 0);
+            bodyp.vel += colNormal*colForce*100.f;
+//            bodyp.Accelerate(colNormal, colForce);
+        }
     }
 
-    void UpdateGravBodyPhysics(GravBodyPhysical& bodyp, int index){
+    void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
         for (int j = 0; j < bodies.size(); ++j) {
             if (index == j) continue; // Skip self
             auto &otherp = physicalBodies[j];
             ApplyGravityForce(bodyp, otherp);
             ApplyCollisionForces(bodyp, otherp);
-
         }
         bodyp.pos += bodyp.vel * updateTimer.dt;
     }

@@ -20,4 +20,8 @@ struct GravBodyPhysical{
     glm::vec2 vel;
     float mass;
     float radius;
+
+    void Accelerate(glm::vec2 direction, float forceAmt){
+        vel += direction * (forceAmt / mass);
+    }
 };
