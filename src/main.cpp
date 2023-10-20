@@ -36,8 +36,7 @@ protected:
     }
 
     void OnResize() override {
-        proj = createOrtho(5);
-        logger->info("Resized");
+        proj = createOrtho(1);
     }
 
     void Load() override {
