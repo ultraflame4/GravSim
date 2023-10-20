@@ -14,6 +14,7 @@ public:
 
 protected:
     std::vector<GravBodyVertex> bodies;
+    std::vector<GravBodyPhysical> physicalBodies;
     Shader shader;
     std::unique_ptr<VertexObject> square;
 
@@ -29,10 +30,25 @@ protected:
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
-    glm::mat4 createOrtho(float size, float zNear = .1f, float zFar = 100.0f){
-        float halfW = size * width ;
-        float halfH = size * height ;
+    glm::mat4 createOrtho(float size, float zNear = .1f, float zFar = 100.0f) {
+        float halfW = size * width;
+        float halfH = size * height;
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
+    }
+
+    void AddBody(float x, float y, float radius, float mass) {
+        bodies.push_back(GravBodyVertex{
+                x, y,
+                radius,
+                1, 1, 1
+        });
+
+        physicalBodies.push_back(GravBodyPhysical{
+                glm::vec2(x, y),
+                glm::vec2(0,0),
+                radius,
+                mass
+        });
     }
 
     void OnResize() override {
@@ -43,17 +59,9 @@ protected:
         logger->info("Hello world!");
 
 
-        bodies.push_back(GravBodyVertex{
-                0, 0,
-                50,
-                1, 1, 1
-        });
+        AddBody(-800,0,50,10);
+        AddBody(800,0,50,10);
 
-        bodies.push_back(GravBodyVertex{
-                -.9f, 0,
-                50,
-                1, 1, 1
-        });
 
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
@@ -77,14 +85,22 @@ protected:
 
     }
 
+    const float mass = 10.f;
+    const float gravityConstant = 1.f;
+
     void Update() override {
         // Make circles go in circle. this is temp for testing
         for (int i = 0; i < bodies.size(); ++i) {
             auto &body = bodies[i];
+            glm::vec2 bodyPos(body.x, body.y);
 
-            auto time = glfwGetTime() + i *10;
-            body.x = sin(time) * 100;
-            body.y = cos(time) * 100;
+            for (int j = 0; j < bodies.size(); ++j) {
+                auto &other = bodies[j];
+                glm::vec2 otherPos(other.x, other.y);
+                float distance = glm::distance(bodyPos, otherPos);
+                float sharedForce = gravityConstant * ((mass * mass) / pow(distance, 2));
+
+            }
         }
     }
 
