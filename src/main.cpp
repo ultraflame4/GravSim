@@ -4,6 +4,7 @@
 #include "GravSim/GravitationalBody.hh"
 #include "GravSim/shader.hh"
 #include "GravSim/VertexObject.hh"
+#include "GravSim/square.hh"
 
 
 class Game : public Window {
@@ -13,27 +14,12 @@ public:
 protected:
     std::vector<GravBodyVertex> bodies;
     Shader shader;
-    std::unique_ptr<VertexObject> vo;
+    std::unique_ptr<VertexObject> square;
+
 
     void Load() override {
         logger->info("Hello world!");
-
-        float vertices[] = {
-                -1, 1,
-                1, 1,
-                1, -1,
-                -1, -1
-
-        };
-        unsigned int indices[] = {
-                2,1,0,
-                0, 3, 2
-        };
-
-        vo = std::make_unique<VertexObject>(sizeof(vertices), vertices, 2 * sizeof(float));
-        vo->SetTriangles(sizeof(indices), indices);
-        vo->CreateAttrib(2);
-
+        square = Square::CreateSquare();
 
         shader.addShader("./assets/gravbody.vertex.glsl", ShaderType::VERTEX);
         shader.addShader("./assets/gravbody.fragment.glsl", ShaderType::FRAGMENT);
@@ -47,7 +33,7 @@ protected:
 
     void Draw() override {
         shader.use();
-        vo->draw();
+        square->draw();
 
     }
 };

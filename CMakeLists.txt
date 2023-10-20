@@ -14,14 +14,9 @@ list(REMOVE_ITEM HEADER_LIST "${PROJECT_SOURCE_DIR}/include/GravSim/meta.hh")
 set(SOURCES
         src/main.cpp
         src/logging.cc
-        include/GravSim/logging.hh
         src/window.cc
-        include/GravSim/window.hh
-        include/GravSim/GravitationalBody.hh
         src/shader.cc
-        include/GravSim/shader.hh
         src/VertexObject.cc
-        include/GravSim/VertexObject.hh
 )
 
 
