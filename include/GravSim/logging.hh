@@ -14,7 +14,7 @@ public:
         std::string type_name = typeid(T).name();
         std::string logger_name = type_name + (prefix.empty() ? "" : " <" + prefix +">");
 
-        return spdlog::createLogger(logger_name);
+        return createLogger(logger_name);
     }
 
 
