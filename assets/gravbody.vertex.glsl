@@ -16,8 +16,9 @@ out vec2 pointPos;
 void main()
 {
     //    gl_PointSize = floatBitsToInt(aRadius);
-    gl_PointSize = aRadius*2;
-    pRadius = aRadius;
+
+    pRadius = (proj * view * model * vec4(aRadius,0,0,1.0)).length();
+    gl_PointSize = pRadius*2;
 //    gl_Position = vec4(aPos, 0, 1.0);
 //    gl_Position =  vec4(aPos, 0, 1.0);
     gl_Position = proj * view * model * vec4(aPos, -1, 1.0);
