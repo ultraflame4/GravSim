@@ -9,8 +9,9 @@
 
 class VertexObject {
 public:
-    VertexObject(int byteSize, const void *data, int stride);
+    VertexObject(int byteSize, const float *data, int stride);
 
+    void SetTriangles(int byteSize, const unsigned int *indices);
     void CreateAttrib(int size);
 
     void bind();
@@ -20,6 +21,7 @@ private:
 //    static inline std::shared_ptr<spdlog::logger> logger = logging::get<VertexObject>();
     unsigned int vbo;
     unsigned int vao;
+    unsigned int ebo;
 
     int attr_index = 0;
     int attr_offset = 0;

@@ -2,9 +2,10 @@
 // Created by powew on 20/10/2023.
 //
 #include <glad/glad.h>
+#include <iostream>
 #include "GravSim/VertexObject.hh"
 
-VertexObject::VertexObject(int byteSize, const void *data, int stride) {
+VertexObject::VertexObject(int byteSize, const float *data, int stride) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
@@ -14,7 +15,7 @@ VertexObject::VertexObject(int byteSize, const void *data, int stride) {
     glBindVertexArray(vao);
     glBufferData(GL_ARRAY_BUFFER, byteSize, data, GL_STATIC_DRAW);
 
-    triangles_count = byteSize / stride;
+
 }
 
 void VertexObject::CreateAttrib(int size) {
@@ -28,9 +29,17 @@ void VertexObject::CreateAttrib(int size) {
 
 void VertexObject::bind() {
     glBindVertexArray(vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 }
 
 void VertexObject::draw() {
     bind();
-    glDrawArrays(GL_TRIANGLES, 0, triangles_count);
+    glDrawElements(GL_TRIANGLES, triangles_count, GL_UNSIGNED_INT, nullptr);
+}
+
+void VertexObject::SetTriangles(int byteSize, const unsigned int *indices) {
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indices, GL_STATIC_DRAW);
+    triangles_count = byteSize / sizeof (unsigned int);
 }

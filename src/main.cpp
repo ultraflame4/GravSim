@@ -19,18 +19,20 @@ protected:
         logger->info("Hello world!");
 
         float vertices[] = {
-                // positions         // colors
-                0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-                -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-                0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
+                -1, 1,
+                1, 1,
+                1, -1,
+                -1, -1
+
+        };
+        unsigned int indices[] = {
+                2,1,0,
+                0, 3, 2
         };
 
-
-        vo = std::make_unique<VertexObject>( sizeof(vertices), vertices, 6 * sizeof(float));
-
-        vo->CreateAttrib(3); // Position attribute
-        vo->CreateAttrib(3); // Position attribute
-
+        vo = std::make_unique<VertexObject>(sizeof(vertices), vertices, 2 * sizeof(float));
+        vo->SetTriangles(sizeof(indices), indices);
+        vo->CreateAttrib(2);
 
 
         shader.addShader("./assets/gravbody.vertex.glsl", ShaderType::VERTEX);
