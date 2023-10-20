@@ -88,7 +88,7 @@ protected:
 
     }
 
-    const float gravityConstant = 10.f;
+    const float gravityConstant = 100.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         float distance = glm::distance(bodyp.pos, otherp.pos);
@@ -103,14 +103,14 @@ protected:
         float collisionDist = (bodyp.radius + otherp.radius) * 2;
         float currentDist = glm::distance(posA, posB);
         if (currentDist < collisionDist) {
-
             glm::vec2 colNormal = glm::normalize(posA - posB);
             glm::vec2 colDir = glm::normalize(bodyp.vel);
             float colForce = glm::length(bodyp.vel);
-            glm::vec2 colReflect = glm::reflect(colDir, colNormal);
+            glm::vec2 colReflect = colNormal - 2 * glm::dot(colDir,colNormal) * colDir;
             // Clamp reflection force to prevent it from going crazy
-            logger->debug("Reflection {},{} Normal {},{}, Direction {},{}", colReflect.x, colReflect.y, colNormal.x, colNormal.y, colDir.x, colDir.y);
-            bodyp.vel = (colReflect + colNormal*.1f) * std::clamp(colForce,0.f,500.f);
+//            logger->debug("Reflection {},{} Normal {},{}, Direction {},{}", colReflect.x, colReflect.y, colNormal.x, colNormal.y, colDir.x, colDir.y);
+            bodyp.vel = colReflect  * std::clamp(colForce,0.f,500.f);
+//            bodyp.vel += colNormal * colForce * .5f;
 
 //            bodyp.Accelerate(colNormal, colForce / 2);
         }
