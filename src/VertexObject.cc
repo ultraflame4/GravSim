@@ -18,7 +18,7 @@ VertexObject::VertexObject(int byteSize, const void *data, int stride) {
 }
 
 void VertexObject::CreateAttrib(int size) {
-    logger->trace("Create attrib at index {}, size {}, stride {}, offset {}", attr_index,size,attr_stride,attr_offset);
+//    logger->trace("Create attrib at index {}, size {}, stride {}, offset {}", attr_index,size,attr_stride,attr_offset);
     glVertexAttribPointer(attr_index, size, GL_FLOAT, GL_FALSE, attr_stride, (void*)(attr_offset));
 
     glEnableVertexAttribArray(attr_index);

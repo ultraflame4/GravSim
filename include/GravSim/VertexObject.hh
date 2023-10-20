@@ -17,7 +17,7 @@ public:
     void draw();
 
 private:
-    static inline std::shared_ptr<spdlog::logger> logger = logging::get<VertexObject>();
+//    static inline std::shared_ptr<spdlog::logger> logger = logging::get<VertexObject>();
     unsigned int vbo;
     unsigned int vao;
 
