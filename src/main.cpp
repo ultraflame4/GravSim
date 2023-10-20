@@ -16,7 +16,7 @@ protected:
     Shader shader;
     std::unique_ptr<VertexObject> square;
 
-    int bodyPositions_location;
+    int feathering_location;
     int viewport_location;
     VertexObject *bodies_draw;
 
@@ -52,7 +52,7 @@ protected:
         shader.build();
         shader.use();
 
-        bodyPositions_location = shader.getUniformLoc("bodies_pos");
+        feathering_location = shader.getUniformLoc("feathering");
         viewport_location = shader.getUniformLoc("viewport");
 
     }
@@ -64,6 +64,7 @@ protected:
     void Draw() override {
         shader.use();
         glUniform2f(viewport_location, width, height);
+        glUniform1f(feathering_location, 1);
         bodies_draw->drawPoints();
 
     }
