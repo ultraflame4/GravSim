@@ -74,3 +74,7 @@ void Shader::build() {
 void Shader::use() {
     glUseProgram(shaderProgram);
 }
+
+int Shader::getUniformLoc(const std::string &name) {
+    return glGetUniformLocation(shaderProgram,name.c_str());
+}

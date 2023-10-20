@@ -22,6 +22,7 @@ public:
     Shader();
 
     void addShader(const std::string &source_path, ShaderType shaderType);
+    int getUniformLoc(const std::string &name);
 
     void build();
 

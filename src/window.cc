@@ -34,10 +34,18 @@ Window::Window(int width, int height, const std::string &title) {
     }
 
     glViewport(0, 0,width, height);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    this->width = width;
+    this->height = height;
+    glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
+    windows_list[window] = this;
 }
 
+void Window::static_framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    windows_list[window]->framebuffer_size_callback(window, width, height);
+}
 void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    this->width = width;
+    this->height = height;
     glViewport(0, 0, width, height);
 }
 

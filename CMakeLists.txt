@@ -30,3 +30,4 @@ target_include_directories(GravSim PUBLIC ${PROJECT_BINARY_DIR}/include ${PROJEC
 target_link_libraries(GravSim PUBLIC spdlog::spdlog)
 target_link_libraries(GravSim PRIVATE glad::glad)
 target_link_libraries(GravSim PRIVATE glfw)
+
