@@ -62,7 +62,10 @@ void Window::run() {
     lastFrameTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        Update();
+        for (int i = 0; i < 20; ++i) {
+            Update();
+        }
+
         glClearColor(.0f, .0f, .0f, .0f);
         glClear(GL_COLOR_BUFFER_BIT);
         Draw();

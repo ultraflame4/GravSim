@@ -45,7 +45,7 @@ protected:
 
         physicalBodies.push_back(GravBodyPhysical{
                 glm::vec2(x, y),
-                glm::vec2(0.0,0.0),
+                glm::vec2(0.0, 0.0),
                 radius,
                 mass
         });
@@ -59,8 +59,10 @@ protected:
         logger->info("Hello world!");
 
 
-        AddBody(-800,0,50,100);
-        AddBody(800,0,50,10);
+        AddBody(-500, 0, 50, 1);
+        AddBody(0, 800, 50, 1);
+        AddBody(500, 0, 80, 5);
+        AddBody(0, -500, 50, 1);
 
 
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
@@ -85,7 +87,7 @@ protected:
 
     }
 
-    const float gravityConstant = 100.f;
+    const float gravityConstant = 10.f;
 
     void Update() override {
         // Make circles go in circle. this is temp for testing
@@ -100,15 +102,15 @@ protected:
 
                 float distance = glm::distance(bodyp.pos, otherp.pos);
                 float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
-                glm::vec2 forceVector = glm::normalize(otherp.pos - bodyp.pos) * (sharedForce/2);
-                bodyp.vel += forceVector;
+                glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
+                glm::vec2 forceVector = dirVector * ((sharedForce / 2) / bodyp.mass);
+                bodyp.vel += forceVector ;
             }
 
 
-            bodyp.pos += bodyp.vel * deltaTime;
+            bodyp.pos += bodyp.vel * deltaTime/20.0f;
             body.x = bodyp.pos.x;
             body.y = bodyp.pos.y;
-//            logger->info("Pos {},{}", body.x,body.y);
         }
 
     }
