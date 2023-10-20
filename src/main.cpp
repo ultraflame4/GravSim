@@ -89,25 +89,27 @@ protected:
 
     const float gravityConstant = 100.f;
 
-    void ApplyGravityForce( GravBodyPhysical& bodyp, int index){
-        for (int j = 0; j < bodies.size(); ++j) {
-            if (index == j) continue; // Skip self
-            auto &other = bodies[j];
-            auto &otherp = physicalBodies[j];
+    void ApplyGravityForce( GravBodyPhysical &bodyp,GravBodyPhysical &otherp){
+        float distance = glm::distance(bodyp.pos, otherp.pos);
+        float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
+        glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
+        glm::vec2 forceVector = dirVector * ((sharedForce / 2) / bodyp.mass);
+        bodyp.vel += forceVector ;
+    }
 
-            float distance = glm::distance(bodyp.pos, otherp.pos);
-            float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
-            glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
-            glm::vec2 forceVector = dirVector * ((sharedForce / 2) / bodyp.mass);
-            bodyp.vel += forceVector ;
-        }
+    void ApplyCollisionForces(GravBodyPhysical &bodyp,GravBodyPhysical &otherp){
+
     }
 
     void UpdateGravBodyPhysics(GravBodyPhysical& bodyp, int index){
-        ApplyGravityForce(bodyp, index);
-        // todo add collision
-        bodyp.pos += bodyp.vel * updateTimer.dt;
+        for (int j = 0; j < bodies.size(); ++j) {
+            if (index == j) continue; // Skip self
+            auto &otherp = physicalBodies[j];
+            ApplyGravityForce(bodyp, otherp);
+            ApplyCollisionForces(bodyp, otherp);
 
+        }
+        bodyp.pos += bodyp.vel * updateTimer.dt;
     }
 
     void Update(float dt) override {
