@@ -107,7 +107,7 @@ protected:
                 bodyp.vel += forceVector ;
             }
 
-
+            // todo add collision
             bodyp.pos += bodyp.vel * dt;
             body.x = bodyp.pos.x;
             body.y = bodyp.pos.y;
