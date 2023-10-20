@@ -17,6 +17,7 @@ set(SOURCES
         src/window.cc
         src/shader.cc
         src/VertexObject.cc
+        src/Timer.cc
 )
 
 

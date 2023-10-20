@@ -89,7 +89,7 @@ protected:
 
     const float gravityConstant = 10.f;
 
-    void Update() override {
+    void Update(float dt) override {
         // Make circles go in circle. this is temp for testing
         for (int i = 0; i < bodies.size(); ++i) {
             auto &body = bodies[i];
@@ -108,14 +108,14 @@ protected:
             }
 
 
-            bodyp.pos += bodyp.vel * deltaTime/20.0f;
+            bodyp.pos += bodyp.vel * dt;
             body.x = bodyp.pos.x;
             body.y = bodyp.pos.y;
         }
 
     }
 
-    void Draw() override {
+    void Draw(float dt) override {
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
         int size = stride * bodies.size();

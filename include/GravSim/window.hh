@@ -5,6 +5,7 @@
 #include <spdlog/logger.h>
 #include <GLFW/glfw3.h>
 #include <map>
+#include "Timer.hh"
 
 
 class Window {
@@ -20,16 +21,17 @@ protected:
     std::shared_ptr<spdlog::logger> logger;
     int width;
     int height;
-    float deltaTime = 0;
-    double lastFrameTime = 0;
+
+    Timer frameTimer;
+    Timer updateTimer;
 
     virtual void OnResize() {};
 
     virtual void Load() {};
 
-    virtual void Update() {};
+    virtual void Update(float dt) {};
 
-    virtual void Draw() {};
+    virtual void Draw(float dt) {};
 
 private:
 

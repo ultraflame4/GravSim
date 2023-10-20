@@ -59,20 +59,21 @@ void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height
 void Window::run() {
     framebuffer_size_callback(window, width, height); // Call once at the start
     Load();
-    lastFrameTime = glfwGetTime();
+    frameTimer.tick();
+    updateTimer.tick();
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         for (int i = 0; i < 20; ++i) {
-            Update();
+            Update(updateTimer.tick());
         }
 
         glClearColor(.0f, .0f, .0f, .0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        Draw();
+
+        Draw(frameTimer.tick());
         glfwSwapBuffers(window);
-        double now = glfwGetTime();
-        deltaTime = now - lastFrameTime;
-        lastFrameTime = now;
+
+
     }
     glfwTerminate();
 }
