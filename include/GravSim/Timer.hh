@@ -5,9 +5,8 @@
 #pragma once
 
 class Timer {
+public:
     double lastTime = 0;
     float dt = 0;
-
-public:
     float tick();
 };

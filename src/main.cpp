@@ -89,26 +89,33 @@ protected:
 
     const float gravityConstant = 100.f;
 
+    void ApplyGravityForce( GravBodyPhysical& bodyp, int index){
+        for (int j = 0; j < bodies.size(); ++j) {
+            if (index == j) continue; // Skip self
+            auto &other = bodies[j];
+            auto &otherp = physicalBodies[j];
+
+            float distance = glm::distance(bodyp.pos, otherp.pos);
+            float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
+            glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
+            glm::vec2 forceVector = dirVector * ((sharedForce / 2) / bodyp.mass);
+            bodyp.vel += forceVector ;
+        }
+    }
+
+    void UpdateGravBodyPhysics(GravBodyPhysical& bodyp, int index){
+        ApplyGravityForce(bodyp, index);
+        // todo add collision
+        bodyp.pos += bodyp.vel * updateTimer.dt;
+
+    }
+
     void Update(float dt) override {
         // Make circles go in circle. this is temp for testing
         for (int i = 0; i < bodies.size(); ++i) {
             auto &body = bodies[i];
             auto &bodyp = physicalBodies[i];
-
-            for (int j = 0; j < bodies.size(); ++j) {
-                if (i == j) continue; // Skip self
-                auto &other = bodies[j];
-                auto &otherp = physicalBodies[j];
-
-                float distance = glm::distance(bodyp.pos, otherp.pos);
-                float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
-                glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
-                glm::vec2 forceVector = dirVector * ((sharedForce / 2) / bodyp.mass);
-                bodyp.vel += forceVector ;
-            }
-
-            // todo add collision
-            bodyp.pos += bodyp.vel * dt;
+            UpdateGravBodyPhysics(bodyp, i);
             body.x = bodyp.pos.x;
             body.y = bodyp.pos.y;
         }
