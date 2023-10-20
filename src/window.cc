@@ -17,7 +17,7 @@ Window::Window(int width, int height, const std::string &title) {
     logger = logging::get<Window>(title);
 
 
-    GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (window == nullptr)
     {
         logger->critical("Failed to create GLFW window");
@@ -34,6 +34,18 @@ Window::Window(int width, int height, const std::string &title) {
     }
 
     glViewport(0, 0,width, height);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+}
 
+void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
 
+void Window::run() {
+    while(!glfwWindowShouldClose(window))
+    {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    glfwTerminate();
 }
