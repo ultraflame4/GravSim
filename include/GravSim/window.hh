@@ -15,6 +15,10 @@ public:
 protected:
     std::shared_ptr<spdlog::logger> logger;
 
+    virtual void Load(){};
+    virtual void Update(){};
+    virtual void Draw(){};
+
 private:
     static inline bool glfw_initialised =false;
     static void Init();

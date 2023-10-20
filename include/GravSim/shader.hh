@@ -1,0 +1,29 @@
+//
+// Created by powew on 20/10/2023.
+//
+
+#pragma once
+
+#include <glad/glad.h>
+#include <string>
+#include "logging.hh"
+
+enum ShaderType{
+    VERTEX = GL_VERTEX_SHADER,
+    FRAGMENT = GL_FRAGMENT_SHADER,
+};
+
+class Shader {
+public:
+    unsigned int vertexShader;
+    unsigned int fragmentShader;
+
+    Shader();
+
+    void addShader(const std::string &source_path, ShaderType shaderType);
+
+    void build();
+private:
+    static inline std::shared_ptr<spdlog::logger> logger = logging::get<ShaderType>();
+    bool checkCompileSuccess(unsigned int shader);
+};

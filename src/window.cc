@@ -42,6 +42,7 @@ void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height
 }
 
 void Window::run() {
+    Load();
     while(!glfwWindowShouldClose(window))
     {
         glfwSwapBuffers(window);

@@ -7,7 +7,7 @@ project(GravSimm
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 
-
+file(COPY assets DESTINATION ${PROJECT_BINARY_DIR})
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/*.hh" "${PROJECT_SOURCE_DIR}/include/*.hh")
 list(REMOVE_ITEM HEADER_LIST "${PROJECT_SOURCE_DIR}/include/GravSim/meta.hh")
 
@@ -18,6 +18,9 @@ set(SOURCES
         include/GravSim/logging.hh
         src/window.cc
         include/GravSim/window.hh
+        include/GravSim/GravitationalBody.hh
+        src/shader.cc
+        include/GravSim/shader.hh
 )
 
 
