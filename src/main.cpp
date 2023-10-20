@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <algorithm>
 #include "GravSim/logging.hh"
 #include "GravSim/window.hh"
 #include "GravSim/GravitationalBody.hh"
@@ -42,27 +43,27 @@ protected:
                 radius,
                 1, 1, 1
         });
-
         physicalBodies.push_back(GravBodyPhysical{
                 glm::vec2(x, y),
                 glm::vec2(0.0, 0.0),
-                radius,
-                mass
+                mass,
+                radius
         });
+
     }
 
     void OnResize() override {
-        proj = createOrtho(1);
+        proj = createOrtho(1.f);
     }
 
     void Load() override {
         logger->info("Hello world!");
 
 
-        AddBody(-500, 0, 50, 1);
-        AddBody(0, 800, 50, 1);
-        AddBody(500, 0, 80, 3);
-        AddBody(0, -500, 50, 1);
+        AddBody(-500, 0, 50, 100);
+        AddBody(0, 800, 50, 100);
+        AddBody(500, 0, 100, 300);
+        AddBody(0, -500, 50, 100);
 
 
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
@@ -87,7 +88,7 @@ protected:
 
     }
 
-    const float gravityConstant = 100.f;
+    const float gravityConstant = 10.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         float distance = glm::distance(bodyp.pos, otherp.pos);
@@ -99,16 +100,19 @@ protected:
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         glm::vec2 posA = bodyp.pos + bodyp.vel;
         glm::vec2 posB = otherp.pos + bodyp.vel;
-        float collisionDist = bodyp.radius + otherp.radius;
+        float collisionDist = (bodyp.radius + otherp.radius) * 2;
         float currentDist = glm::distance(posA, posB);
-        logger->info("COLLIDE DIST {} CURRENT DIST {}",collisionDist,currentDist);
         if (currentDist < collisionDist) {
 
-            glm::vec2 colNormal = glm::normalize(posA-posB);
+            glm::vec2 colNormal = glm::normalize(posA - posB);
+            glm::vec2 colDir = glm::normalize(bodyp.vel);
             float colForce = glm::length(bodyp.vel);
-            bodyp.vel = glm::vec2(0, 0);
-            bodyp.vel += colNormal*colForce*100.f;
-//            bodyp.Accelerate(colNormal, colForce);
+            glm::vec2 colReflect = glm::reflect(colDir, colNormal);
+            // Clamp reflection force to prevent it from going crazy
+            logger->debug("Reflection {},{} Normal {},{}, Direction {},{}", colReflect.x, colReflect.y, colNormal.x, colNormal.y, colDir.x, colDir.y);
+            bodyp.vel = (colReflect + colNormal*.1f) * std::clamp(colForce,0.f,500.f);
+
+//            bodyp.Accelerate(colNormal, colForce / 2);
         }
     }
 

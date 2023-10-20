@@ -12,7 +12,7 @@ in vec2 pointPos;
 void main()
 {
     float dist = distance(pointPos, gl_FragCoord.xy);
-    if (dist > pRadius) discard;
+//    if (dist > pRadius) discard;
 
     float featherStart = pRadius - feathering;
     float featherVal = dist - featherStart;
