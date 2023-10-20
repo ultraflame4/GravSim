@@ -18,7 +18,7 @@ protected:
 
     int bodyPositions_location;
     int viewport_location;
-    VertexObject* bodies_draw;
+    VertexObject *bodies_draw;
 
     void Load() override {
         logger->info("Hello world!");
@@ -36,10 +36,10 @@ protected:
                 1, 1, 1
         });
 
-        auto* bodiesArr = reinterpret_cast<float *>(bodies.data());
+        auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
         int size = stride * bodies.size();
-        bodies_draw = new VertexObject(size,bodiesArr, stride);
+        bodies_draw = new VertexObject(size, bodiesArr, stride);
 
         bodies_draw->CreateAttrib(2); // Position attribute
         bodies_draw->CreateAttrib(1); // radius attribute
@@ -63,7 +63,7 @@ protected:
 
     void Draw() override {
         shader.use();
-        glUniform4f(viewport_location, 10,10, width, height);
+        glUniform2f(viewport_location, width, height);
         bodies_draw->drawPoints();
 
     }
