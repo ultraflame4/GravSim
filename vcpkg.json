@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "grav-sim",
+  "version-string": "0.0.0",
+  "license": "MIT",
+  "dependencies": [
+    "glfw3",
+    "spdlog",
+    "magic-enum"
+  ]
+}
