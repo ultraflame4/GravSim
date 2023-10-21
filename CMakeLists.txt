@@ -25,6 +25,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 add_executable(GravSim ${SOURCES} ${HEADER_LIST})
 
@@ -33,3 +34,4 @@ target_link_libraries(GravSim PUBLIC spdlog::spdlog)
 target_link_libraries(GravSim PRIVATE glfw)
 target_link_libraries(GravSim PRIVATE glad::glad)
 target_link_libraries(GravSim PRIVATE glm::glm)
+target_link_libraries(GravSim PRIVATE imgui::imgui)

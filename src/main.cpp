@@ -2,6 +2,9 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <algorithm>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include "GravSim/logging.hh"
 #include "GravSim/window.hh"
 #include "GravSim/GravitationalBody.hh"
@@ -205,8 +208,20 @@ protected:
 
 
 int main() {
+// Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
 
     auto window = std::make_shared<Game>(1000, 800, "GravSim");
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window->window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
+
+
     window->run();
 
     return 0;

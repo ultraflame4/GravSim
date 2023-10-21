@@ -11,6 +11,10 @@
     {
       "name": "glad",
       "features": ["gl-api-33", "loader"]
+    },
+    {
+      "name": "imgui",
+      "features": ["glfw-binding","opengl3-binding"]
     }
   ]
 
