@@ -65,13 +65,13 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        filename: '${{ github.workspace }}_release.zip'
+        filename: '${{ github.workspace }}_${{ matrix.os }}_release.zip'
         path: ${{ steps.strings.outputs.build-output-dir }}
         exclusions: '*.git* *.ninja *.cmake CMakeCache.txt CMakeFiles /*vcpkg_installed/*'
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
       with:
-        artifacts: "${{ github.workspace }}_release.zip"
+        artifacts: '${{ github.workspace }}_${{ matrix.os }}_release.zip'
         token: ${{ secrets.GITHUB_TOKEN }}
         allowUpdates: true
     - name: Test
