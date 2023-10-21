@@ -150,7 +150,11 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
     if (debugLines.size() != physicalBodies.size()) {
         debugLines.clear();
         for (const auto &item: physicalBodies){
-            debugLines.emplace_back();
+            auto &line = debugLines.emplace_back();
+            line.color[0] = 0.4f;
+            line.color[1] = 0.9f;
+            line.color[2] = 0.1f;
+            line.thick =1;
         }
     }
 
