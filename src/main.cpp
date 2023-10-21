@@ -71,6 +71,11 @@ protected:
     void OnInput(int key, int action, int mods) override {
         switch (action) {
             case GLFW_RELEASE:
+
+                if (key == GLFW_MOUSE_BUTTON_RIGHT) {
+                    spawningGravBody->active = true;
+                    spawningGravBody = nullptr;
+                }
                 break;
             case GLFW_PRESS:
                 if (key == GLFW_KEY_G) {
@@ -92,7 +97,7 @@ protected:
                     glm::vec3 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
                                                    glm::vec4(0, 0, width, height));
                     logger->debug("Spawn object at {},{},{}", pos.x, pos.y, pos.z);
-                    spawningGravBody = &AddBody(pos.x,pos.y, 10, 10, false);
+                    spawningGravBody = &AddBody(pos.x,-pos.y, 10, 10, false);
                 }
                 break;
             default:
@@ -221,7 +226,7 @@ protected:
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
         int size = stride * bodies.size();
-        
+
         bodies_draw->SetVertices(bodiesArr, size);
 
 
