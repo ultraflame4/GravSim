@@ -19,6 +19,7 @@ set(SOURCES
         src/VertexObject.cc
         src/Timer.cc
         src/TrajectoryLine.cc
+        src/GravitySimulation.cc
 )
 
 

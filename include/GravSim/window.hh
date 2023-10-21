@@ -16,14 +16,15 @@ public:
     static inline std::map<GLFWwindow *, Window *> windows_list{};
 
     void run();
+    Timer frameTimer;
+    Timer updateTimer;
 
-protected:
-    std::shared_ptr<spdlog::logger> logger;
     int width;
     int height;
 
-    Timer frameTimer;
-    Timer updateTimer;
+protected:
+    std::shared_ptr<spdlog::logger> logger;
+
 
     virtual void OnResize() {};
     virtual void OnInput(int key, int action, int mods) {};
