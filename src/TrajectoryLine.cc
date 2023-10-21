@@ -26,14 +26,14 @@ void Line::load() {
 void Line::update() {
 
     float length = glm::length(direction);
-
-    vertices[0] = -1.f;
+    float half = thick/2;
+    vertices[0] = 1.f * half;
     vertices[1] = -1.f;
-    vertices[2] = -1.f * thick;
+    vertices[2] = -1.f * half;
     vertices[3] = -1.f;
-    vertices[4] = -1.f * thick;
+    vertices[4] = -1.f * half;
     vertices[5] = fmax(length , 1.0);
-    vertices[6] = -1.f;
+    vertices[6] = 1.f * half;
     vertices[7] = fmax(length , 1.0);
 
     triangles[0] = 2;
@@ -61,11 +61,11 @@ void Line::draw(glm::mat4 view, glm::mat4 proj) {
     if (!active) return;
 
 
-//    glm::qua qat = glm::rotation(up,glm::normalize(direction));
+    glm::qua qat = glm::rotation(up,glm::normalize(direction));
 //    glm::qua qat(glm::vec3(0.0, 0.0, 0.0));
     glm::mat4 model = glm::mat4(1.f);
-//    model = model * glm::mat4_cast(qat);
     model = glm::translate(model, origin);
+    model = model * glm::mat4_cast(qat);
 
     shader.use();
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
