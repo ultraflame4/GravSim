@@ -62,9 +62,9 @@ protected:
         logger->info("Hello world!");
 
 
-        AddBody(-200, 10, 13, 100);
-        AddBody(0, 0, 15, 200);
-        AddBody(500, 0, 20, 300);
+        AddBody(-200, 10, 10, 10);
+        AddBody(0, 0, 20, 20);
+        AddBody(800, 0, 50, 100);
         AddBody(0, -500, 10, 10);
 
 
@@ -100,23 +100,34 @@ protected:
     }
 
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
+
+
         glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * updateTimer.dt;
+
+
+
         glm::vec2 posB = otherp.last_pos + bodyp.last_vel * updateTimer.dt;
         float collisionDist = (bodyp.radius + otherp.radius) * 2;
+
         float currentDist = glm::distance(posA, posB);
+
+
+
         if (currentDist > collisionDist) {
             return;
         }
+
+
 
         glm::vec2 normal = glm::normalize(posB - posA);
         glm::vec2 incoming = otherp.last_vel + bodyp.last_vel;
         glm::vec2 reflect = -glm::reflect(incoming, normal);
 //        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
-        bodyp.vel = (reflect * .1f);
-
+        bodyp.vel = reflect *.5f;
         // Immediate move the two bodies apart (so that it is not colliding!)
         glm::vec2 move_dir = -glm::normalize(bodyp.last_vel);
-        bodyp.pos = posA + move_dir * (collisionDist - currentDist);
+//        bodyp.pos= posA + move_dir * (collisionDist - currentDist);
+
 
     }
 
