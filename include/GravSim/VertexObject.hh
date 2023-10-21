@@ -11,7 +11,7 @@ class VertexObject {
 public:
     VertexObject(int byteSize, const float *data, int stride);
 
-    void SetVertices( const float *dataArr, int dataCount);
+    void SetVertices( const float *dataArr, int byteSize);
     void SetTriangles(int byteSize, const unsigned int *indices);
     void CreateAttrib(int size);
 
@@ -19,11 +19,13 @@ public:
     void draw();
     void drawPoints();
 
+    ~VertexObject();
+
 private:
 //    static inline std::shared_ptr<spdlog::logger> logger = logging::get<VertexObject>();
     unsigned int vbo;
     unsigned int vao;
-    unsigned int ebo;
+    std::optional<unsigned int> ebo = std::nullopt;
 
     int attr_index = 0;
     int attr_offset = 0;

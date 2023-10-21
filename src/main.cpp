@@ -10,6 +10,7 @@
 #include "GravSim/shader.hh"
 #include "GravSim/VertexObject.hh"
 #include "GravSim/square.hh"
+#include "GravSim/TrajectoryLine.hh"
 
 class Game : public Window {
 public:
@@ -33,6 +34,7 @@ protected:
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
+    Line targetingLine;
 
     bool gravity = true;
     bool collision = true;
@@ -275,6 +277,7 @@ protected:
         glUniform1f(feathering_loc, 1);
         bodies_draw->drawPoints();
 
+        targetingLine.draw(view, proj);
     }
 };
 

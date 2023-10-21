@@ -18,6 +18,7 @@ set(SOURCES
         src/shader.cc
         src/VertexObject.cc
         src/Timer.cc
+        src/TrajectoryLine.cc
 )
 
 
