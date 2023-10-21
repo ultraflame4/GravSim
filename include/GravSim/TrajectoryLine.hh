@@ -9,7 +9,7 @@
 
 class Line {
 public:
-    glm::vec2 origin = glm::vec2(0,0);
+    glm::vec3 origin = glm::vec3(0,0,0);
     glm::vec3 direction = glm::vec3(0,0,0);
 
     float thick = 10;

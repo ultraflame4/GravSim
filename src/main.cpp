@@ -26,7 +26,6 @@ protected:
 
     Line targetingLine;
 
-
     GravitySimulation simulation;
     bool paused = false;
 
@@ -113,6 +112,7 @@ protected:
     }
 
     void Update(float dt) override {
+
         if (paused) return;
         simulation.update();
     }
@@ -147,9 +147,15 @@ protected:
 
         simulation.draw(view,proj);
 
-
         targetingLine.active = spawningGravBody != nullptr;
-        targetingLine.draw(view, proj);
+        if (targetingLine.active) {
+            targetingLine.origin.x = spawningGravBody->pos.x;
+            targetingLine.origin.y = spawningGravBody->pos.y;
+            targetingLine.direction.x = spawningGravBody->vel.x;
+            targetingLine.direction.y = spawningGravBody->vel.y;
+            targetingLine.update();
+            targetingLine.draw(view, proj);
+        }
     }
 };
 

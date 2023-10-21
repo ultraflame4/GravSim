@@ -54,7 +54,7 @@ void VertexObject::SetTriangles(int byteSize, const unsigned int *indices) {
         glGenBuffers(1, &*ebo);
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.value());
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indices, GL_DYNAMIC_DRAW);
     triangles_count = byteSize / sizeof (unsigned int);
 }
 
