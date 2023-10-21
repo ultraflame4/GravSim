@@ -48,7 +48,7 @@ protected:
         bodies.push_back(GravBodyVertex{
                 x, y,
                 radius,
-                1, 1, 1
+                spawnColor[0], spawnColor[1], spawnColor[2]
         });
         physicalBodies.push_back(GravBodyPhysical{
                 active,
@@ -69,6 +69,8 @@ protected:
     GravBodyPhysical *spawningGravBody = nullptr; // grav body currently being spawned
     float spawnMass = 10;
     float spawnRadius = 10;
+    float spawnColor[3] = {1.f,1.f,1.f};
+
     void UpdateSpawningBodyVel() {
         if (spawningGravBody == nullptr) return;
         double xpos, ypos;
@@ -236,14 +238,15 @@ protected:
         ImGui::Text("FPS AVG: %f", 1.f / frameTimer.avg_delta);
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
-        ImGui::Checkbox("Paused", &paused);
-        ImGui::Checkbox("Enable Gravity", &gravity);
-        ImGui::Checkbox("Enable Collisions", &collision);
+        ImGui::Checkbox("Paused [Spacebar]", &paused);
+        ImGui::Checkbox("Enable Gravity [G]", &gravity);
+        ImGui::Checkbox("Enable Collisions [C]", &collision);
         ImGui::SliderFloat("Gravity Constant", &gravityConstant, -100.f, 100.f);
-        if (ImGui::CollapsingHeader("Body Spawn Settings")){
+        if (ImGui::CollapsingHeader("Body Spawn Settings")) {
             ImGui::Text("Right click & drag to spawn bodies");
-            ImGui::SliderFloat("Mass", &spawnMass,1,1000);
-            ImGui::SliderFloat("Radius", &spawnRadius, 5,500);
+            ImGui::SliderFloat("Mass", &spawnMass, 1, 1000);
+            ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
+            ImGui::ColorEdit3("Color", spawnColor);
             if (ImGui::Button("Clear Bodies")) {
                 bodies.clear();
                 physicalBodies.clear();
