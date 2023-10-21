@@ -27,7 +27,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
+      with:
+        submodules: 'recursive'
+        
     - uses: lukka/get-cmake@latest
 
     - run: cmake --version
