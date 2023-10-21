@@ -16,7 +16,7 @@ public:
     float color[3] = {.5f,.5f,.5f};
     bool active = true;
 
-    void load();
+    static void load();
     void update();
     void draw(glm::mat4 view, glm::mat4 proj);
     ~Line();
@@ -25,9 +25,9 @@ private:
     float vertices[8];
     unsigned int triangles[6];
     VertexObject* vo = nullptr;
-    Shader shader;
-    int color_loc;
-    int proj_loc;
-    int view_loc;
-    int model_loc;
+    static inline Shader shader;
+    static inline int color_loc;
+    static inline int proj_loc;
+    static inline int view_loc;
+    static inline int model_loc;
 };

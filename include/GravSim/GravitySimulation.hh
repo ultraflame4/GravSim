@@ -8,6 +8,7 @@
 #include "shader.hh"
 #include "VertexObject.hh"
 #include "window.hh"
+#include "TrajectoryLine.hh"
 
 struct GravBodyVertex {
     float x;
@@ -59,6 +60,7 @@ public:
 
     bool gravity = true;
     bool collision = true;
+    bool debug = false;
 
     void load();
 
@@ -75,5 +77,6 @@ private:
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp);
 
-
+    std::vector<Line> debugLines;
+    void drawDebugLines(glm::mat4 view, glm::mat4 proj);
 };

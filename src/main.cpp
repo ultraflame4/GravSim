@@ -98,7 +98,7 @@ protected:
     void Load() override {
         logger->info("Hello world!");
         simulation.load();
-        targetingLine.load();
+        Line::load();
         AddBody(-200, 10, 1 + 5, 10);
         AddBody(-50, 0, 2 + 5, 20);
         AddBody(800, 0, 1 + 5, 10);
@@ -122,8 +122,6 @@ protected:
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
         ImGui::Checkbox("Paused [Spacebar]", &paused);
-        ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
-        ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -100.f, 100.f);
         if (ImGui::CollapsingHeader("Gravity Bodies",ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
@@ -139,6 +137,11 @@ protected:
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Thickness", &targetingLine.thick, 1, 100);
             ImGui::ColorEdit3("Color", targetingLine.color);
+        }
+        if (ImGui::CollapsingHeader("Debug",ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
+            ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
+            ImGui::Checkbox("Debug Velocity", &simulation.debug);
         }
         ImGui::End();
     }

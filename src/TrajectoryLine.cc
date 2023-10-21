@@ -3,7 +3,6 @@
 //
 
 #include "GravSim/TrajectoryLine.hh"
-#include "GravSim/window.hh"
 #include "GravSim/square.hh"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>

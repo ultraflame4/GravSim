@@ -122,6 +122,10 @@ void GravitySimulation::draw(glm::mat4 view,    glm::mat4 proj) {
     glUniform2f(viewport_loc, window.width, window.height);
     glUniform1f(feathering_loc, 1);
     vo->drawPoints();
+
+    if (debug) {
+        drawDebugLines(view, proj);
+    }
 }
 
 GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
@@ -140,5 +144,25 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
             radius
     });
     return physicalBodies.back();
+}
+
+void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
+    if (debugLines.size() != physicalBodies.size()) {
+        debugLines.clear();
+        for (const auto &item: physicalBodies){
+            debugLines.emplace_back();
+        }
+    }
+
+    for (int i = 0; i < physicalBodies.size(); ++i) {
+        auto &line = debugLines[i];
+        auto &bodyp = physicalBodies[i];
+        line.direction.x = bodyp.vel.x;
+        line.direction.y = bodyp.vel.y;
+        line.origin.x = bodyp.pos.x;
+        line.origin.y = bodyp.pos.y;
+        line.update();
+        line.draw(view, proj);
+    }
 }
 
