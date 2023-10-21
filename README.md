@@ -22,8 +22,11 @@ git clone https://github.com/ultraflame4/GravSim.git --recursive --depth=1
 ```shell
 cmake -S . -B build -G Ninja
 ```
-
-Section WIP
+3. Build the project with.
+```shell
+cmake --build build
+```
+4. Run the executable `GravSim.exe` in the build folder
 
 ## Notes:
 1. The collision physics is very buggy.
