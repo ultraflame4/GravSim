@@ -132,7 +132,7 @@ protected:
             ImGui::ColorEdit3("Spawn Color", spawnColor);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.bodies.clear();
-                simulation.bodies.clear();
+                simulation.physicalBodies.clear();
             }
         }
         if (ImGui::CollapsingHeader("Trajectory Line",ImGuiTreeNodeFlags_DefaultOpen)) {
