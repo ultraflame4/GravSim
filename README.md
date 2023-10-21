@@ -7,3 +7,7 @@ This project uses cmake.
 Use cmake to build.
 
 Section WIP
+
+## Notes:
+1. The collision physics is very buggy.
+2. Spawning too many bodies will make them disappear. I have no idea why.
