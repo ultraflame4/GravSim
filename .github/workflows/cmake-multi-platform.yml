@@ -58,6 +58,18 @@ jobs:
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
+    - name: Archive Release
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        filename: '${{ github.workspace }}_release.zip'
+        path: ${{ steps.strings.outputs.build-output-dir }}
+        exclusions: '*.git* *.ninja *.cmake CMakeCache.txt CMakeFiles /*vcpkg_installed/*'
+    - name: Upload Release
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        artifacts: "${{ github.workspace }}_release.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
