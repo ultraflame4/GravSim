@@ -62,6 +62,7 @@ public:
     bool collision = true;
     bool debug = false;
 
+    void clear();
     void load();
 
     void update();

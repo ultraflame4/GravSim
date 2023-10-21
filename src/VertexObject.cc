@@ -14,6 +14,16 @@ VertexObject::VertexObject(int byteSize, const float *data, int stride) {
     glBindVertexArray(vao);
     CheckGLErrors();
 }
+void VertexObject::SetTriangles(int byteSize, const unsigned int *indices) {
+    if (!ebo.has_value()) {
+        ebo = 0;
+        glGenBuffers(1, &*ebo);
+    }
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.value());
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indices, GL_DYNAMIC_DRAW);
+    triangles_count = byteSize / sizeof (unsigned int);
+}
+
 void VertexObject::SetVertices(const float *dataArr, int byteSize) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, byteSize, dataArr, GL_DYNAMIC_DRAW);
@@ -42,25 +52,15 @@ void VertexObject::draw() {
     glDrawElements(GL_TRIANGLES, triangles_count, GL_UNSIGNED_INT, nullptr);
 }
 
+
 void VertexObject::drawPoints() {
     bind();
     glDrawArrays( GL_POINTS, 0, vertex_count );
 }
 
-
-void VertexObject::SetTriangles(int byteSize, const unsigned int *indices) {
-    if (!ebo.has_value()) {
-        ebo = 0;
-        glGenBuffers(1, &*ebo);
-    }
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.value());
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, byteSize, indices, GL_DYNAMIC_DRAW);
-    triangles_count = byteSize / sizeof (unsigned int);
-}
-
 VertexObject::~VertexObject() {
-    glDeleteBuffers(1,&vao);
-    glDeleteBuffers(1,&vbo);
+    glDeleteVertexArrays(1,&vao);
+    glDeleteBuffers(1, &vbo);
     if (ebo.has_value()) {
         glDeleteBuffers(1,&*ebo);
     }

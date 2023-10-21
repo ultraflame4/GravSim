@@ -166,3 +166,9 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
     }
 }
 
+void GravitySimulation::clear() {
+    physicalBodies.clear();
+    bodies.clear();
+    debugLines.clear();
+}
+

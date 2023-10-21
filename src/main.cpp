@@ -129,8 +129,7 @@ protected:
             ImGui::SliderFloat("Spawn Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Spawn Color", spawnColor);
             if (ImGui::Button("Clear Bodies")) {
-                simulation.bodies.clear();
-                simulation.physicalBodies.clear();
+                simulation.clear();
             }
         }
         if (ImGui::CollapsingHeader("Trajectory Line",ImGuiTreeNodeFlags_DefaultOpen)) {
