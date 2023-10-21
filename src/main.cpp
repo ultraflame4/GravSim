@@ -3,8 +3,7 @@
 #include <glm/ext.hpp>
 #include <algorithm>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+
 #include "GravSim/logging.hh"
 #include "GravSim/window.hh"
 #include "GravSim/GravitationalBody.hh"
@@ -45,13 +44,14 @@ protected:
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
     }
 
-    void AddBody(float x, float y, float radius, float mass) {
+    void AddBody(float x, float y, float radius, float mass, bool active = true) {
         bodies.push_back(GravBodyVertex{
                 x, y,
                 radius,
                 1, 1, 1
         });
         physicalBodies.push_back(GravBodyPhysical{
+                active,
                 glm::vec2(x, y),
                 glm::vec2(x, y),
                 glm::vec2(0, 0),
@@ -86,13 +86,13 @@ protected:
         logger->info("Hello world!");
 
 
-        AddBody(-200, 10, 1+5, 10);
-        AddBody(-50, 0, 2+5, 20);
-        AddBody(800, 0, 1+5, 10);
+        AddBody(-200, 10, 1 + 5, 10);
+        AddBody(-50, 0, 2 + 5, 20);
+        AddBody(800, 0, 1 + 5, 10);
         AddBody(0, 0, 15, 500);
-        AddBody(0, -500, 1+5, 10);
-        AddBody(200, -100, 4+5, 40);
-        AddBody(200, -500, 4+5, 40);
+        AddBody(0, -500, 1 + 5, 10);
+        AddBody(200, -100, 4 + 5, 40);
+        AddBody(200, -500, 4 + 5, 40);
 
 
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
@@ -117,7 +117,7 @@ protected:
 
     }
 
-    const float gravityConstant = 50.f;
+    float gravityConstant = 50.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         if (!gravity) return;
@@ -154,6 +154,7 @@ protected:
     }
 
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
+        if (!bodyp.active) return;
         for (int j = 0; j < bodies.size(); ++j) {
             if (index == j) continue; // Skip self
             auto &otherp = physicalBodies[j];
@@ -187,6 +188,15 @@ protected:
 
     }
 
+    void OnImGui_Draw() override {
+        ImGui::Begin("Simulation Config");
+        ImGui::Checkbox("Paused", &paused);
+        ImGui::Checkbox("Enable Gravity", &gravity);
+        ImGui::Checkbox("Enable Collisions", &collision);
+        ImGui::SliderFloat("Gravity Constant", &gravityConstant, -100.f, 100.f);
+        ImGui::End();
+    }
+
     void Draw(float dt) override {
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
@@ -208,19 +218,8 @@ protected:
 
 
 int main() {
-// Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
 
     auto window = std::make_shared<Game>(1000, 800, "GravSim");
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window->window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-    ImGui_ImplOpenGL3_Init();
-
 
     window->run();
 

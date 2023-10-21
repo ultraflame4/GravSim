@@ -2,7 +2,9 @@
 #include <GLFW/glfw3.h>
 #include "GravSim/window.hh"
 #include "GravSim/logging.hh"
-
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 void Window::Init() {
     glfwInit();
@@ -44,6 +46,8 @@ Window::Window(int width, int height, const std::string &title) {
     glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
     glfwSetKeyCallback(window, static_key_callback);
     windows_list[window] = this;
+
+    InitIMGUI();
 }
 
 void Window::static_framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -75,9 +79,32 @@ void Window::run() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         Draw(frameTimer.tick());
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        OnImGui_Draw();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
-
-
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glfwTerminate();
+}
+
+void Window::InitIMGUI() {
+// Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
 }

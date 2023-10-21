@@ -16,6 +16,7 @@ struct GravBodyVertex{
 static_assert(sizeof(GravBodyVertex) == sizeof (float ) * 6, "ERROR GravBodyVertex struct contains padding!");
 
 struct GravBodyPhysical{
+    bool active;
     glm::vec2 pos;
     glm::vec2 last_pos;
     glm::vec2 vel;
