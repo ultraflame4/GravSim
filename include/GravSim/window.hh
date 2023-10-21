@@ -26,6 +26,7 @@ protected:
     Timer updateTimer;
 
     virtual void OnResize() {};
+    virtual void OnInput(int key, int scancode, int action, int mods) {};
 
     virtual void Load() {};
 
@@ -41,6 +42,7 @@ private:
     static void Init();
 
     static void static_framebuffer_size_callback(GLFWwindow *window, int width, int height);
+    static void static_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 

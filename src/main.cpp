@@ -31,6 +31,10 @@ protected:
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
+
+    bool gravity = true;
+    bool collision = true;
+
     glm::mat4 createOrtho(float size, float zNear = .1f, float zFar = 100.0f) {
         float halfW = size * width;
         float halfH = size * height;
@@ -56,6 +60,18 @@ protected:
 
     void OnResize() override {
         proj = createOrtho(1.f);
+    }
+
+    void OnInput(int key, int scancode, int action, int mods) override {
+        if (action != GLFW_PRESS) return;
+        if (key == GLFW_KEY_G) {
+            gravity = !gravity;
+            logger->info("Gravity enabled: {}", gravity);
+        }
+        if (key == GLFW_KEY_C) {
+            collision = !collision;
+            logger->info("Collision enabled: {}", collision);
+        }
     }
 
     void Load() override {
@@ -96,6 +112,7 @@ protected:
     const float gravityConstant = 50.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
+        if (!gravity) return;
         float distance = glm::distance(bodyp.pos, otherp.pos);
         float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
         glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
@@ -103,7 +120,7 @@ protected:
     }
 
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
-
+        if (!collision) return;
 
         glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * updateTimer.dt;
 

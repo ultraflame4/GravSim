@@ -42,11 +42,15 @@ Window::Window(int width, int height, const std::string &title) {
     this->width = width;
     this->height = height;
     glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
+    glfwSetKeyCallback(window, static_key_callback);
     windows_list[window] = this;
 }
 
 void Window::static_framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     windows_list[window]->framebuffer_size_callback(window, width, height);
+}
+void Window::static_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    windows_list[window]->OnInput(key,scancode,action,mods);
 }
 
 void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
