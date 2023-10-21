@@ -63,8 +63,8 @@ protected:
 
 
         AddBody(-200, 10, 10, 10);
-        AddBody(-10, 0, 20, 20);
-        AddBody(800, 0, 50, 100);
+        AddBody(-50, 0, 20, 200);
+        AddBody(800, 0, 10, 10);
         AddBody(0, -500, 10, 10);
 
 
@@ -90,7 +90,7 @@ protected:
 
     }
 
-    const float gravityConstant = 100.f;
+    const float gravityConstant = 10.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         float distance = glm::distance(bodyp.pos, otherp.pos);
@@ -105,12 +105,10 @@ protected:
         glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * updateTimer.dt;
 
 
-
         glm::vec2 posB = otherp.last_pos + bodyp.last_vel * updateTimer.dt;
         float collisionDist = (bodyp.radius + otherp.radius) * 2;
 
         float currentDist = glm::distance(posA, posB);
-
 
 
         if (currentDist > collisionDist) {
@@ -118,12 +116,11 @@ protected:
         }
 
 
-
         glm::vec2 normal = glm::normalize(posB - posA);
-        glm::vec2 incoming = otherp.last_vel + bodyp.last_vel;
-        glm::vec2 reflect = -glm::reflect(incoming, normal);
+        glm::vec2 incoming = bodyp.last_vel - otherp.last_vel;
+        glm::vec2 reflect = glm::reflect(incoming, normal);
 //        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
-        bodyp.vel = reflect *.5f;
+        bodyp.vel = reflect * .5f;
 
 
     }
