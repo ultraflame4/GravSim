@@ -73,6 +73,14 @@ protected:
             case GLFW_RELEASE:
 
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
+                    double xpos, ypos;
+                    glfwGetCursorPos(window, &xpos, &ypos);
+                    glm::vec2 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
+                                                   glm::vec4(0, 0, width, height));
+                    pos.y = -pos.y;
+                    glm::vec2 vel = spawningGravBody->pos - pos;
+
+                    spawningGravBody->vel = vel;
                     spawningGravBody->active = true;
                     spawningGravBody = nullptr;
                 }
@@ -94,10 +102,11 @@ protected:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
                     double xpos, ypos;
                     glfwGetCursorPos(window, &xpos, &ypos);
-                    glm::vec3 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
+                    glm::vec2 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
                                                    glm::vec4(0, 0, width, height));
-                    logger->debug("Spawn object at {},{},{}", pos.x, pos.y, pos.z);
-                    spawningGravBody = &AddBody(pos.x,-pos.y, 10, 10, false);
+                    pos.y = -pos.y;
+                    logger->debug("Spawn object at {},{}", pos.x, pos.y);
+                    spawningGravBody = &AddBody(pos.x,pos.y, 10, 10, false);
                 }
                 break;
             default:
