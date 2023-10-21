@@ -20,6 +20,7 @@ set(SOURCES
         src/Timer.cc
         src/TrajectoryLine.cc
         src/GravitySimulation.cc
+        include/GravSim/utils.hh
 )
 
 

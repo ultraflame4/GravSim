@@ -54,8 +54,8 @@ void Line::update() {
 }
 
 const auto up = glm::vec3(0, 1, 0);
-const auto right = glm::vec3(1, 0, 0);
-const auto forward = glm::vec3(0, 0, 1);
+//const auto right = glm::vec3(1, 0, 0);
+//const auto forward = glm::vec3(0, 0, 1);
 
 void Line::draw(glm::mat4 view, glm::mat4 proj) {
     if (!active) return;

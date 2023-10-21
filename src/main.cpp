@@ -11,6 +11,7 @@
 #include "GravSim/VertexObject.hh"
 #include "GravSim/square.hh"
 #include "GravSim/TrajectoryLine.hh"
+#include "GravSim/utils.hh"
 
 class Game : public Window {
 public:
@@ -20,7 +21,7 @@ public:
 
 protected:
 
-    glm::mat4 model = glm::mat4(1.0f);
+
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
@@ -48,9 +49,7 @@ protected:
         if (spawningGravBody == nullptr) return;
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        glm::vec2 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
-                                       glm::vec4(0, 0, width, height));
-        pos.y = -pos.y;
+        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, *this);
         glm::vec2 vel = spawningGravBody->pos - pos;
         spawningGravBody->vel = vel;
     }
@@ -82,9 +81,7 @@ protected:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
                     double xpos, ypos;
                     glfwGetCursorPos(window, &xpos, &ypos);
-                    glm::vec2 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
-                                                   glm::vec4(0, 0, width, height));
-                    pos.y = -pos.y;
+                    glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, *this);
                     logger->debug("Spawn object at {},{}", pos.x, pos.y);
                     spawningGravBody = &AddBody(pos.x, pos.y, spawnRadius, spawnMass, false);
                 }
