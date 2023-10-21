@@ -44,7 +44,7 @@ protected:
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
     }
 
-    void AddBody(float x, float y, float radius, float mass, bool active = true) {
+    GravBodyPhysical & AddBody(float x, float y, float radius, float mass, bool active = true) {
         bodies.push_back(GravBodyVertex{
                 x, y,
                 radius,
@@ -59,27 +59,47 @@ protected:
                 mass,
                 radius
         });
-
+        return physicalBodies.back();
     }
 
     void OnResize() override {
         proj = createOrtho(1.f);
     }
 
-    void OnInput(int key, int scancode, int action, int mods) override {
-        if (action != GLFW_PRESS) return;
-        if (key == GLFW_KEY_G) {
-            gravity = !gravity;
-            logger->info("Gravity enabled: {}", gravity);
+    GravBodyPhysical* spawningGravBody = nullptr; // grav body currently being spawned
+
+    void OnInput(int key, int action, int mods) override {
+        switch (action) {
+            case GLFW_RELEASE:
+                break;
+            case GLFW_PRESS:
+                if (key == GLFW_KEY_G) {
+                    gravity = !gravity;
+                    logger->info("Gravity enabled: {}", gravity);
+                }
+                if (key == GLFW_KEY_C) {
+                    collision = !collision;
+                    logger->info("Collision enabled: {}", collision);
+                }
+                if (key == GLFW_KEY_SPACE) {
+                    paused = !paused;
+                    logger->info("Paused enabled: {}", paused);
+                }
+
+                if (key == GLFW_MOUSE_BUTTON_RIGHT) {
+                    double xpos, ypos;
+                    glfwGetCursorPos(window, &xpos, &ypos);
+                    glm::vec3 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
+                                                   glm::vec4(0, 0, width, height));
+                    logger->debug("Spawn object at {},{},{}", pos.x, pos.y, pos.z);
+                    spawningGravBody = &AddBody(pos.x,pos.y, 10, 10, false);
+                }
+                break;
+            default:
+                break;
         }
-        if (key == GLFW_KEY_C) {
-            collision = !collision;
-            logger->info("Collision enabled: {}", collision);
-        }
-        if (key == GLFW_KEY_SPACE) {
-            paused = !paused;
-            logger->info("Paused enabled: {}", paused);
-        }
+
+
     }
 
     void Load() override {
@@ -201,6 +221,7 @@ protected:
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
         int size = stride * bodies.size();
+        
         bodies_draw->SetVertices(bodiesArr, size);
 
 

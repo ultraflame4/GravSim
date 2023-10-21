@@ -45,6 +45,7 @@ Window::Window(int width, int height, const std::string &title) {
     this->height = height;
     glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
     glfwSetKeyCallback(window, static_key_callback);
+    glfwSetMouseButtonCallback(window, static_mousebtn_callback);
     windows_list[window] = this;
 
     InitIMGUI();
@@ -54,8 +55,12 @@ void Window::static_framebuffer_size_callback(GLFWwindow *window, int width, int
     windows_list[window]->framebuffer_size_callback(window, width, height);
 }
 void Window::static_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    windows_list[window]->OnInput(key,scancode,action,mods);
+    windows_list[window]->OnInput(key, action, mods);
 }
+void Window::static_mousebtn_callback(GLFWwindow *window, int key, int action, int mods) {
+    windows_list[window]->OnInput(key, action, mods);
+}
+
 
 void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     this->width = width;

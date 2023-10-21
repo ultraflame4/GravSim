@@ -26,7 +26,7 @@ protected:
     Timer updateTimer;
 
     virtual void OnResize() {};
-    virtual void OnInput(int key, int scancode, int action, int mods) {};
+    virtual void OnInput(int key, int action, int mods) {};
     virtual void OnImGui_Draw() {};
 
     virtual void Load() {};
@@ -48,4 +48,6 @@ private:
     void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
     void InitIMGUI();
+
+    static void static_mousebtn_callback(GLFWwindow* window, int key, int action, int mods);
 };
