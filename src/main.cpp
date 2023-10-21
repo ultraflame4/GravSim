@@ -67,7 +67,8 @@ protected:
     }
 
     GravBodyPhysical *spawningGravBody = nullptr; // grav body currently being spawned
-
+    float spawnMass = 10;
+    float spawnRadius = 10;
     void UpdateSpawningBodyVel() {
         if (spawningGravBody == nullptr) return;
         double xpos, ypos;
@@ -110,7 +111,7 @@ protected:
                                                    glm::vec4(0, 0, width, height));
                     pos.y = -pos.y;
                     logger->debug("Spawn object at {},{}", pos.x, pos.y);
-                    spawningGravBody = &AddBody(pos.x, pos.y, 10, 10, false);
+                    spawningGravBody = &AddBody(pos.x, pos.y, spawnRadius, spawnMass, false);
                 }
                 break;
             default:
@@ -182,11 +183,10 @@ protected:
 
 
         glm::vec2 normal = glm::normalize(posB - posA);
-        glm::vec2 incoming = bodyp.last_vel - otherp.last_vel;
+        glm::vec2 incoming = otherp.last_vel - bodyp.last_vel ;
         glm::vec2 reflect = glm::reflect(incoming, normal);
 //        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
         bodyp.vel = reflect * .5f;
-
 
     }
 
@@ -233,13 +233,18 @@ protected:
         ImGui::Begin("Simulation Config");
         ImGui::Text("Bodies count: %d", (int) physicalBodies.size());
         ImGui::Text("FPS: %f", 1.f / frameTimer.delta);
-        ImGui::Text("AVG FPS: %f", 1.f / frameTimer.avg_delta);
+        ImGui::Text("FPS AVG: %f", 1.f / frameTimer.avg_delta);
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
-        ImGui::Text("AVG: %f", 1.f / updateTimer.avg_delta);
+        ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
         ImGui::Checkbox("Paused", &paused);
         ImGui::Checkbox("Enable Gravity", &gravity);
         ImGui::Checkbox("Enable Collisions", &collision);
         ImGui::SliderFloat("Gravity Constant", &gravityConstant, -100.f, 100.f);
+        if (ImGui::CollapsingHeader("Body Spawn Settings")){
+            ImGui::Text("Right click & drag to spawn bodies");
+            ImGui::SliderFloat("Mass", &spawnMass,1,1000);
+            ImGui::SliderFloat("Radius", &spawnRadius, 5,500);
+        }
         ImGui::End();
     }
 
