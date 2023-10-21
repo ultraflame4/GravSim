@@ -34,6 +34,7 @@ protected:
 
     bool gravity = true;
     bool collision = true;
+    bool paused = false;
 
     glm::mat4 createOrtho(float size, float zNear = .1f, float zFar = 100.0f) {
         float halfW = size * width;
@@ -71,6 +72,10 @@ protected:
         if (key == GLFW_KEY_C) {
             collision = !collision;
             logger->info("Collision enabled: {}", collision);
+        }
+        if (key == GLFW_KEY_SPACE) {
+            paused = !paused;
+            logger->info("Paused enabled: {}", paused);
         }
     }
 
@@ -159,12 +164,15 @@ protected:
             ApplyCollisionForces(bodyp, otherp);
         }
 
+
         bodyp.pos += bodyp.vel * updateTimer.dt;
         bodyp.last_pos = bodyp.pos;
 
     }
 
     void Update(float dt) override {
+        if (paused) return;
+
         // Make circles go in circle. this is temp for testing
         for (int i = 0; i < bodies.size(); ++i) {
             auto &body = bodies[i];
