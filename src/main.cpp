@@ -183,7 +183,7 @@ protected:
 
 
         glm::vec2 normal = glm::normalize(posB - posA);
-        glm::vec2 incoming = otherp.last_vel - bodyp.last_vel ;
+        glm::vec2 incoming = bodyp.last_vel - otherp.last_vel;
         glm::vec2 reflect = glm::reflect(incoming, normal);
 //        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
         bodyp.vel = reflect * .5f;
@@ -244,6 +244,11 @@ protected:
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Mass", &spawnMass,1,1000);
             ImGui::SliderFloat("Radius", &spawnRadius, 5,500);
+            if (ImGui::Button("Clear Bodies")) {
+                bodies.clear();
+                physicalBodies.clear();
+            }
+
         }
         ImGui::End();
     }
