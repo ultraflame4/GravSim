@@ -128,16 +128,20 @@ protected:
         ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
         ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -100.f, 100.f);
-        if (ImGui::CollapsingHeader("Body Spawn Settings")) {
+        if (ImGui::CollapsingHeader("Gravity Bodies",ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
-            ImGui::SliderFloat("Mass", &spawnMass, 1, 1000);
-            ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
-            ImGui::ColorEdit3("Color", spawnColor);
+            ImGui::SliderFloat("Spawn Mass", &spawnMass, 1, 1000);
+            ImGui::SliderFloat("Spawn Radius", &spawnRadius, 5, 500);
+            ImGui::ColorEdit3("Spawn Color", spawnColor);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.bodies.clear();
                 simulation.bodies.clear();
             }
-
+        }
+        if (ImGui::CollapsingHeader("Trajectory Line",ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Text("Right click & drag to spawn bodies");
+            ImGui::SliderFloat("Thickness", &targetingLine.thick, 1, 100);
+            ImGui::ColorEdit3("Color", targetingLine.color);
         }
         ImGui::End();
     }
