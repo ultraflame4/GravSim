@@ -62,10 +62,13 @@ protected:
         logger->info("Hello world!");
 
 
-        AddBody(-200, 10, 10, 10);
-        AddBody(-50, 0, 20, 200);
-        AddBody(800, 0, 10, 10);
-        AddBody(0, -500, 10, 10);
+        AddBody(-200, 10, 1+5, 10);
+        AddBody(-50, 0, 2+5, 20);
+        AddBody(800, 0, 1+5, 10);
+        AddBody(0, 0, 15, 500);
+        AddBody(0, -500, 1+5, 10);
+        AddBody(200, -100, 4+5, 40);
+        AddBody(200, -500, 4+5, 40);
 
 
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
@@ -90,7 +93,7 @@ protected:
 
     }
 
-    const float gravityConstant = 10.f;
+    const float gravityConstant = 50.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
         float distance = glm::distance(bodyp.pos, otherp.pos);
