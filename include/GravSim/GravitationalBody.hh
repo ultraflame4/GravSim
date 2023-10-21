@@ -17,11 +17,18 @@ static_assert(sizeof(GravBodyVertex) == sizeof (float ) * 6, "ERROR GravBodyVert
 
 struct GravBodyPhysical{
     glm::vec2 pos;
+    glm::vec2 last_pos;
     glm::vec2 vel;
+    glm::vec2 last_vel;
     float mass;
     float radius;
+    int index;
 
     void Accelerate(glm::vec2 direction, float forceAmt){
         vel += direction * (forceAmt / mass);
+    }
+
+    void addImmediateForce(glm::vec2 direction, float forceAmt){
+        vel = direction * (forceAmt / mass);
     }
 };

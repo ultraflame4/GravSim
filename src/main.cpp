@@ -45,7 +45,9 @@ protected:
         });
         physicalBodies.push_back(GravBodyPhysical{
                 glm::vec2(x, y),
-                glm::vec2(0.0, 0.0),
+                glm::vec2(x, y),
+                glm::vec2(-x, 0),
+                glm::vec2(0, 0),
                 mass,
                 radius
         });
@@ -60,10 +62,10 @@ protected:
         logger->info("Hello world!");
 
 
-        AddBody(-500, 0, 50, 100);
-        AddBody(0, 800, 50, 100);
-        AddBody(500, 0, 100, 300);
-        AddBody(0, -500, 50, 100);
+        AddBody(-200, 10, 13, 100);
+        AddBody(0, 0, 15, 200);
+        AddBody(500, 0, 20, 300);
+        AddBody(0, -500, 10, 10);
 
 
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
@@ -98,22 +100,24 @@ protected:
     }
 
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
-        glm::vec2 posA = bodyp.pos + bodyp.vel;
-        glm::vec2 posB = otherp.pos + bodyp.vel;
+        glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * updateTimer.dt;
+        glm::vec2 posB = otherp.last_pos + bodyp.last_vel * updateTimer.dt;
         float collisionDist = (bodyp.radius + otherp.radius) * 2;
         float currentDist = glm::distance(posA, posB);
-        if (currentDist < collisionDist) {
-            glm::vec2 colNormal = glm::normalize(posA - posB);
-            glm::vec2 colDir = glm::normalize(bodyp.vel);
-            float colForce = glm::length(bodyp.vel);
-            glm::vec2 colReflect = colNormal - 2 * glm::dot(colDir,colNormal) * colDir;
-            // Clamp reflection force to prevent it from going crazy
-//            logger->debug("Reflection {},{} Normal {},{}, Direction {},{}", colReflect.x, colReflect.y, colNormal.x, colNormal.y, colDir.x, colDir.y);
-            bodyp.vel = colReflect  * std::clamp(colForce,0.f,500.f);
-//            bodyp.vel += colNormal * colForce * .5f;
-
-//            bodyp.Accelerate(colNormal, colForce / 2);
+        if (currentDist > collisionDist) {
+            return;
         }
+
+        glm::vec2 normal = glm::normalize(posB - posA);
+        glm::vec2 incoming = otherp.last_vel + bodyp.last_vel;
+        glm::vec2 reflect = -glm::reflect(incoming, normal);
+//        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
+        bodyp.vel = (reflect * .1f);
+
+        // Immediate move the two bodies apart (so that it is not colliding!)
+        glm::vec2 move_dir = -glm::normalize(bodyp.last_vel);
+        bodyp.pos = posA + move_dir * (collisionDist - currentDist);
+
     }
 
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
@@ -121,9 +125,18 @@ protected:
             if (index == j) continue; // Skip self
             auto &otherp = physicalBodies[j];
             ApplyGravityForce(bodyp, otherp);
+        }
+
+        bodyp.last_vel = bodyp.vel;
+        for (int j = 0; j < bodies.size(); ++j) {
+            if (index == j) continue; // Skip self
+            auto &otherp = physicalBodies[j];
             ApplyCollisionForces(bodyp, otherp);
         }
+
         bodyp.pos += bodyp.vel * updateTimer.dt;
+        bodyp.last_pos = bodyp.pos;
+
     }
 
     void Update(float dt) override {
