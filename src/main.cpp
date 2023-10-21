@@ -46,7 +46,7 @@ protected:
         physicalBodies.push_back(GravBodyPhysical{
                 glm::vec2(x, y),
                 glm::vec2(x, y),
-                glm::vec2(-x, 0),
+                glm::vec2(0, 0),
                 glm::vec2(0, 0),
                 mass,
                 radius
@@ -63,7 +63,7 @@ protected:
 
 
         AddBody(-200, 10, 10, 10);
-        AddBody(0, 0, 20, 20);
+        AddBody(-10, 0, 20, 20);
         AddBody(800, 0, 50, 100);
         AddBody(0, -500, 10, 10);
 
@@ -124,9 +124,6 @@ protected:
         glm::vec2 reflect = -glm::reflect(incoming, normal);
 //        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
         bodyp.vel = reflect *.5f;
-        // Immediate move the two bodies apart (so that it is not colliding!)
-        glm::vec2 move_dir = -glm::normalize(bodyp.last_vel);
-//        bodyp.pos= posA + move_dir * (collisionDist - currentDist);
 
 
     }
