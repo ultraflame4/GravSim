@@ -36,7 +36,7 @@ void VertexObject::bind() {
 void VertexObject::draw() {
     bind();
     if (!ebo.has_value()) {
-        throw std::runtime_error("Triangles not set!")
+        throw std::runtime_error("Triangles not set!");
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.value());
     glDrawElements(GL_TRIANGLES, triangles_count, GL_UNSIGNED_INT, nullptr);

@@ -128,7 +128,7 @@ protected:
     void Load() override {
         logger->info("Hello world!");
 
-
+        targetingLine.load();
         AddBody(-200, 10, 1 + 5, 10);
         AddBody(-50, 0, 2 + 5, 20);
         AddBody(800, 0, 1 + 5, 10);
@@ -277,6 +277,7 @@ protected:
         glUniform1f(feathering_loc, 1);
         bodies_draw->drawPoints();
 
+        targetingLine.active = spawningGravBody != nullptr;
         targetingLine.draw(view, proj);
     }
 };

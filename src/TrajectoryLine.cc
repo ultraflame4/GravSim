@@ -3,13 +3,21 @@
 //
 
 #include "GravSim/TrajectoryLine.hh"
+#include "GravSim/window.hh"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 
 void Line::load() {
-
+    shader.addShader("./assets/line.vertex.glsl", ShaderType::VERTEX);
+    shader.addShader("./assets/line.fragment.glsl", ShaderType::FRAGMENT);
+    shader.build();
+    shader.use();
+    model_loc = shader.getUniformLoc("model");
+    view_loc = shader.getUniformLoc("view");
+    proj_loc = shader.getUniformLoc("proj");
+    color_loc = shader.getUniformLoc("color");
 
 }
 
@@ -43,12 +51,18 @@ void Line::update() {
 }
 
 const auto up = glm::vec3(0, 1, 0);
+
 void Line::draw(glm::mat4 view, glm::mat4 proj) {
     if (!active) return;
     update();
     glm::qua qat = glm::quatLookAt(direction, up);
     glm::mat4 model = glm::toMat4(qat);
 
+    shader.use();
+    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj));
+    glUniform3f(color_loc, .5f,.9f,.9f);
     vo->draw();
 }
 
