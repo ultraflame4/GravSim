@@ -44,7 +44,7 @@ protected:
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
     }
 
-    GravBodyPhysical & AddBody(float x, float y, float radius, float mass, bool active = true) {
+    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true) {
         bodies.push_back(GravBodyVertex{
                 x, y,
                 radius,
@@ -66,21 +66,25 @@ protected:
         proj = createOrtho(1.f);
     }
 
-    GravBodyPhysical* spawningGravBody = nullptr; // grav body currently being spawned
+    GravBodyPhysical *spawningGravBody = nullptr; // grav body currently being spawned
+
+    void UpdateSpawningBodyVel() {
+        if (spawningGravBody == nullptr) return;
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        glm::vec2 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
+                                       glm::vec4(0, 0, width, height));
+        pos.y = -pos.y;
+        glm::vec2 vel = spawningGravBody->pos - pos;
+        spawningGravBody->vel = vel;
+    }
+
 
     void OnInput(int key, int action, int mods) override {
         switch (action) {
             case GLFW_RELEASE:
 
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
-                    double xpos, ypos;
-                    glfwGetCursorPos(window, &xpos, &ypos);
-                    glm::vec2 pos = glm::unProject(glm::vec3(xpos, ypos, 0), model, proj,
-                                                   glm::vec4(0, 0, width, height));
-                    pos.y = -pos.y;
-                    glm::vec2 vel = spawningGravBody->pos - pos;
-
-                    spawningGravBody->vel = vel;
                     spawningGravBody->active = true;
                     spawningGravBody = nullptr;
                 }
@@ -106,7 +110,7 @@ protected:
                                                    glm::vec4(0, 0, width, height));
                     pos.y = -pos.y;
                     logger->debug("Spawn object at {},{}", pos.x, pos.y);
-                    spawningGravBody = &AddBody(pos.x,pos.y, 10, 10, false);
+                    spawningGravBody = &AddBody(pos.x, pos.y, 10, 10, false);
                 }
                 break;
             default:
@@ -154,7 +158,6 @@ protected:
     float gravityConstant = 50.f;
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
-        if (!gravity) return;
         float distance = glm::distance(bodyp.pos, otherp.pos);
         float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
         glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
@@ -162,12 +165,12 @@ protected:
     }
 
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
-        if (!collision) return;
-
-        glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * updateTimer.dt;
 
 
-        glm::vec2 posB = otherp.last_pos + bodyp.last_vel * updateTimer.dt;
+        glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * updateTimer.delta;
+
+
+        glm::vec2 posB = otherp.last_pos + bodyp.last_vel * updateTimer.delta;
         float collisionDist = (bodyp.radius + otherp.radius) * 2;
 
         float currentDist = glm::distance(posA, posB);
@@ -189,21 +192,25 @@ protected:
 
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
         if (!bodyp.active) return;
-        for (int j = 0; j < bodies.size(); ++j) {
-            if (index == j) continue; // Skip self
-            auto &otherp = physicalBodies[j];
-            ApplyGravityForce(bodyp, otherp);
+        if (gravity) {
+            for (int j = 0; j < bodies.size(); ++j) {
+                if (index == j) continue; // Skip self
+                auto &otherp = physicalBodies[j];
+                ApplyGravityForce(bodyp, otherp);
+            }
         }
+
 
         bodyp.last_vel = bodyp.vel;
-        for (int j = 0; j < bodies.size(); ++j) {
-            if (index == j) continue; // Skip self
-            auto &otherp = physicalBodies[j];
-            ApplyCollisionForces(bodyp, otherp);
+        if (collision) {
+            for (int j = 0; j < bodies.size(); ++j) {
+                if (index == j) continue; // Skip self
+                auto &otherp = physicalBodies[j];
+                ApplyCollisionForces(bodyp, otherp);
+            }
         }
 
-
-        bodyp.pos += bodyp.vel * updateTimer.dt;
+        bodyp.pos += bodyp.vel * updateTimer.delta;
         bodyp.last_pos = bodyp.pos;
 
     }
@@ -224,6 +231,11 @@ protected:
 
     void OnImGui_Draw() override {
         ImGui::Begin("Simulation Config");
+        ImGui::Text("Bodies count: %d", (int) physicalBodies.size());
+        ImGui::Text("FPS: %f", 1.f / frameTimer.delta);
+        ImGui::Text("AVG FPS: %f", 1.f / frameTimer.avg_delta);
+        ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
+        ImGui::Text("AVG: %f", 1.f / updateTimer.avg_delta);
         ImGui::Checkbox("Paused", &paused);
         ImGui::Checkbox("Enable Gravity", &gravity);
         ImGui::Checkbox("Enable Collisions", &collision);
@@ -232,6 +244,8 @@ protected:
     }
 
     void Draw(float dt) override {
+        UpdateSpawningBodyVel();
+
         auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
         int stride = sizeof(GravBodyVertex);
         int size = stride * bodies.size();

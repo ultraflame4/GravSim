@@ -7,7 +7,13 @@
 
 float Timer::tick() {
     double now = glfwGetTime();
-    dt = now - lastTime;
+    delta = now - lastTime;
     lastTime = now;
-    return dt;
+//    ticks += 1;
+    calc_avg();
+    return delta;
+}
+
+void Timer::calc_avg() {
+    avg_delta = avg_delta + (delta - avg_delta) / average_factor;
 }

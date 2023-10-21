@@ -7,6 +7,10 @@
 class Timer {
 public:
     double lastTime = 0;
-    float dt = 0;
+    float delta = 0;
+    float avg_delta = 0;
+    int average_factor = 90;
     float tick();
+private:
+    void calc_avg();
 };
