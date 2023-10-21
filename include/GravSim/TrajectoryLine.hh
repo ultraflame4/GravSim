@@ -12,7 +12,8 @@ public:
     glm::vec3 origin = glm::vec3(0,0,0);
     glm::vec3 direction = glm::vec3(0,0,0);
 
-    float thick = 10;
+    float thick = 5;
+    float color[3] = {.5f,.5f,.5f};
     bool active = true;
 
     void load();

@@ -71,7 +71,7 @@ void Line::draw(glm::mat4 view, glm::mat4 proj) {
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj));
-    glUniform3f(color_loc, .5f,.9f,.9f);
+    glUniform3f(color_loc, color[0],color[1],color[2]);
     vo->draw();
 }
 
