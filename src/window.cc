@@ -36,11 +36,14 @@ Window::Window(int width, int height, const std::string &title) {
 
     glViewport(0, 0, width, height);
     glEnable(GL_PROGRAM_POINT_SIZE);
+    CheckGLErrors();
     glEnable(GL_MULTISAMPLE);
-    glEnable(GL_POINT_SMOOTH);
+    CheckGLErrors();
     glEnable(GL_BLEND);
+    CheckGLErrors();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    CheckGLErrors();
     this->width = width;
     this->height = height;
     glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
@@ -49,6 +52,7 @@ Window::Window(int width, int height, const std::string &title) {
     windows_list[window] = this;
 
     InitIMGUI();
+    CheckGLErrors();
 }
 
 void Window::static_framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -84,14 +88,13 @@ void Window::run() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         Draw(frameTimer.tick());
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         OnImGui_Draw();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        CheckGLErrors();
         glfwSwapBuffers(window);
     }
 
@@ -112,4 +115,26 @@ void Window::InitIMGUI() {
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
+}
+
+std::shared_ptr<spdlog::logger> logger = logging::get("OpenGl");
+GLenum CheckGLErrors_(const char *file, int line)
+{
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        logger->error("Error code {} : {} at \"{}\" line {}", errorCode, error, file, line);
+    }
+    return errorCode;
 }

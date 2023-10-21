@@ -51,3 +51,5 @@ private:
 
     static void static_mousebtn_callback(GLFWwindow* window, int key, int action, int mods);
 };
+GLenum CheckGLErrors_(const char *file, int line);
+#define CheckGLErrors() CheckGLErrors_(__FILE__,__LINE__)

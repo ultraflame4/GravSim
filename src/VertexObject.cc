@@ -4,14 +4,15 @@
 #include <glad/glad.h>
 #include <iostream>
 #include "GravSim/VertexObject.hh"
+#include "GravSim/window.hh"
 
 VertexObject::VertexObject(int byteSize, const float *data, int stride) {
     glGenBuffers(1, &vbo);
     attr_stride = stride;
     SetVertices(data, byteSize);
-
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
+    CheckGLErrors();
 }
 void VertexObject::SetVertices(const float *dataArr, int byteSize) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
