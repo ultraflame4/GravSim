@@ -66,10 +66,12 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     // Collision resolution
 
     glm::vec2 incoming = bodyp.vel - otherp.vel;
-    float sepVel = -glm::dot(incoming, normal);
-    glm::vec2 reflect = normal * sepVel * .5f;
-    bodyp.vel = reflect;
-    otherp.vel = -reflect;
+    float resForce = -glm::dot(incoming, normal);
+
+    float totalMass = otherp.mass + bodyp.mass;
+    bodyp.vel += normal * (resForce * otherp.mass/totalMass);
+    otherp.vel += -normal * (resForce * bodyp.mass/totalMass);
+
 
 }
 
