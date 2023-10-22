@@ -16,8 +16,8 @@
 class Game : public Window {
 public:
     Game(int width, int height, const std::string &title) :
-    Window(width, height, title),
-    simulation(*this){}
+            Window(width, height, title),
+            simulation(*this) {}
 
 protected:
 
@@ -43,7 +43,7 @@ protected:
     GravBodyPhysical *spawningGravBody = nullptr; // grav body currently being spawned
     float spawnMass = 10;
     float spawnRadius = 10;
-    float spawnColor[3] = {1.f,1.f,1.f};
+    float spawnColor[3] = {1.f, 1.f, 1.f};
 
     void UpdateSpawningBodyVel() {
         if (spawningGravBody == nullptr) return;
@@ -92,9 +92,11 @@ protected:
 
 
     }
-    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true){
+
+    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true) {
         return simulation.AddBody(x, y, radius, mass, spawnColor, active);
     }
+
     void Load() override {
         logger->info("Hello world!");
         simulation.load();
@@ -123,21 +125,23 @@ protected:
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
         ImGui::Checkbox("Paused [Spacebar]", &paused);
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -100.f, 100.f);
-        if (ImGui::CollapsingHeader("Gravity Bodies",ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Gravity Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Spawn Mass", &spawnMass, 1, 1000);
             ImGui::SliderFloat("Spawn Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Spawn Color", spawnColor);
+            glm::vec2 spawnVel = spawningGravBody!= nullptr ? spawningGravBody->vel : glm::vec2(0,0);
+            ImGui::Text("Spawn Velocity %f,%f", spawnVel.x, spawnVel.y);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.clear();
             }
         }
-        if (ImGui::CollapsingHeader("Trajectory Line",ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Trajectory Line", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Thickness", &targetingLine.thick, 1, 100);
             ImGui::ColorEdit3("Color", targetingLine.color);
         }
-        if (ImGui::CollapsingHeader("Debug",ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
             ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
             ImGui::Checkbox("Debug Velocity", &simulation.debug);
@@ -148,7 +152,7 @@ protected:
     void Draw(float dt) override {
         UpdateSpawningBodyVel();
 
-        simulation.draw(view,proj);
+        simulation.draw(view, proj);
 
         targetingLine.active = spawningGravBody != nullptr;
         if (targetingLine.active) {

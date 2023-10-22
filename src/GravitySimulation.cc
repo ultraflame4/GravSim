@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+
 #include "GravSim/GravitySimulation.hh"
 
 GravitySimulation::GravitySimulation(Window &window) : window(window) {}
@@ -43,21 +44,27 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
 
-    glm::vec2 posA = bodyp.last_pos + bodyp.vel * window.updateTimer.delta;
+    glm::vec2 posA = bodyp.pos + bodyp.vel;
+    glm::vec2 posB = otherp.pos + bodyp.vel;
 
-
-    glm::vec2 posB = otherp.last_pos + bodyp.vel * window.updateTimer.delta;
-    float collisionDist = (bodyp.radius + otherp.radius) * 2;
+    float collisionDist = bodyp.radius + otherp.radius;
 
     float currentDist = glm::distance(posA, posB);
 
-
-    if (currentDist > collisionDist) {
+    if (currentDist > (collisionDist + 0.1f)) {
+        vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 1.f;
         return;
     }
-
-
+    vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 0.f;
     glm::vec2 normal = glm::normalize(posA - posB);
+    /// Resist penetration
+    float pen_depth = (bodyp.radius + otherp.radius) - currentDist;
+    glm::vec2 pen_res = normal * (pen_depth *.5f + 0.1f);
+    bodyp.pos += pen_res;
+    otherp.pos += -pen_res;
+
+    // Collision resolution
+
     glm::vec2 incoming = bodyp.vel - otherp.vel;
     float sepVel = -glm::dot(incoming, normal);
     glm::vec2 reflect = normal * sepVel * .5f;
@@ -125,15 +132,16 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
             radius,
             color[0], color[1], color[2]
     });
-    physicalBodies.push_back(GravBodyPhysical{
+    auto &bodyp = physicalBodies.emplace_back(GravBodyPhysical{
             active,
             glm::vec2(x, y),
             glm::vec2(x, y),
             glm::vec2(0, 0),
             mass,
-            radius
+            radius,
     });
-    return physicalBodies.back();
+    bodyp.index = physicalBodies.size()-1;
+    return bodyp;
 }
 
 void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
@@ -164,5 +172,9 @@ void GravitySimulation::clear() {
     physicalBodies.clear();
     bodies.clear();
     debugLines.clear();
+}
+
+GravBodyVertex & GravitySimulation::vertex(GravBodyPhysical &bodyp) {
+    return bodies[bodyp.index];
 }
 

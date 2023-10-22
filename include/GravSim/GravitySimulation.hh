@@ -80,4 +80,6 @@ private:
 
     std::vector<Line> debugLines;
     void drawDebugLines(glm::mat4 view, glm::mat4 proj);
+
+    GravBodyVertex & vertex(GravBodyPhysical &bodyp);
 };
