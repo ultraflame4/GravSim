@@ -7,12 +7,12 @@ and some other physics formulas
 Get latest release from [https://ultr42.dev/v6/projects](https://github.com/ultraflame4/GravSim/releases).
 
 ### Controls
-[Space] - Pause
-[W] - Move camera up
-[A] - Move camera left
-[S] - Move camera down
-[D] - Move camera right
-[Right Click + drag] Spawn object with velocity ( velocity depends on direction and distance of drag)
+[Space] - Pause <br/>
+[W] - Move camera up <br/>
+[A] - Move camera left <br/>
+[S] - Move camera down <br/>
+[D] - Move camera right <br/>
+[Right Click + drag] Spawn object with velocity ( velocity depends on direction and distance of drag) <br/>
 
 ## Building
 
