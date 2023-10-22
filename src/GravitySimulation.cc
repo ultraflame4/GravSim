@@ -46,7 +46,6 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
 
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
-
     glm::vec2 posA = bodyp.pos + bodyp.vel;
     glm::vec2 posB = otherp.pos + bodyp.vel;
 
@@ -84,6 +83,7 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
     for (int j = 0; j < bodies.size(); ++j) {
         if (index == j) continue; // Skip self
         auto &otherp = physicalBodies[j];
+        if (!otherp.active) continue;
         if (gravity)ApplyGravityForce(bodyp, otherp);
         if (collision) ApplyCollisionForces(bodyp, otherp);
     }
