@@ -25,7 +25,6 @@ struct GravBodyPhysical {
     glm::vec2 pos;
     glm::vec2 last_pos;
     glm::vec2 vel;
-    glm::vec2 last_vel;
     float mass;
     float radius;
     int index;
@@ -72,6 +71,7 @@ public:
     GravBodyPhysical &AddBody(float x, float y, float radius, float mass, float color[3], bool active = true);
 
 private:
+    std::shared_ptr<spdlog::logger> logger = logging::get<GravitySimulation>();
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index);
 
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp);

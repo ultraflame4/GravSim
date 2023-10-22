@@ -39,13 +39,14 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
     glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
     bodyp.Accelerate(dirVector, sharedForce / 2);
 }
+
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
 
-    glm::vec2 posA = bodyp.last_pos + bodyp.last_vel * window.updateTimer.delta;
+    glm::vec2 posA = bodyp.last_pos + bodyp.vel * window.updateTimer.delta;
 
 
-    glm::vec2 posB = otherp.last_pos + bodyp.last_vel * window.updateTimer.delta;
+    glm::vec2 posB = otherp.last_pos + bodyp.vel * window.updateTimer.delta;
     float collisionDist = (bodyp.radius + otherp.radius) * 2;
 
     float currentDist = glm::distance(posA, posB);
@@ -56,32 +57,23 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     }
 
 
-    glm::vec2 normal = glm::normalize(posB - posA);
-    glm::vec2 incoming = bodyp.last_vel - otherp.last_vel;
-    glm::vec2 reflect = glm::reflect(incoming, normal);
-//        logger->info("R {},{} F {}", reflect.x, reflect.y,glm::length(reflect*.5f));
-    bodyp.vel = reflect * .5f;
+    glm::vec2 normal = glm::normalize(posA - posB);
+    glm::vec2 incoming = bodyp.vel - otherp.vel;
+    float sepVel = -glm::dot(incoming, normal);
+    glm::vec2 reflect = normal * sepVel * .5f;
+    bodyp.vel = reflect;
+    otherp.vel = -reflect;
 
 }
 
 void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
     if (!bodyp.active) return;
-    if (gravity) {
-        for (int j = 0; j < bodies.size(); ++j) {
-            if (index == j) continue; // Skip self
-            auto &otherp = physicalBodies[j];
-            ApplyGravityForce(bodyp, otherp);
-        }
-    }
 
-
-    bodyp.last_vel = bodyp.vel;
-    if (collision) {
-        for (int j = 0; j < bodies.size(); ++j) {
-            if (index == j) continue; // Skip self
-            auto &otherp = physicalBodies[j];
-            ApplyCollisionForces(bodyp, otherp);
-        }
+    for (int j = 0; j < bodies.size(); ++j) {
+        if (index == j) continue; // Skip self
+        auto &otherp = physicalBodies[j];
+        if (gravity)ApplyGravityForce(bodyp, otherp);
+        if (collision) ApplyCollisionForces(bodyp, otherp);
     }
 
     bodyp.pos += bodyp.vel * window.updateTimer.delta;
@@ -102,8 +94,7 @@ void GravitySimulation::update() {
 }
 
 
-
-void GravitySimulation::draw(glm::mat4 view,    glm::mat4 proj) {
+void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
     auto *bodiesArr = reinterpret_cast<float *>(bodies.data());
     int stride = sizeof(GravBodyVertex);
     int size = stride * bodies.size();
@@ -139,7 +130,6 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
             glm::vec2(x, y),
             glm::vec2(x, y),
             glm::vec2(0, 0),
-            glm::vec2(0, 0),
             mass,
             radius
     });
@@ -149,12 +139,12 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
 void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
     if (debugLines.size() != physicalBodies.size()) {
         debugLines.clear();
-        for (const auto &item: physicalBodies){
+        for (const auto &item: physicalBodies) {
             auto &line = debugLines.emplace_back();
             line.color[0] = 0.4f;
             line.color[1] = 0.9f;
             line.color[2] = 0.1f;
-            line.thick =1;
+            line.thick = 1;
         }
     }
 
