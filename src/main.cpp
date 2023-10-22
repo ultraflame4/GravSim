@@ -15,7 +15,8 @@ public:
 
 protected:
 
-    glm::vec3 cameraPos = glm::vec3 (0,0,0);
+    glm::vec3 cameraPos = glm::vec3(0, 0, 0);
+    glm::vec3 cameraMove = glm::vec3(0, 0, 0);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
@@ -57,8 +58,17 @@ protected:
                     spawningGravBody->active = true;
                     spawningGravBody = nullptr;
                 }
+                if (key == GLFW_KEY_W) cameraMove -= up;
+                if (key == GLFW_KEY_A) cameraMove -= left;
+                if (key == GLFW_KEY_S) cameraMove -= down;
+                if (key == GLFW_KEY_D) cameraMove -= right;
                 break;
             case GLFW_PRESS:
+                if (key == GLFW_KEY_W) cameraMove += up;
+                if (key == GLFW_KEY_A) cameraMove += left;
+                if (key == GLFW_KEY_S) cameraMove += down;
+                if (key == GLFW_KEY_D) cameraMove += right;
+
                 if (key == GLFW_KEY_G) {
                     simulation.gravity = !simulation.gravity;
                     logger->info("Gravity enabled: {}", simulation.gravity);
@@ -111,12 +121,13 @@ protected:
     }
 
     void OnImGui_Draw() override {
-        ImGui::Begin("Simulation Config");
+        ImGui::Begin("Simulation Set");
         ImGui::Text("Bodies count: %d", (int) simulation.physicalBodies.size());
         ImGui::Text("FPS: %f", 1.f / frameTimer.delta);
         ImGui::Text("FPS AVG: %f", 1.f / frameTimer.avg_delta);
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
+        ImGui::Text("Camera Position: %f,&f", cameraPos.x, cameraPos.y);
         ImGui::Checkbox("Paused [Spacebar]", &paused);
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -100.f, 100.f);
         if (ImGui::CollapsingHeader("Gravity Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -124,7 +135,7 @@ protected:
             ImGui::SliderFloat("Spawn Mass", &spawnMass, 1, 1000);
             ImGui::SliderFloat("Spawn Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Spawn Color", spawnColor);
-            glm::vec2 spawnVel = spawningGravBody!= nullptr ? spawningGravBody->vel : glm::vec2(0,0);
+            glm::vec2 spawnVel = spawningGravBody != nullptr ? spawningGravBody->vel : glm::vec2(0, 0);
             ImGui::Text("Spawn Velocity %f,%f", spawnVel.x, spawnVel.y);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.clear();
@@ -144,6 +155,7 @@ protected:
     }
 
     void Draw(float dt) override {
+        cameraPos += cameraMove * 10.f;
         view = glm::lookAt(cameraPos, cameraPos + forward, up);
 
         UpdateSpawningBodyVel();

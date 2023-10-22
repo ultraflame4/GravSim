@@ -12,6 +12,9 @@
 const glm::mat4 IdentityMat(1.f);
 
 const glm::vec3 up(0, 1, 0);
+const glm::vec3 down(0, -1, 0);
+const glm::vec3 left(-1, 0, 0);
+const glm::vec3 right(1, 0, 0);
 const glm::vec3 forward(0, 0, -1);
 
 
