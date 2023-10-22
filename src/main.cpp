@@ -178,7 +178,9 @@ protected:
 
 int main() {
     logging::get("main()")->info("GravSim version {}",GravSim_VERSION);
-    auto window = std::make_shared<Game>(1000, 800, "GravSim");
+    std::string title = "GravSim v";
+    title += GravSim_VERSION;
+    auto window = std::make_shared<Game>(1000, 800, title);
 
     window->run();
 
