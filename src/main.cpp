@@ -1,17 +1,11 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <algorithm>
 #include <imgui.h>
-
-#include "GravSim/logging.hh"
 #include "GravSim/window.hh"
 #include "GravSim/GravitySimulation.hh"
-#include "GravSim/shader.hh"
-#include "GravSim/VertexObject.hh"
-#include "GravSim/square.hh"
-#include "GravSim/TrajectoryLine.hh"
 #include "GravSim/utils.hh"
+#include "GravSim/TrajectoryLine.hh"
 
 class Game : public Window {
 public:
@@ -21,7 +15,7 @@ public:
 
 protected:
 
-
+    glm::vec3 cameraPos = glm::vec3 (0,0,0);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
 
@@ -150,6 +144,8 @@ protected:
     }
 
     void Draw(float dt) override {
+        view = glm::lookAt(cameraPos, cameraPos + forward, up);
+
         UpdateSpawningBodyVel();
 
         simulation.draw(view, proj);
