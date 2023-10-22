@@ -65,15 +65,25 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        filename: '${{ github.workspace }}_${{ matrix.os }}_release.zip'
+        filename: '${{ github.workspace }}_${{ matrix.os }}_${{ github.ref_name }}_release.zip'
         directory: ${{ steps.strings.outputs.build-output-dir }}
         exclusions: '*.git* *.ninja *.cmake CMakeCache.txt CMakeFiles /*vcpkg_installed/*'
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
       with:
-        artifacts: '${{ github.workspace }}_${{ matrix.os }}_release.zip'
+        artifacts: '${{ github.workspace }}_${{ matrix.os }}_${{ github.ref_name }}_release.zip'
         token: ${{ secrets.GITHUB_TOKEN }}
         allowUpdates: true
+
+    - uses: manleydev/butler-publish-itchio-action@master
+      env:
+        BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: ${{ matrix.os }}
+        ITCH_GAME: gravsim
+        ITCH_USER: NotLivingStudios
+        PACKAGE: '${{ github.workspace }}_${{ matrix.os }}_${{ github.ref_name }}_release.zip'
+        VERSION: ${{ github.ref_name }}
+
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
