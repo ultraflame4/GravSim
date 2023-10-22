@@ -2,6 +2,18 @@
 Gravity simulation for circular objects using [Newton's law of universal gravitation](https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
 and some other physics formulas
 ![img.png](blob/img.png)
+
+## Usage
+Get latest release from [https://ultr42.dev/v6/projects](https://github.com/ultraflame4/GravSim/releases).
+
+### Controls
+[Space] - Pause
+[W] - Move camera up
+[A] - Move camera left
+[S] - Move camera down
+[D] - Move camera right
+[Right Click + drag] Spawn object with velocity ( velocity depends on direction and distance of drag)
+
 ## Building
 
 ### Prerequisites
