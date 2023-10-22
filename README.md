@@ -3,10 +3,12 @@ Gravity simulation for circular objects using [Newton's law of universal gravita
 and some other physics formulas
 ![img.png](blob/img.png)
 
-## Usage
-Get latest release from [https://ultr42.dev/v6/projects](https://github.com/ultraflame4/GravSim/releases).
+## Downloads
+Get latest release from [releases](https://github.com/ultraflame4/GravSim/releases).
+You can also install from itch.io https://notlivingstudios.itch.io/gravsim
 
-### Controls
+
+## Controls
 [Space] - Pause <br/>
 [W] - Move camera up <br/>
 [A] - Move camera left <br/>
