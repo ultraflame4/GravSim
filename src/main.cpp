@@ -44,7 +44,7 @@ protected:
         if (spawningGravBody == nullptr) return;
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, *this);
+        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj,view, *this);
         glm::vec2 vel = spawningGravBody->pos - pos;
         spawningGravBody->vel = vel;
     }
@@ -85,7 +85,7 @@ protected:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
                     double xpos, ypos;
                     glfwGetCursorPos(window, &xpos, &ypos);
-                    glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, *this);
+                    glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
                     logger->debug("Spawn object at {},{}", pos.x, pos.y);
                     spawningGravBody = &AddBody(pos.x, pos.y, spawnRadius, spawnMass, false);
                 }
@@ -127,7 +127,7 @@ protected:
         ImGui::Text("FPS AVG: %f", 1.f / frameTimer.avg_delta);
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
-        ImGui::Text("Camera Position: %f,&f", cameraPos.x, cameraPos.y);
+        ImGui::Text("Camera Position: %f,%f", cameraPos.x, cameraPos.y);
         ImGui::Checkbox("Paused [Spacebar]", &paused);
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -100.f, 100.f);
         if (ImGui::CollapsingHeader("Gravity Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
