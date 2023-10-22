@@ -45,7 +45,7 @@ jobs:
       run: |
         echo "
         build-output-dir=${{ github.workspace }}/build
-        filename=${{ github.workspace }}_${{ matrix.os }}_${{ github.ref_name }}_${{ RUNNER_OS }}_release.zip
+        filename=${{ github.workspace }}_${{ matrix.os }}_${{ github.ref_name }}_${{ runner.os  }}_release.zip
         " >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
@@ -84,7 +84,7 @@ jobs:
 
     - name: Publish game to itch.io
       run: |
-        butler push ${{ steps.strings.outputs.filename }} notlivingstudios/gravsim:${{ RUNNER_OS }} --userversion ${{ github.ref_name }}
+        butler push ${{ steps.strings.outputs.filename }} notlivingstudios/gravsim:${{ runner.os  }} --userversion ${{ github.ref_name }}
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
 
