@@ -52,13 +52,14 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     float currentDist = glm::distance(posA, posB);
 
     if (currentDist > (collisionDist + 0.1f)) {
-        vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 1.f;
+//        vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 1.f;
         return;
     }
-    vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 0.f;
+//    vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 0.f;
+
     glm::vec2 normal = glm::normalize(posA - posB);
     /// Resist penetration
-    float pen_depth = (bodyp.radius + otherp.radius) - currentDist;
+    float pen_depth = collisionDist - currentDist;
     glm::vec2 pen_res = normal * (pen_depth *.5f + 0.1f);
     bodyp.pos += pen_res;
     otherp.pos += -pen_res;
