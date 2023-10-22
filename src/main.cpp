@@ -6,6 +6,7 @@
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
 #include "GravSim/TrajectoryLine.hh"
+#include "GravSim/meta.hh"
 
 class Game : public Window {
 public:
@@ -176,7 +177,7 @@ protected:
 
 
 int main() {
-
+    logging::get("main()")->info("GravSim version {}",GravSim_VERSION);
     auto window = std::make_shared<Game>(1000, 800, "GravSim");
 
     window->run();

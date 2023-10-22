@@ -2,11 +2,19 @@ cmake_minimum_required(VERSION 3.26)
 # Setup vcpkg script with CMake (note: should be placed before project() call)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
 
-project(GravSimm
-        VERSION 0.0.1
+project(GravSim
+        VERSION 0.0.3
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
+
+
+configure_file(
+        "${GravSim_SOURCE_DIR}/include/GravSim/meta.hh.in"
+        "${PROJECT_BINARY_DIR}/include/GravSim/meta.hh"
+)
+
 file(COPY assets DESTINATION ${PROJECT_BINARY_DIR})
+
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/*.hh" "${PROJECT_SOURCE_DIR}/include/*.hh")
 list(REMOVE_ITEM HEADER_LIST "${PROJECT_SOURCE_DIR}/include/GravSim/meta.hh")
 
