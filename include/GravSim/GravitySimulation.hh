@@ -66,6 +66,13 @@ public:
 
     void update();
 
+    /**
+     * Resolve 2 physical bodies with the same position
+     * @param a
+     * @param b
+     */
+    void resolveFused(GravBodyPhysical &a, GravBodyPhysical &b);
+
     void draw(glm::mat4 view, glm::mat4 proj);
 
     GravBodyPhysical &AddBody(float x, float y, float radius, float mass, float color[3], bool active = true);

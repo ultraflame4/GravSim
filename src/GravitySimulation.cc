@@ -5,8 +5,10 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <algorithm>
 
 #include "GravSim/GravitySimulation.hh"
+#include "GravSim/utils.hh"
 
 GravitySimulation::GravitySimulation(Window &window) : window(window) {}
 
@@ -36,6 +38,7 @@ void GravitySimulation::load() {
 
 void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
     float distance = glm::distance(bodyp.pos, otherp.pos);
+    if (isnan(distance)) return;
     float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
     glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
     bodyp.Accelerate(dirVector, sharedForce / 2);
@@ -50,14 +53,17 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     float collisionDist = bodyp.radius + otherp.radius;
 
     float currentDist = glm::distance(posA, posB);
-
-    if (currentDist > (collisionDist + 0.1f)) {
-//        vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 1.f;
+    // When nan, currentDist is 0! They fused together. Skip collision check!
+    if (isnan(currentDist)) {
+        resolveFused(bodyp, otherp);
         return;
     }
-//    vertex(bodyp).g = vertex(bodyp).b = vertex(otherp).g = vertex(otherp).b = 0.f;
+
+    if (currentDist > (collisionDist + 0.1f)) return;
 
     glm::vec2 normal = glm::normalize(posA - posB);
+    // When a & b distance is 0, they are at the same spot, hence no collision normal, so just use up vector
+    if (isnan(currentDist)) normal = up;
     /// Resist penetration
     float pen_depth = collisionDist - currentDist;
     glm::vec2 pen_res = normal * (pen_depth *.5f + 0.1f);
@@ -65,15 +71,11 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     otherp.pos += -pen_res;
 
     // Collision resolution
-
     glm::vec2 incoming = bodyp.vel - otherp.vel;
     float resForce = -glm::dot(incoming, normal);
-
     float totalMass = otherp.mass + bodyp.mass;
     bodyp.vel += normal * (resForce * otherp.mass/totalMass);
     otherp.vel += -normal * (resForce * bodyp.mass/totalMass);
-
-
 }
 
 void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
@@ -179,5 +181,10 @@ void GravitySimulation::clear() {
 
 GravBodyVertex & GravitySimulation::vertex(GravBodyPhysical &bodyp) {
     return bodies[bodyp.index];
+}
+
+void GravitySimulation::resolveFused(GravBodyPhysical &a, GravBodyPhysical &b) {
+    a.pos.x -= a.radius/2;
+    b.pos.x += b.radius/2;
 }
 

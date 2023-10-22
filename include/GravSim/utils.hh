@@ -8,6 +8,7 @@
 #include <glm/ext.hpp>
 #include <glm/ext/matrix_projection.hpp>
 #include "window.hh"
+#define CLAMP_VEL()
 
 const glm::mat4 IdentityMat(1.f);
 

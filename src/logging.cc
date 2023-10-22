@@ -17,7 +17,7 @@ void logging::Init() {
                                             std::chrono::system_clock::now() };
 
 
-    const std::string logfile_name = std::format("{:%d-%m-%Y_%H-%M-%OS}_log.txt", cur_time);
+    const std::string logfile_name = std::format("./logs/{:%d-%m-%Y_%H-%M-%OS}_log.txt", cur_time);
 
     sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt >(logfile_name));
 
