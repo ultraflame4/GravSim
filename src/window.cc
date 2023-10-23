@@ -42,7 +42,7 @@ Window::Window(int width, int height, const std::string &title) {
     glEnable(GL_BLEND);
     CheckGLErrors();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+//    glfwSwapInterval(0);
     CheckGLErrors();
     this->width = width;
     this->height = height;

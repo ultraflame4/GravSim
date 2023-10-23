@@ -156,7 +156,7 @@ protected:
     }
 
     void Draw(float dt) override {
-        cameraPos += cameraMove * 10.f;
+        cameraPos += cameraMove * 3000.f * dt;
         view = glm::lookAt(cameraPos, cameraPos + forward, up);
 
         UpdateSpawningBodyVel();

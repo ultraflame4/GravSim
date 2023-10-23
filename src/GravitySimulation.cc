@@ -39,15 +39,15 @@ void GravitySimulation::load() {
 void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
     float distance = glm::distance(bodyp.pos, otherp.pos);
     if (isnan(distance)) return;
-    float sharedForce = gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
+    float sharedForce = 100.f * gravityConstant * ((bodyp.mass * otherp.mass) / pow(distance, 2));
     glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
-    bodyp.Accelerate(dirVector, sharedForce / 2);
+    bodyp.Accelerate(dirVector, sharedForce * .5f * window.updateTimer.delta);
 }
 
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
-    glm::vec2 posA = bodyp.pos + bodyp.vel;
-    glm::vec2 posB = otherp.pos + bodyp.vel;
+    glm::vec2 posA = bodyp.pos + bodyp.vel * window.updateTimer.delta;
+    glm::vec2 posB = otherp.pos + bodyp.vel * window.updateTimer.delta;
 
     float collisionDist = bodyp.radius + otherp.radius;
 
