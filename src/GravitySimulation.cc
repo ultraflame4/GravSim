@@ -86,8 +86,8 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
         if (index == j) continue; // Skip self
         auto &otherp = physicalBodies[j];
         if (!otherp.active) continue;
-        if (gravity)ApplyGravityForce(bodyp, otherp);
         if (collision) ApplyCollisionForces(bodyp, otherp);
+        if (gravity)ApplyGravityForce(bodyp, otherp);
     }
 
     bodyp.pos += bodyp.vel * window.updateTimer.delta;
