@@ -69,7 +69,7 @@ jobs:
         type: 'zip'
         filename:  ${{ steps.strings.outputs.filename }}
         directory: ${{ steps.strings.outputs.build-output-dir }}
-        exclusions: '*.git* *.ninja *.cmake CMakeCache.txt CMakeFiles /*vcpkg_installed/*'
+        exclusions: '*.git* *.ninja* *.cmake CMakeCache.txt CMakeFiles *vcpkg*'
 
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
