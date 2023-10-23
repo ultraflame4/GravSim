@@ -7,6 +7,8 @@ and some other physics formulas
 Get latest release from [releases](https://github.com/ultraflame4/GravSim/releases).
 You can also install from itch.io https://notlivingstudios.itch.io/gravsim
 
+<a href="https://notlivingstudios.itch.io/gravsim" target="_blank"><img src="https://static.itch.io/images/badge-color.svg" 
+alt="Available on itch.io" height="60"/></a>
 
 ## Controls
 [Space] - Pause <br/>
