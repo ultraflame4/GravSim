@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <algorithm>
+#include <glm/gtx/norm.hpp>
 
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
@@ -37,11 +38,12 @@ void GravitySimulation::load() {
 
 
 void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
-    float distance = glm::distance(bodyp.pos, otherp.pos);
-    if (isnan(distance)) return;
-    float sharedForce = 100.f * gravityConstant * ((bodyp.mass * otherp.mass) / distance*distance);
-    glm::vec2 dirVector = glm::normalize(otherp.pos - bodyp.pos);
-    bodyp.Accelerate(dirVector, sharedForce * .5f * window.updateTimer.delta);
+    glm::vec2 dir = otherp.pos - bodyp.pos;
+    float distance2 = glm::length2(dir);
+    if (isnan(distance2)) return;
+    float sharedForce = 100.f * gravityConstant * ((bodyp.mass * otherp.mass) / distance2);
+    glm::vec2 dir_norm = glm::normalize(dir);
+    bodyp.Accelerate(dir_norm, sharedForce * .5f * window.updateTimer.delta);
 }
 
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
