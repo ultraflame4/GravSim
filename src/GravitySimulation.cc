@@ -49,7 +49,7 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
     glm::vec2 posA = bodyp.pos + bodyp.vel * window.updateTimer.delta;
-    glm::vec2 posB = otherp.pos + bodyp.vel * window.updateTimer.delta;
+    glm::vec2 posB = otherp.pos + otherp.vel * window.updateTimer.delta;
 
     float collisionDist = bodyp.radius + otherp.radius;
 
