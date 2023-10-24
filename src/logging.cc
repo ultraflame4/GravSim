@@ -6,7 +6,6 @@
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/wincolor_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
-#include <format>
 
 
 void logging::Init() {
