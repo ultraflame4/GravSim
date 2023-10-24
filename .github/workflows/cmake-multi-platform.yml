@@ -111,7 +111,7 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        filename:  ${{ steps.strings.outputs.filename }}
+        filename:  '${{ github.workspace }}/${{ steps.strings.outputs.filename }}'
         directory: ${{ steps.strings.outputs.build-output-dir }}
         exclusions: '*.git* *.ninja* *.cmake CMakeCache.txt CMakeFiles *vcpkg* include/*'
 
