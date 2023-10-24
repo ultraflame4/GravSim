@@ -40,6 +40,7 @@ find_package(imgui CONFIG REQUIRED)
 
 add_executable(GravSim ${SOURCES} ${HEADER_LIST})
 
+target_compile_features(GravSim PRIVATE cxx_std_23)
 target_include_directories(GravSim PUBLIC ${PROJECT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include/)
 target_link_libraries(GravSim PUBLIC spdlog::spdlog)
 target_link_libraries(GravSim PRIVATE glfw)
