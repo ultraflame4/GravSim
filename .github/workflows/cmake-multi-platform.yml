@@ -51,7 +51,12 @@ jobs:
       with:
         submodules: 'recursive'
 
-    - uses: lukka/get-cmake@latest
+    - name: Setup Cpp
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: llvm
+        cmake: true
+        ninja: true
 
     - run: cmake --version
     - run: ninja --version
