@@ -27,10 +27,16 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
         c_compiler: [clang]
         cpp_compiler: [clang++]
+
+        include:
+          - display: wayland
+            os: ubuntu-latest
+          - display: x11
+            os: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -59,6 +65,19 @@ jobs:
           core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
+    - name: Install Glfw X11 Deps
+      if: ${{ matrix.display == "x11" && os.runner == "linux"}}
+      run: |
+            sudo apt update
+            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+
+    - name: Install Glfw Wayland Deps
+      if: ${{ matrix.display == "wayland" && os.runner == "linux"}}
+      run: |
+            sudo apt update
+            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev wayland-protocols libwayland-dev libxkbcommon-dev
+            
+            
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -67,6 +86,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DGLFW_BUILD_WAYLAND=${{ (os.runner == "linux" && matrix.display == "wayland" ) && "ON" || "OFF"}}
         -S ${{ github.workspace }}
         -G Ninja
 
