@@ -6,7 +6,7 @@ on:
   push:
     tags:
     - '*'
-
+  workflow_dispatch:
 env: 
     VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
     
@@ -63,7 +63,7 @@ jobs:
       run: |
         echo "
         build-output-dir=${{ github.workspace }}/build
-        filename=${{ github.workspace }}_${{ matrix.os }}_${{ github.ref_name }}_${{ runner.os }}_${{ matrix.display || '' }}_release.zip
+        filename=${{ github.event.repository.name }}_${{ github.ref_name }}_build-${{ matrix.os }}_${{ runner.os }}-${{ matrix.display || '' }}_release.zip
         " >> "$GITHUB_OUTPUT"
 
     - name: Export GitHub Actions cache environment variables
@@ -77,13 +77,13 @@ jobs:
       if: ${{ matrix.display == 'x11' && runner.os == 'linux'}}
       run: |
             sudo apt update
-            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libgl-dev
 
     - name: Install Glfw Wayland Deps
       if: ${{ matrix.display == 'wayland' && runner.os == 'linux'}}
       run: |
             sudo apt update
-            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev wayland-protocols libwayland-dev libxkbcommon-dev
+            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev wayland-protocols libwayland-dev libxkbcommon-dev libgl-dev
             
             
     - name: Configure CMake
@@ -127,14 +127,15 @@ jobs:
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
 
+    - name: Archive build
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: build-results-${{ steps.strings.outputs.filename }} 
+        path: ./build
+
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
-    - name: Archive Everthing
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: test-results
-        path: .
