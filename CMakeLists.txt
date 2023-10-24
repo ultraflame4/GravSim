@@ -6,7 +6,7 @@ project(GravSim
         VERSION 0.0.4
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
 
 configure_file(
         "${GravSim_SOURCE_DIR}/include/GravSim/meta.hh.in"
