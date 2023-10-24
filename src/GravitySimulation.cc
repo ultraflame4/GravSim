@@ -5,8 +5,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <algorithm>
 #include <glm/gtx/norm.hpp>
+#include <cmath>
 
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
