@@ -66,13 +66,13 @@ jobs:
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Install Glfw X11 Deps
-      if: ${{ matrix.display == 'x11' && os.runner == 'linux'}}
+      if: ${{ matrix.display == 'x11' && runner.os == 'linux'}}
       run: |
             sudo apt update
             sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
 
     - name: Install Glfw Wayland Deps
-      if: ${{ matrix.display == 'wayland' && os.runner == 'linux'}}
+      if: ${{ matrix.display == 'wayland' && runner.os == 'linux'}}
       run: |
             sudo apt update
             sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev wayland-protocols libwayland-dev libxkbcommon-dev
@@ -86,7 +86,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DGLFW_BUILD_WAYLAND=${{ (os.runner == 'linux' && matrix.display == 'wayland' ) && 'ON' || 'OFF'}}
+        -DGLFW_BUILD_WAYLAND=${{ (runner.os == 'linux' && matrix.display == 'wayland' ) && 'ON' || 'OFF'}}
         -S ${{ github.workspace }}
         -G Ninja
 
