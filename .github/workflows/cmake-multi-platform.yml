@@ -77,13 +77,13 @@ jobs:
       if: ${{ matrix.display == 'x11' && runner.os == 'linux'}}
       run: |
             sudo apt update
-            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libgl-dev
 
     - name: Install Glfw Wayland Deps
       if: ${{ matrix.display == 'wayland' && runner.os == 'linux'}}
       run: |
             sudo apt update
-            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev wayland-protocols libwayland-dev libxkbcommon-dev
+            sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev wayland-protocols libwayland-dev libxkbcommon-dev libgl-dev
             
             
     - name: Configure CMake
