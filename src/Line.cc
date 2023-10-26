@@ -2,7 +2,7 @@
 // Created by powew on 21/10/2023.
 //
 
-#include "GravSim/TrajectoryLine.hh"
+#include "GravSim/Line.hh"
 #include "GravSim/square.hh"
 #include "GravSim/utils.hh"
 #include <glm/glm.hpp>

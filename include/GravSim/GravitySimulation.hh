@@ -8,7 +8,7 @@
 #include "shader.hh"
 #include "VertexObject.hh"
 #include "window.hh"
-#include "TrajectoryLine.hh"
+#include "Line.hh"
 
 struct GravBodyVertex {
     float x;

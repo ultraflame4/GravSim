@@ -25,7 +25,7 @@ set(SOURCES
         src/shader.cc
         src/VertexObject.cc
         src/Timer.cc
-        src/TrajectoryLine.cc
+        src/Line.cc
         src/GravitySimulation.cc
         include/GravSim/utils.hh
 )

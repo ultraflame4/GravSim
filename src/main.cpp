@@ -6,7 +6,7 @@
 #include "GravSim/window.hh"
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
-#include "GravSim/TrajectoryLine.hh"
+#include "GravSim/Line.hh"
 #include "GravSim/meta.hh"
 
 class Game : public Window {
