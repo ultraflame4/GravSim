@@ -21,7 +21,7 @@ protected:
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
     float size = 1.f;
-    float zoomSpeed = .01f;
+    float zoomSpeed = .2f;
 
     Line targetingLine;
 
@@ -54,7 +54,7 @@ protected:
 
     void OnScroll(double x_offset, double y_offset) override {
         logger->debug("Y off {}, size: {}", y_offset, size);
-        size += y_offset * zoomSpeed;
+        size -= y_offset * zoomSpeed;
         OnResize();
     }
 
