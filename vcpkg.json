@@ -10,7 +10,7 @@
     "glm",
     {
       "name": "glad",
-      "features": ["gl-api-33", "loader"]
+      "features": ["gl-api-44", "loader"]
     },
     {
       "name": "imgui",
