@@ -171,7 +171,7 @@ protected:
             current_zoom = std::lerp(current_zoom, target_zoom, 10*dt);
             proj = createOrtho(current_zoom);
         }
-        cameraPos += cameraMove * 3000.f * dt;
+        cameraPos += cameraMove * 3000.f * dt * current_zoom;
         view = glm::lookAt(cameraPos, cameraPos + forward, up);
 
         UpdateSpawningBodyVel();
