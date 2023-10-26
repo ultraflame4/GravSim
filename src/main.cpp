@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <imgui.h>
+#include <algorithm>
 #include "GravSim/window.hh"
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
@@ -22,7 +23,9 @@ protected:
     glm::mat4 proj;
     float current_zoom = 1.f;
     float target_zoom = 1.f;
-    float zoom_speed = .2f;
+    float zoom_speed = .1f;
+    const float max_zoom = 5;
+    const float min_zoom = .2f;
 
     Line targetingLine;
 
@@ -128,22 +131,25 @@ protected:
     }
 
     void OnImGui_Draw() override {
-        ImGui::Begin("Simulation Set");
+        ImGui::Begin("Simulation");
         ImGui::Text("Bodies count: %d", (int) simulation.physicalBodies.size());
         ImGui::Text("FPS: %f", 1.f / frameTimer.delta);
         ImGui::Text("FPS AVG: %f", 1.f / frameTimer.avg_delta);
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
-        ImGui::Text("Camera Position: %f,%f", cameraPos.x, cameraPos.y);
         ImGui::Checkbox("Paused [Spacebar]", &paused);
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -1000.f, 1000.f);
-        if (ImGui::CollapsingHeader("Gravity Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Text("Position: %f,%f", cameraPos.x, cameraPos.y);
+            ImGui::SliderFloat("Zoom", &target_zoom,min_zoom,max_zoom);
+        }
+        if (ImGui::CollapsingHeader("Spawning", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
-            ImGui::SliderFloat("Spawn Mass", &spawnMass, 1, 2000);
-            ImGui::SliderFloat("Spawn Radius", &spawnRadius, 5, 500);
-            ImGui::ColorEdit3("Spawn Color", spawnColor);
+            ImGui::SliderFloat("Mass", &spawnMass, 1, 2000);
+            ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
+            ImGui::ColorEdit3("Color", spawnColor);
             glm::vec2 spawnVel = spawningGravBody != nullptr ? spawningGravBody->vel : glm::vec2(0, 0);
-            ImGui::Text("Spawn Velocity %f,%f", spawnVel.x, spawnVel.y);
+            ImGui::Text("Velocity %f,%f", spawnVel.x, spawnVel.y);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.clear();
             }
@@ -163,7 +169,7 @@ protected:
 
     void Draw(float dt) override {
 
-
+        target_zoom = std::clamp(target_zoom, min_zoom, max_zoom);
         if (abs(current_zoom - target_zoom) < 0.01f) {
             current_zoom = target_zoom;
         }
