@@ -18,6 +18,7 @@ public:
 protected:
 
     glm::vec3 cameraPos = glm::vec3(0, 0, 0);
+    glm::vec3 targetCameraPos = glm::vec3(0, 0, 0);
     glm::vec3 cameraMove = glm::vec3(0, 0, 0);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
@@ -51,7 +52,7 @@ protected:
         if (spawningGravBody == nullptr) return;
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj,view, *this);
+        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
         glm::vec2 vel = spawningGravBody->pos - pos;
         spawningGravBody->vel = vel;
     }
@@ -141,7 +142,7 @@ protected:
         ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -1000.f, 1000.f);
         if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Position: %f,%f", cameraPos.x, cameraPos.y);
-            ImGui::SliderFloat("Zoom", &target_zoom,min_zoom,max_zoom);
+            ImGui::SliderFloat("Zoom", &target_zoom, min_zoom, max_zoom);
         }
         if (ImGui::CollapsingHeader("Spawning", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
@@ -172,12 +173,20 @@ protected:
         target_zoom = std::clamp(target_zoom, min_zoom, max_zoom);
         if (abs(current_zoom - target_zoom) < 0.01f) {
             current_zoom = target_zoom;
-        }
-        else{
-            current_zoom = std::lerp(current_zoom, target_zoom, 10*dt);
+        } else {
+            current_zoom = std::lerp(current_zoom, target_zoom, 10 * dt);
             proj = createOrtho(current_zoom);
         }
-        cameraPos += cameraMove * 3000.f * dt * current_zoom;
+
+        targetCameraPos = targetCameraPos + cameraMove * dt * 2000.f * current_zoom;
+        if (abs(length(cameraPos - targetCameraPos)) < (0.01f * current_zoom)) {
+            cameraPos = glm::mix(cameraPos, targetCameraPos, 10*dt);
+        }
+        else{
+            cameraPos = glm::mix(cameraPos, targetCameraPos, 10*dt);
+        }
+
+
         view = glm::lookAt(cameraPos, cameraPos + forward, up);
 
         UpdateSpawningBodyVel();
@@ -194,11 +203,13 @@ protected:
             targetingLine.draw(view, proj);
         }
     }
+
+
 };
 
 
 int main() {
-    logging::get("main()")->info("GravSim version {}",GravSim_VERSION);
+    logging::get("main()")->info("GravSim version {}", GravSim_VERSION);
     std::string title = "GravSim v";
     title += GravSim_VERSION;
     auto window = std::make_shared<Game>(1000, 800, title);
