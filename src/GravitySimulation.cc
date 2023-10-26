@@ -68,15 +68,15 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     /// Resist penetration
     float pen_depth = collisionDist - currentDist;
     glm::vec2 pen_res = normal * (pen_depth *.5f + 0.1f);
-    bodyp.pos += pen_res;
-    otherp.pos += -pen_res;
+    if (!otherp.phantom) bodyp.pos += pen_res;
+    if (!bodyp.phantom) otherp.pos += -pen_res;
 
     // Collision resolution
     glm::vec2 incoming = bodyp.vel - otherp.vel;
     float resForce = -glm::dot(incoming, normal);
     float totalMass = otherp.mass + bodyp.mass;
-    bodyp.vel += normal * (resForce * otherp.mass/totalMass);
-    otherp.vel += -normal * (resForce * bodyp.mass/totalMass);
+    if (!otherp.phantom) bodyp.vel += normal * (resForce * otherp.mass/totalMass);
+    if (!bodyp.phantom) otherp.vel += -normal * (resForce * bodyp.mass/totalMass);
 }
 
 void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
@@ -140,12 +140,13 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
             color[0], color[1], color[2]
     });
     auto &bodyp = physicalBodies.emplace_back(GravBodyPhysical{
-            active,
             glm::vec2(x, y),
             glm::vec2(x, y),
             glm::vec2(0, 0),
             mass,
             radius,
+            active,
+            false
     });
     bodyp.index = physicalBodies.size()-1;
     return bodyp;
@@ -186,7 +187,7 @@ GravBodyVertex & GravitySimulation::vertex(GravBodyPhysical &bodyp) {
 }
 
 void GravitySimulation::resolveFused(GravBodyPhysical &a, GravBodyPhysical &b) {
-    a.pos.x -= a.radius/2;
-    b.pos.x += b.radius/2;
+    if (!b.phantom) a.pos.x -= a.radius/2;
+    if (!a.phantom) b.pos.x += b.radius/2;
 }
 

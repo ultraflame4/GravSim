@@ -20,13 +20,20 @@ struct GravBodyVertex {
 };
 static_assert(sizeof(GravBodyVertex) == sizeof(float) * 6, "ERROR GravBodyVertex struct contains padding!");
 
+enum BodyActiveStatus : uint8_t {
+    ACTIVE,
+    NO_COLLIDE,
+    DISABLED
+};
+
 struct GravBodyPhysical {
-    bool active;
     glm::vec2 pos;
     glm::vec2 last_pos;
     glm::vec2 vel;
     float mass;
     float radius;
+    bool active;
+    bool phantom;
     int index;
 
     void Accelerate(glm::vec2 direction, float forceAmt) {
