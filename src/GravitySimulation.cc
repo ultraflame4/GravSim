@@ -43,7 +43,7 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
     if (std::isnan(distance2)) return;
     float sharedForce = 100.f * gravityConstant * ((bodyp.mass * otherp.mass) / distance2);
     glm::vec2 dir_norm = glm::normalize(dir);
-    bodyp.Accelerate(dir_norm, sharedForce * .5f * window.updateTimer.delta);
+    if (!otherp.phantom) bodyp.Accelerate(dir_norm, sharedForce * .5f * window.updateTimer.delta);
 }
 
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
