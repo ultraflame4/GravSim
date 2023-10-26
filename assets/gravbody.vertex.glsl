@@ -16,11 +16,10 @@ out vec2 pointPos;
 void main()
 {
     //    gl_PointSize = floatBitsToInt(aRadius);
+    vec4 a =  proj * model * vec4(1 + aRadius,0,0,1.0);
+    vec4 b =  proj * model * vec4(1,0,0,1.0);
 
-    pRadius = aRadius / 2;
-//    pRadius = aRadius;
-    gl_PointSize = aRadius;
-//    gl_Position = vec4(aPos, 0, 1.0);
+    //    gl_Position = vec4(aPos, 0, 1.0);
 //    gl_Position =  vec4(aPos, 0, 1.0);
     gl_Position = proj * view * model * vec4(aPos, -1, 1.0);
     vColor = aColor;
@@ -28,4 +27,9 @@ void main()
     vec2 ndcPos = gl_Position.xy / gl_Position.w;
 
     pointPos    = viewport * (ndcPos*0.5 + 0.5);
+
+    // Scale point size -> Referenced from https://stackoverflow.com/a/25783231
+    gl_PointSize = viewport.y * proj[1][1] * aRadius / gl_Position.w;
+    pRadius = gl_PointSize/2;
+
 }

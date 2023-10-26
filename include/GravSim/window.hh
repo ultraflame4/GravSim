@@ -28,6 +28,7 @@ protected:
 
     virtual void OnResize() {};
     virtual void OnInput(int key, int action, int mods) {};
+    virtual void OnScroll( double x_offset, double y_offset) {};
     virtual void OnImGui_Draw() {};
 
     virtual void Load() {};
@@ -45,6 +46,8 @@ private:
 
     static void static_framebuffer_size_callback(GLFWwindow *window, int width, int height);
     static void static_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+    static void static_scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
     void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 

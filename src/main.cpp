@@ -20,6 +20,8 @@ protected:
     glm::vec3 cameraMove = glm::vec3(0, 0, 0);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj;
+    float size = 1.f;
+    float zoomSpeed = .01f;
 
     Line targetingLine;
 
@@ -33,7 +35,7 @@ protected:
     }
 
     void OnResize() override {
-        proj = createOrtho(1.f);
+        proj = createOrtho(size);
     }
 
     GravBodyPhysical *spawningGravBody = nullptr; // grav body currently being spawned
@@ -50,6 +52,11 @@ protected:
         spawningGravBody->vel = vel;
     }
 
+    void OnScroll(double x_offset, double y_offset) override {
+        logger->debug("Y off {}, size: {}", y_offset, size);
+        size += y_offset * zoomSpeed;
+        OnResize();
+    }
 
     void OnInput(int key, int action, int mods) override {
         switch (action) {

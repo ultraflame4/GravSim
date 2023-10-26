@@ -49,6 +49,7 @@ Window::Window(int width, int height, const std::string &title) {
     glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
     glfwSetKeyCallback(window, static_key_callback);
     glfwSetMouseButtonCallback(window, static_mousebtn_callback);
+    glfwSetScrollCallback(window, static_scroll_callback);
     windows_list[window] = this;
 
     InitIMGUI();
@@ -65,6 +66,9 @@ void Window::static_mousebtn_callback(GLFWwindow *window, int key, int action, i
     windows_list[window]->OnInput(key, action, mods);
 }
 
+void Window::static_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    windows_list[window]->OnScroll(xoffset,yoffset);
+}
 
 void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     this->width = width;
@@ -116,6 +120,7 @@ void Window::InitIMGUI() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
 }
+
 
 std::shared_ptr<spdlog::logger> logger = logging::get("OpenGl");
 GLenum CheckGLErrors_(const char *file, int line)
