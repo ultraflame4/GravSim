@@ -190,7 +190,6 @@ protected:
             targetingLine.origin.y = spawningGravBody->pos.y;
             targetingLine.direction.x = spawningGravBody->vel.x;
             targetingLine.direction.y = spawningGravBody->vel.y;
-            targetingLine.update();
             targetingLine.draw(view, proj);
         }
     }

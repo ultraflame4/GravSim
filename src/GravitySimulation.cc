@@ -171,7 +171,6 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
         line.direction.y = bodyp.vel.y;
         line.origin.x = bodyp.pos.x;
         line.origin.y = bodyp.pos.y;
-        line.update();
         line.draw(view, proj);
     }
 }

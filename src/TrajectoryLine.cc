@@ -23,7 +23,7 @@ void Line::load() {
 
 }
 
-void Line::update() {
+void Line::update_line_vertices() {
 
     float length = glm::length(direction);
     float half = thick/2;
@@ -59,7 +59,7 @@ void Line::update() {
 //const glm::vec3 up(0, 1, 0);
 void Line::draw(glm::mat4 view, glm::mat4 proj) {
     if (!active) return;
-
+    update_line_vertices();
 
     glm::qua qat = glm::rotation(up,glm::normalize(direction));
 //    glm::qua qat(glm::vec3(0.0, 0.0, 0.0));
