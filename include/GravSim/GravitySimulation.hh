@@ -51,7 +51,7 @@ public:
     int view_loc;
     int proj_loc;
 
-    float gravityConstant = 50.f;
+    float gravityConstant = 500.f;
     VertexObject *vo;
     Window &window;
 

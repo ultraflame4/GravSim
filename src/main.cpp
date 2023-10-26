@@ -130,10 +130,10 @@ protected:
         ImGui::Text("TPS AVG: %f", 1.f / updateTimer.avg_delta);
         ImGui::Text("Camera Position: %f,%f", cameraPos.x, cameraPos.y);
         ImGui::Checkbox("Paused [Spacebar]", &paused);
-        ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -100.f, 100.f);
+        ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant, -1000.f, 1000.f);
         if (ImGui::CollapsingHeader("Gravity Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
-            ImGui::SliderFloat("Spawn Mass", &spawnMass, 1, 1000);
+            ImGui::SliderFloat("Spawn Mass", &spawnMass, 1, 2000);
             ImGui::SliderFloat("Spawn Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Spawn Color", spawnColor);
             glm::vec2 spawnVel = spawningGravBody != nullptr ? spawningGravBody->vel : glm::vec2(0, 0);
