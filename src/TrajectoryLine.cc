@@ -23,7 +23,7 @@ void Line::load() {
 
 }
 
-void Line::update() {
+void Line::update_line_vertices() {
 
     float length = glm::length(direction);
     float half = thick/2;

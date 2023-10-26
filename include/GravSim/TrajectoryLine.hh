@@ -17,7 +17,7 @@ public:
     bool active = true;
 
     static void load();
-    void update();
+    void update_line_vertices();
     void draw(glm::mat4 view, glm::mat4 proj);
     ~Line();
 
