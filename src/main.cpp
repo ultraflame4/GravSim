@@ -45,7 +45,7 @@ protected:
         proj = createOrtho(current_zoom);
     }
 
-    std::vector<GravBodyPhysical *> spawningGravBodies; // grav body currently being spawned
+    std::vector<int> spawningGravBodies; // grav body currently being spawned
     float spawnMass = 10;
     float spawnRadius = 10;
     float spawnColor[3] = {1.f, 1.f, 1.f};
@@ -62,7 +62,7 @@ protected:
         spawnVel = spawnPosition - pos;
     }
 
-    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true) {
+    int AddBody(float x, float y, float radius, float mass, bool active = true) {
         return simulation.AddBody(x, y, radius, mass, spawnColor, active);
     }
 
@@ -75,9 +75,10 @@ protected:
             case GLFW_RELEASE:
 
                 if (key == GLFW_MOUSE_BUTTON_RIGHT && !spawningGravBodies.empty()) {
-                    for (auto body: spawningGravBodies) {
-                        body->vel = spawnVel;
-                        body->active = true;
+                    for (int bodyIndex: spawningGravBodies) {
+                        GravBodyPhysical& body = simulation.physicalBodies[bodyIndex];
+                        body.vel = spawnVel;
+                        body.active = true;
                     }
                     spawningGravBodies.clear();
                 }
@@ -112,7 +113,7 @@ protected:
 
                     logger->debug("Spawning {} object(s) at {},{}", spawnCount, spawnPosition.x, spawnPosition.y);
                     spawningGravBodies.emplace_back(
-                            &AddBody(spawnPosition.x, spawnPosition.y, spawnRadius, spawnMass, false));
+                            AddBody(spawnPosition.x, spawnPosition.y, spawnRadius, spawnMass, false));
                     float angle = 0;
                     float max_angle = 360 * (std::numbers::pi / 180);
                     for (int i = 0; i < spawnCount - 1; ++i) {
@@ -124,7 +125,7 @@ protected:
                         glm::vec2 final_pos = spawnPosition + (dir_off * dist);
 
                         spawningGravBodies.emplace_back(
-                                &AddBody(final_pos.x, final_pos.y, spawnRadius, spawnMass, false));
+                                AddBody(final_pos.x, final_pos.y, spawnRadius, spawnMass, false));
 
                         // Amount to increase angle by. Should increase just enough such that the bodies dont collide!
                         float dist_2sq = 2 * dist * dist;

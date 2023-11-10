@@ -134,7 +134,7 @@ void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
     }
 }
 
-GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
+int GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
     bodies_mutex.lock();
     bodies.push_back(GravBodyVertex{
             x, y,
@@ -152,7 +152,7 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
     });
     bodyp.index = physicalBodies.size()-1;
     bodies_mutex.unlock();
-    return bodyp;
+    return bodyp.index;
 }
 
 void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {

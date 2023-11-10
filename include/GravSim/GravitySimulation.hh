@@ -82,7 +82,7 @@ public:
 
     void draw(glm::mat4 view, glm::mat4 proj);
 
-    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, float color[3], bool active = true);
+    int AddBody(float x, float y, float radius, float mass, float color[3], bool active = true);
 
 private:
     std::shared_ptr<spdlog::logger> logger = logging::get<GravitySimulation>();
