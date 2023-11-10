@@ -7,6 +7,8 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/norm.hpp>
 #include <cmath>
+#include <algorithm>
+#include <execution>
 
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
@@ -97,7 +99,39 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 
 void GravitySimulation::update() {
     bodies_mutex.lock();
-    // Make circles go in circle. this is temp for testing
+
+    std::vector<CellItem> spatialLookup;
+    spatialLookup.resize(bodies.size());
+    for (int i = 0; i < bodies.size(); ++i) {
+        spatialLookup[i] = CellItem{
+                GetCellKey(physicalBodies[i].pos),
+                &physicalBodies[i]
+        };
+    }
+    std::sort(std::execution::par_unseq,spatialLookup.begin(), spatialLookup.end(), &CellItem::sorter);
+    std::vector<int> startIndices;
+    float prevKey;
+    for (int i = 0; i < bodies.size(); ++i) {
+        if (i == 0) {
+            prevKey=spatialLookup[0].cellHash;
+            startIndices.push_back(0);
+            continue;
+        }
+        if (prevKey != spatialLookup[i].cellHash) {
+            prevKey = spatialLookup[i].cellHash;
+            startIndices.push_back(i);
+        }
+    }
+    // todo continue
+
+
+//    std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
+//        auto &body = this->vertex(bodyp);
+//        UpdateGravBodyPhysics(bodyp, bodyp.index);
+//        body.x = bodyp.pos.x;
+//        body.y = bodyp.pos.y;
+//    });
+
     for (int i = 0; i < bodies.size(); ++i) {
         auto &body = bodies[i];
         auto &bodyp = physicalBodies[i];
@@ -196,3 +230,11 @@ void GravitySimulation::resolveFused(GravBodyPhysical &a, GravBodyPhysical &b) {
     if (!a.phantom) b.pos.x += b.radius/2;
 }
 
+float GravitySimulation::GetCellKey(const glm::vec2 &pos) {
+    glm::vec2 cellPos = glm::floor(pos / (float)cell_size);
+    return (cellPos.x * 15823) * (cellPos.y * 98711);
+}
+
+bool CellItem::sorter(const CellItem &a, const CellItem &b) {
+    return a.cellHash<b.cellHash;
+}

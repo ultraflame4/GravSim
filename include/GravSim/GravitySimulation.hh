@@ -45,6 +45,13 @@ struct GravBodyPhysical {
     }
 };
 
+
+struct CellItem{
+    float cellHash;
+    GravBodyPhysical* bodyp;
+    static bool sorter(CellItem const& a, CellItem const &b);
+};
+
 class GravitySimulation {
 public:
     std::vector<GravBodyVertex> bodies;
@@ -52,6 +59,7 @@ public:
     Shader shader;
     std::mutex bodies_mutex;
 
+    const int cell_size = 50;
     int feathering_loc;
     int viewport_loc;
     int model_loc;
@@ -96,4 +104,7 @@ private:
     void drawDebugLines(glm::mat4 view, glm::mat4 proj);
 
     GravBodyVertex & vertex(GravBodyPhysical &bodyp);
+
+    float GetCellKey(const glm::vec2 &pos);
+
 };
