@@ -190,8 +190,8 @@ protected:
             ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Color", spawnColor);
             ImGui::SliderInt("Count", &spawnCount, 1, 20);
-            glm::vec2 spawnVel = spawningGravBodies.empty() ? glm::vec2(0, 0) : spawnVel;
-            ImGui::Text("Velocity %f,%f", spawnVel.x, spawnVel.y);
+            glm::vec2 text_vel = spawningGravBodies.empty() ? glm::vec2(0, 0) : spawnVel;
+            ImGui::Text("Velocity %f,%f", text_vel.x,  text_vel.y);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.clear();
             }
