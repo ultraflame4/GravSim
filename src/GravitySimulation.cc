@@ -180,9 +180,11 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 }
 
 void GravitySimulation::clear() {
+    bodies_mutex.lock();
     physicalBodies.clear();
     bodies.clear();
     debugLines.clear();
+    bodies_mutex.unlock();
 }
 
 GravBodyVertex & GravitySimulation::vertex(GravBodyPhysical &bodyp) {
