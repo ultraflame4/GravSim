@@ -1,8 +1,10 @@
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <imgui.h>
 #include <algorithm>
+#include <numbers>
 #include "GravSim/window.hh"
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
@@ -75,7 +77,7 @@ protected:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT && !spawningGravBodies.empty()) {
                     for (auto body: spawningGravBodies) {
                         body->vel = spawnVel;
-                        body->active= true;
+                        body->active = true;
                     }
                     spawningGravBodies.clear();
                 }
@@ -111,8 +113,23 @@ protected:
                     logger->debug("Spawning {} object(s) at {},{}", spawnCount, spawnPosition.x, spawnPosition.y);
                     spawningGravBodies.emplace_back(
                             &AddBody(spawnPosition.x, spawnPosition.y, spawnRadius, spawnMass, false));
+                    float angle = 0;
+                    float max_angle = 360 * (std::numbers::pi / 180);
                     for (int i = 0; i < spawnCount - 1; ++i) {
-//todo
+
+                        // Distance from center
+                        float dist = spawnRadius * 2 * (std::floor(angle / max_angle) + 1);
+                        // Direction offset from spawn position
+                        glm::vec2 dir_off(std::sin(angle), std::cos(angle));
+                        glm::vec2 final_pos = spawnPosition + (dir_off * dist);
+
+                        spawningGravBodies.emplace_back(
+                                &AddBody(final_pos.x, final_pos.y, spawnRadius, spawnMass, false));
+
+                        // Amount to increase angle by. Should increase just enough such that the bodies dont collide!
+                        float dist_2sq = 2 * dist * dist;
+                        float amt = std::acos((dist_2sq - (4 * spawnRadius * spawnRadius)) / dist_2sq);
+                        angle += amt;
                     }
 
                 }
