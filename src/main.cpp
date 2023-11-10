@@ -57,6 +57,10 @@ protected:
         spawningGravBody->vel = vel;
     }
 
+    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true) {
+        return simulation.AddBody(x, y, radius, mass, spawnColor, active);
+    }
+
     void OnScroll(double x_offset, double y_offset) override {
         target_zoom -= y_offset * zoom_speed;
     }
@@ -106,10 +110,6 @@ protected:
         }
 
 
-    }
-
-    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true) {
-        return simulation.AddBody(x, y, radius, mass, spawnColor, active);
     }
 
     void Load() override {

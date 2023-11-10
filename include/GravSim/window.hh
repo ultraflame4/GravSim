@@ -23,8 +23,11 @@ public:
     int height;
 
 protected:
-    std::shared_ptr<spdlog::logger> logger;
+    ~Window() = default;
 
+    std::shared_ptr<spdlog::logger> logger;
+    bool is_running = false;
+    std::thread* pUpdateThread = nullptr;
 
     virtual void OnResize() {};
     virtual void OnInput(int key, int action, int mods) {};
@@ -54,6 +57,9 @@ private:
     void InitIMGUI();
 
     static void static_mousebtn_callback(GLFWwindow* window, int key, int action, int mods);
+
+    void _update_thread();
+
 };
 GLenum CheckGLErrors_(const char *file, int line);
 #define CheckGLErrors() CheckGLErrors_(__FILE__,__LINE__)

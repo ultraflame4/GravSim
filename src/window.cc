@@ -66,6 +66,7 @@ void Window::static_mousebtn_callback(GLFWwindow *window, int key, int action, i
     windows_list[window]->OnInput(key, action, mods);
 }
 
+
 void Window::static_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     windows_list[window]->OnScroll(xoffset,yoffset);
 }
@@ -77,16 +78,23 @@ void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height
     this->OnResize();
 }
 
+void Window::_update_thread() {
+    updateTimer.tick();
+    while (is_running) {
+        Update(updateTimer.tick());
+    }
+}
+
 void Window::run() {
     framebuffer_size_callback(window, width, height); // Call once at the start
     Load();
     frameTimer.tick();
-    updateTimer.tick();
+    is_running = true;
+    pUpdateThread = new std::thread(&Window::_update_thread, this);
+
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        for (int i = 0; i < 20; ++i) {
-            Update(updateTimer.tick());
-        }
 
         glClearColor(.0f, .0f, .0f, .0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -101,6 +109,10 @@ void Window::run() {
         CheckGLErrors();
         glfwSwapBuffers(window);
     }
+
+    is_running = false;
+    pUpdateThread->join();
+    delete pUpdateThread;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
