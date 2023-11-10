@@ -114,12 +114,19 @@ protected:
                     logger->debug("Spawning {} object(s) at {},{}", spawnCount, spawnPosition.x, spawnPosition.y);
                     spawningGravBodies.emplace_back(
                             AddBody(spawnPosition.x, spawnPosition.y, spawnRadius, spawnMass, false));
+                    float dist = spawnRadius *2;
                     float angle = 0;
                     float max_angle = 360 * (std::numbers::pi / 180);
+                    float layer_count = 0;
                     for (int i = 0; i < spawnCount - 1; ++i) {
 
                         // Distance from center
-                        float dist = spawnRadius * 2 * (std::floor(angle / max_angle) + 1);
+
+                        // Amount to increase angle by. Should increase just enough such that the bodies dont collide!
+                        float dist_2sq = 2 * dist * dist;
+                        float amt = std::acos((dist_2sq - (4 * spawnRadius * spawnRadius)) / dist_2sq);
+
+
                         // Direction offset from spawn position
                         glm::vec2 dir_off(std::sin(angle), std::cos(angle));
                         glm::vec2 final_pos = spawnPosition + (dir_off * dist);
@@ -127,9 +134,12 @@ protected:
                         spawningGravBodies.emplace_back(
                                 AddBody(final_pos.x, final_pos.y, spawnRadius, spawnMass, false));
 
-                        // Amount to increase angle by. Should increase just enough such that the bodies dont collide!
-                        float dist_2sq = 2 * dist * dist;
-                        float amt = std::acos((dist_2sq - (4 * spawnRadius * spawnRadius)) / dist_2sq);
+                        int max_layer_count = std::floor(max_angle / amt);
+                        layer_count++;
+                        if (layer_count >= max_layer_count) {
+                            dist+=spawnRadius*2;
+                            layer_count=0;
+                        }
                         angle += amt;
                     }
 
