@@ -50,7 +50,7 @@ public:
     std::vector<GravBodyVertex> bodies;
     std::vector<GravBodyPhysical> physicalBodies;
     Shader shader;
-
+    std::mutex bodies_mutex;
 
     int feathering_loc;
     int viewport_loc;

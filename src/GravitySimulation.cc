@@ -96,7 +96,7 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 }
 
 void GravitySimulation::update() {
-
+    bodies_mutex.lock();
     // Make circles go in circle. this is temp for testing
     for (int i = 0; i < bodies.size(); ++i) {
         auto &body = bodies[i];
@@ -105,6 +105,7 @@ void GravitySimulation::update() {
         body.x = bodyp.pos.x;
         body.y = bodyp.pos.y;
     }
+    bodies_mutex.unlock();
 }
 
 
@@ -134,6 +135,7 @@ void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
 }
 
 GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
+    bodies_mutex.lock();
     bodies.push_back(GravBodyVertex{
             x, y,
             radius,
@@ -149,6 +151,7 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
             false
     });
     bodyp.index = physicalBodies.size()-1;
+    bodies_mutex.unlock();
     return bodyp;
 }
 

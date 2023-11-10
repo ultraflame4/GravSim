@@ -9,7 +9,7 @@ public:
     double lastTime = 0;
     float delta = 0;
     float avg_delta = 0;
-    int average_factor = 90;
+    int average_factor = 100;
     float tick();
 private:
     void calc_avg();
