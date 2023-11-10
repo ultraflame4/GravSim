@@ -73,7 +73,11 @@ protected:
             case GLFW_RELEASE:
 
                 if (key == GLFW_MOUSE_BUTTON_RIGHT && !spawningGravBodies.empty()) {
-
+                    for (auto body: spawningGravBodies) {
+                        body->vel = spawnVel;
+                        body->active= true;
+                    }
+                    spawningGravBodies.clear();
                 }
                 if (key == GLFW_KEY_W) cameraMove -= up;
                 if (key == GLFW_KEY_A) cameraMove -= left;
