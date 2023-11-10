@@ -45,13 +45,6 @@ struct GravBodyPhysical {
     }
 };
 
-
-struct CellItem{
-    float cellHash;
-    GravBodyPhysical* bodyp;
-    static bool sorter(CellItem const& a, CellItem const &b);
-};
-
 class GravitySimulation {
 public:
     std::vector<GravBodyVertex> bodies;
@@ -105,6 +98,5 @@ private:
 
     GravBodyVertex & vertex(GravBodyPhysical &bodyp);
 
-    float GetCellKey(const glm::vec2 &pos);
 
 };
