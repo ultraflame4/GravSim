@@ -43,18 +43,21 @@ protected:
         proj = createOrtho(current_zoom);
     }
 
-    GravBodyPhysical *spawningGravBody = nullptr; // grav body currently being spawned
+    std::vector<GravBodyPhysical *> spawningGravBodies; // grav body currently being spawned
     float spawnMass = 10;
     float spawnRadius = 10;
     float spawnColor[3] = {1.f, 1.f, 1.f};
+    int spawnCount = 1;
+
+    glm::vec2 spawnPosition;
+    glm::vec2 spawnVel;
 
     void UpdateSpawningBodyVel() {
-        if (spawningGravBody == nullptr) return;
+        if (spawningGravBodies.empty()) return;
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
         glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
-        glm::vec2 vel = spawningGravBody->pos - pos;
-        spawningGravBody->vel = vel;
+        spawnVel = spawnPosition - pos;
     }
 
     GravBodyPhysical &AddBody(float x, float y, float radius, float mass, bool active = true) {
@@ -69,9 +72,8 @@ protected:
         switch (action) {
             case GLFW_RELEASE:
 
-                if (key == GLFW_MOUSE_BUTTON_RIGHT) {
-                    spawningGravBody->active = true;
-                    spawningGravBody = nullptr;
+                if (key == GLFW_MOUSE_BUTTON_RIGHT && !spawningGravBodies.empty()) {
+
                 }
                 if (key == GLFW_KEY_W) cameraMove -= up;
                 if (key == GLFW_KEY_A) cameraMove -= left;
@@ -100,9 +102,15 @@ protected:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
                     double xpos, ypos;
                     glfwGetCursorPos(window, &xpos, &ypos);
-                    glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
-                    logger->debug("Spawn object at {},{}", pos.x, pos.y);
-                    spawningGravBody = &AddBody(pos.x, pos.y, spawnRadius, spawnMass, false);
+                    spawnPosition = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
+
+                    logger->debug("Spawning {} object(s) at {},{}", spawnCount, spawnPosition.x, spawnPosition.y);
+                    spawningGravBodies.emplace_back(
+                            &AddBody(spawnPosition.x, spawnPosition.y, spawnRadius, spawnMass, false));
+                    for (int i = 0; i < spawnCount - 1; ++i) {
+//todo
+                    }
+
                 }
                 break;
             default:
@@ -149,7 +157,8 @@ protected:
             ImGui::SliderFloat("Mass", &spawnMass, 1, 2000);
             ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Color", spawnColor);
-            glm::vec2 spawnVel = spawningGravBody != nullptr ? spawningGravBody->vel : glm::vec2(0, 0);
+            ImGui::SliderInt("Count", &spawnCount, 1, 20);
+            glm::vec2 spawnVel = spawningGravBodies.empty() ? glm::vec2(0, 0) : spawnVel;
             ImGui::Text("Velocity %f,%f", spawnVel.x, spawnVel.y);
             if (ImGui::Button("Clear Bodies")) {
                 simulation.clear();
@@ -180,10 +189,9 @@ protected:
 
         targetCameraPos = targetCameraPos + cameraMove * dt * 2000.f * current_zoom;
         if (abs(length(cameraPos - targetCameraPos)) < (0.01f * current_zoom)) {
-            cameraPos = glm::mix(cameraPos, targetCameraPos, 10*dt);
-        }
-        else{
-            cameraPos = glm::mix(cameraPos, targetCameraPos, 10*dt);
+            cameraPos = glm::mix(cameraPos, targetCameraPos, 10 * dt);
+        } else {
+            cameraPos = glm::mix(cameraPos, targetCameraPos, 10 * dt);
         }
 
 
@@ -193,12 +201,12 @@ protected:
 
         simulation.draw(view, proj);
 
-        targetingLine.active = spawningGravBody != nullptr;
+        targetingLine.active = !spawningGravBodies.empty();
         if (targetingLine.active) {
-            targetingLine.origin.x = spawningGravBody->pos.x;
-            targetingLine.origin.y = spawningGravBody->pos.y;
-            targetingLine.direction.x = spawningGravBody->vel.x;
-            targetingLine.direction.y = spawningGravBody->vel.y;
+            targetingLine.origin.x = spawnPosition.x;
+            targetingLine.origin.y = spawnPosition.y;
+            targetingLine.direction.x = spawnVel.x;
+            targetingLine.direction.y = spawnVel.y;
             targetingLine.update_line_vertices();
             targetingLine.draw(view, proj);
         }
