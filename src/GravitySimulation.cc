@@ -7,6 +7,8 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/norm.hpp>
 #include <cmath>
+#include <algorithm>
+#include <execution>
 
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
@@ -97,14 +99,21 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 
 void GravitySimulation::update() {
     bodies_mutex.lock();
-    // Make circles go in circle. this is temp for testing
-    for (int i = 0; i < bodies.size(); ++i) {
-        auto &body = bodies[i];
-        auto &bodyp = physicalBodies[i];
-        UpdateGravBodyPhysics(bodyp, i);
+
+    std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
+        auto &body = this->vertex(bodyp);
+        UpdateGravBodyPhysics(bodyp, bodyp.index);
         body.x = bodyp.pos.x;
         body.y = bodyp.pos.y;
-    }
+    });
+
+//    for (int i = 0; i < bodies.size(); ++i) {
+//        auto &body = bodies[i];
+//        auto &bodyp = physicalBodies[i];
+//        UpdateGravBodyPhysics(bodyp, i);
+//        body.x = bodyp.pos.x;
+//        body.y = bodyp.pos.y;
+//    }
     bodies_mutex.unlock();
 }
 
@@ -134,7 +143,7 @@ void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
     }
 }
 
-GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
+int GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
     bodies_mutex.lock();
     bodies.push_back(GravBodyVertex{
             x, y,
@@ -152,7 +161,7 @@ GravBodyPhysical &GravitySimulation::AddBody(float x, float y, float radius, flo
     });
     bodyp.index = physicalBodies.size()-1;
     bodies_mutex.unlock();
-    return bodyp;
+    return bodyp.index;
 }
 
 void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
@@ -180,9 +189,11 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 }
 
 void GravitySimulation::clear() {
+    bodies_mutex.lock();
     physicalBodies.clear();
     bodies.clear();
     debugLines.clear();
+    bodies_mutex.unlock();
 }
 
 GravBodyVertex & GravitySimulation::vertex(GravBodyPhysical &bodyp) {

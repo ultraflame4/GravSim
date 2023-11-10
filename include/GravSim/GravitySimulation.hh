@@ -52,6 +52,7 @@ public:
     Shader shader;
     std::mutex bodies_mutex;
 
+    const int cell_size = 50;
     int feathering_loc;
     int viewport_loc;
     int model_loc;
@@ -82,7 +83,7 @@ public:
 
     void draw(glm::mat4 view, glm::mat4 proj);
 
-    GravBodyPhysical &AddBody(float x, float y, float radius, float mass, float color[3], bool active = true);
+    int AddBody(float x, float y, float radius, float mass, float color[3], bool active = true);
 
 private:
     std::shared_ptr<spdlog::logger> logger = logging::get<GravitySimulation>();
@@ -96,4 +97,6 @@ private:
     void drawDebugLines(glm::mat4 view, glm::mat4 proj);
 
     GravBodyVertex & vertex(GravBodyPhysical &bodyp);
+
+
 };
