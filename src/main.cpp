@@ -199,7 +199,7 @@ protected:
         if (ImGui::CollapsingHeader("Trajectory Line", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Thickness", &targetingLine.thick, 1, 100);
-            ImGui::ColorEdit3("Color", targetingLine.color);
+            ImGui::ColorEdit3("Line Color", targetingLine.color);
         }
         if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
