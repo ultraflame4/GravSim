@@ -26,10 +26,8 @@ set(SOURCES
         src/VertexObject.cc
         src/Timer.cc
         src/Line.cc
-        src/QuadTree.cc
         src/GravitySimulation.cc
         include/GravSim/utils.hh
-        src/QuadTreeImpl.cc
 )
 
 
