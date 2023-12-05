@@ -2,7 +2,7 @@
 // Created by powew on 5/12/2023.
 //
 
-#include "QuadTree.hh"
+#include "GravSim/QuadTree.hh"
 
 
 template<typename T>

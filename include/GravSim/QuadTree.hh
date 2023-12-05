@@ -26,8 +26,6 @@ namespace QuadTree {
         glm::vec2 center;
 
         explicit QuadTreeManager(float physicalSize  = 100.f, glm::vec2 center= glm::vec2(0,0));
-
-
         const Node <T> &GetNodeFromPosition(glm::vec2 position);
     };
 

@@ -9,6 +9,7 @@
 #include "VertexObject.hh"
 #include "window.hh"
 #include "Line.hh"
+#include "QuadTree.hh"
 
 struct GravBodyVertex {
     float x;
@@ -53,14 +54,14 @@ public:
     std::mutex bodies_mutex;
 
     const int cell_size = 50;
-    int feathering_loc;
-    int viewport_loc;
-    int model_loc;
-    int view_loc;
-    int proj_loc;
+    int feathering_loc{};
+    int viewport_loc{};
+    int model_loc{};
+    int view_loc{};
+    int proj_loc{};
 
     float gravityConstant = 500.f;
-    VertexObject *vo;
+    VertexObject *vo{};
     Window &window;
 
     GravitySimulation(Window &window);
@@ -87,6 +88,8 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger = logging::get<GravitySimulation>();
+    QuadTree::QuadTreeManager<GravBodyPhysical> quadTreeManager;
+
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index);
 
     void ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp);
