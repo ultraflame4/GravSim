@@ -28,6 +28,7 @@ set(SOURCES
         src/Line.cc
         src/GravitySimulation.cc
         include/GravSim/utils.hh
+        src/QuadTree/QuadTree.cc
 )
 
 
