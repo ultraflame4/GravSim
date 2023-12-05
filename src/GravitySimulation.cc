@@ -100,6 +100,11 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 void GravitySimulation::update() {
     bodies_mutex.lock();
 
+    quadTreeManager.clearItems();
+    for (const auto &bodyp: physicalBodies) {
+        auto node = quadTreeManager.CreateNodeFromPosition(bodyp.pos, 4);
+        node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
+    }
 
 
 //    std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
@@ -142,6 +147,7 @@ void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
 
     if (debug) {
         drawDebugLines(view, proj);
+
     }
 }
 
@@ -167,26 +173,13 @@ int GravitySimulation::AddBody(float x, float y, float radius, float mass, float
 }
 
 void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
-    if (debugLines.size() != physicalBodies.size()) {
-        debugLines.clear();
-        for (const auto &item: physicalBodies) {
-            auto &line = debugLines.emplace_back();
-            line.color[0] = 0.4f;
-            line.color[1] = 0.9f;
-            line.color[2] = 0.1f;
-            line.thick = 1;
-        }
-    }
+
+    debugLines.proj = &proj;
+    debugLines.view = &view;
 
     for (int i = 0; i < physicalBodies.size(); ++i) {
-        auto &line = debugLines[i];
         auto &bodyp = physicalBodies[i];
-        line.direction.x = bodyp.vel.x;
-        line.direction.y = bodyp.vel.y;
-        line.origin.x = bodyp.pos.x;
-        line.origin.y = bodyp.pos.y;
-        line.update_line_vertices();
-        line.draw(view, proj);
+        debugLines.DrawRay(bodyp.pos, bodyp.vel, {.4f, .9f, .1f});
     }
 }
 
@@ -194,7 +187,6 @@ void GravitySimulation::clear() {
     bodies_mutex.lock();
     physicalBodies.clear();
     bodies.clear();
-    debugLines.clear();
     bodies_mutex.unlock();
 }
 

@@ -10,6 +10,7 @@
 #include "window.hh"
 #include "Line.hh"
 #include "QuadTree.hh"
+#include "DebugLineFactory.hh"
 
 struct GravBodyVertex {
     float x;
@@ -88,7 +89,7 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger = logging::get<GravitySimulation>();
-    QuadTree::QuadTreeManager<GravBodyPhysical> quadTreeManager;
+    QuadTree::QuadTreeManager<GravBodyPhysical*> quadTreeManager;
 
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index);
 
@@ -96,7 +97,7 @@ private:
 
     void ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysical &otherp);
 
-    std::vector<Line> debugLines;
+    DebugLineFactory debugLines;
     void drawDebugLines(glm::mat4 view, glm::mat4 proj);
 
     GravBodyVertex & vertex(GravBodyPhysical &bodyp);
