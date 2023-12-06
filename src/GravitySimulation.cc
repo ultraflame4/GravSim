@@ -103,7 +103,7 @@ void GravitySimulation::update() {
     quadTreeGenTimer.tick(true);
     quadTreeManager.clearItems();
     for (const auto &bodyp: physicalBodies) {
-        auto node = quadTreeManager.CreateNodeFromPosition(bodyp.pos, 10);
+        auto node = quadTreeManager.CreateNodeFromPosition(bodyp.pos, 5);
         node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
     }
     quadTreeGenTimer.tick();
