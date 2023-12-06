@@ -17,7 +17,7 @@ namespace QuadTree {
     class Node {
     public:
         std::unique_ptr<Node<T>> children[4];
-        int depth;
+        int depth=0;
         int index;
         Node<T>* parent;
         std::vector<T> items;
@@ -92,7 +92,7 @@ namespace QuadTree {
             int depth = rootNode->depth;
             while (current != nullptr && depth <= maxDepth) {
                 parent = current;
-                depth++;
+
 
                 if (position.y < quad_center.y) {
                     // Top left
@@ -105,7 +105,7 @@ namespace QuadTree {
                         current = parent->addchild(1, depth);
                         quad_center.x += halfSize;
                     }
-                    quad_center.y += halfSize;
+                    quad_center.y -= halfSize;
                 } else {
                     // bottom left
                     if (position.x < quad_center.x) {
@@ -117,9 +117,10 @@ namespace QuadTree {
                         current = parent->addchild(3, depth);
                         quad_center.x += halfSize;
                     }
-                    quad_center.y -= halfSize;
+                    quad_center.y += halfSize;
                 }
-                halfSize = halfSize / 2;
+                halfSize /= 2;
+                depth++;
             }
             return parent;
         }
