@@ -84,7 +84,7 @@ namespace QuadTree {
         float physicalSize;
         glm::vec2 center;
 
-        explicit QuadTreeManager(float physicalSize = 1000.f, glm::vec2 center = glm::vec2(0, 0)) {
+        explicit QuadTreeManager(float physicalSize = 5000.f, glm::vec2 center = glm::vec2(0, 0)) {
             rootNode.reset(new Node<T>());
             rootNode->depth=0;
             this->center = center;
