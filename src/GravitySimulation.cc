@@ -205,7 +205,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 
         current = parent->children[index].get();
         // If current is null, increase index
-        if (current == nullptr) {
+        if (current == nullptr || current->empty()) {
             index++;
             // logger->debug("Current Is null. Change to depth {} index {}", depth, index);
             continue;

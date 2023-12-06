@@ -15,12 +15,17 @@ namespace QuadTree {
 
     template<typename T>
     class Node {
+    private:
+        bool isEmpty;
     public:
         std::unique_ptr<Node<T>> children[4];
         int depth=0;
         int index;
         Node<T>* parent;
         std::vector<T> items;
+        bool empty() {
+            return isEmpty;
+        }
 
         Node<T> *addchild(int index, int _depth, bool force = false) {
             std::unique_ptr<Node<T>>& child = children[index];
@@ -33,6 +38,8 @@ namespace QuadTree {
                 child->index = index;
                 child->depth = _depth;
             }
+            isEmpty = false;
+
             return child.get();
         }
 
@@ -43,6 +50,15 @@ namespace QuadTree {
                     child->clearItems();
                 }
             }
+            bool deleteSelf = true;
+            for (int i = 0; i < 4; ++i) {
+                auto child = children[i].get();
+                if (child != nullptr) {
+                    if (!child->isEmpty) deleteSelf = false;
+                }
+            }
+
+            isEmpty = deleteSelf;
         }
 
 
