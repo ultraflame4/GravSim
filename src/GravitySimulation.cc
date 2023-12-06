@@ -100,11 +100,13 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 void GravitySimulation::update() {
     bodies_mutex.lock();
 
+    quadTreeGenTimer.tick(true);
     quadTreeManager.clearItems();
     for (const auto &bodyp: physicalBodies) {
         auto node = quadTreeManager.CreateNodeFromPosition(bodyp.pos, 10);
         node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
     }
+    quadTreeGenTimer.tick();
 
 
     std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){

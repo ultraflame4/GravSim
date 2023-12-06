@@ -10,7 +10,7 @@ public:
     float delta = 0;
     float avg_delta = 0;
     int average_factor = 100;
-    float tick();
+    float tick(bool reset=false);
 private:
     void calc_avg();
 };

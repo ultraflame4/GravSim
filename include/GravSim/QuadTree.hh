@@ -46,7 +46,7 @@ namespace QuadTree {
         void clearItems(){
             items.clear();
             for (const auto& child: children) {
-                if (child != nullptr) {
+                if (child != nullptr && !child->isEmpty) {
                     child->clearItems();
                 }
             }

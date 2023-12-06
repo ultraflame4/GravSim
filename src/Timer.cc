@@ -5,12 +5,13 @@
 #include <GLFW/glfw3.h>
 #include "GravSim/Timer.hh"
 
-float Timer::tick() {
+float Timer::tick(bool reset) {
     double now = glfwGetTime();
-    delta = now - lastTime;
+    if(!reset) {
+        delta = now - lastTime;
+        calc_avg();
+    }
     lastTime = now;
-//    ticks += 1;
-    calc_avg();
     return delta;
 }
 

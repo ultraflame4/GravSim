@@ -202,6 +202,8 @@ protected:
             ImGui::ColorEdit3("Line Color", targetingLine.color);
         }
         if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Text("QuadTree genTime: %f", simulation.quadTreeGenTimer.delta);
+            ImGui::Text("QuadTree genAvgTime: %f", simulation.quadTreeGenTimer.avg_delta);
             ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
             ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
             ImGui::Checkbox("Debug Velocity", &simulation.debug);
