@@ -107,12 +107,12 @@ void GravitySimulation::update() {
     }
 
 
-//    std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
-//        auto &body = this->vertex(bodyp);
-//        UpdateGravBodyPhysics(bodyp, bodyp.index);
-//        body.x = bodyp.pos.x;
-//        body.y = bodyp.pos.y;
-//    });
+    std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
+        auto &body = this->vertex(bodyp);
+        UpdateGravBodyPhysics(bodyp, bodyp.index);
+        body.x = bodyp.pos.x;
+        body.y = bodyp.pos.y;
+    });
 
 //    for (int i = 0; i < bodies.size(); ++i) {
 //        auto &body = bodies[i];
@@ -180,6 +180,48 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
     for (int i = 0; i < physicalBodies.size(); ++i) {
         auto &bodyp = physicalBodies[i];
         debugLines.DrawRay(bodyp.pos, bodyp.vel, {.4f, .9f, .1f});
+    }
+
+    QuadTree::Node<GravBodyPhysical *>* parent = quadTreeManager.rootNode.get();
+    glm::vec2 parentPosition = quadTreeManager.center;
+    float parentSize = quadTreeManager.physicalSize;
+
+    int depth = 0;
+    QuadTree::Node<GravBodyPhysical *>* current;
+    int index = 0;
+    while (true) {
+
+
+        if (index >= 4) {
+            index = parent->index+1; // Set next index to the parent's sibling
+            parent = parent->parent;
+            parentSize*=2;
+            parentPosition -= parentSize*QuadTree::IndexToVector(index-1);
+            depth--;
+            // logger->debug("Ascend to depth {} index {}", depth, index);
+            continue;
+        }
+        if (parent == nullptr) break;
+
+        current = parent->children[index].get();
+        // If current is null, increase index
+        if (current == nullptr) {
+            index++;
+            // logger->debug("Current Is null. Change to depth {} index {}", depth, index);
+            continue;
+        }
+
+
+        glm::vec2 currentPos = parentSize*QuadTree::IndexToVector(index) + parentPosition;
+        debugLines.DrawSquare(currentPos, parentSize,{0,1,1});
+
+        // Set current as new parent to descend down the tree
+        parent = current;
+        parentPosition = currentPos;
+        parentSize/=2;
+        index = 0;
+        depth++;
+        // logger->debug("Descend to depth {} index {}", depth, index);
     }
 }
 

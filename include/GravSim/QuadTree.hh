@@ -18,6 +18,8 @@ namespace QuadTree {
     public:
         std::unique_ptr<Node<T>> children[4];
         int depth;
+        int index;
+        Node<T>* parent;
         std::vector<T> items;
 
         Node<T> *addchild(int index, int _depth, bool force = false) {
@@ -27,6 +29,8 @@ namespace QuadTree {
             }
             if (child == nullptr) {
                 child.reset(new Node<T>());
+                child->parent = this;
+                child->index = index;
                 child->depth = _depth;
             }
             return child.get();
@@ -41,7 +45,21 @@ namespace QuadTree {
             }
         }
 
+
+
     };
+
+    inline glm::vec2 IndexToVector(int index) {
+        switch (index) {
+            case 0: return glm::vec2(-.5,-.5);
+            case 1: return glm::vec2(.5,-.5);
+            case 2: return glm::vec2(-.5,.5);
+            case 3: return glm::vec2(.5,.5);
+            default: break;
+        }
+        throw std::invalid_argument("Index is more than 3 ! (0-4 only)");
+    }
+
 
     template<typename T>
     class QuadTreeManager {
@@ -50,9 +68,13 @@ namespace QuadTree {
         float physicalSize;
         glm::vec2 center;
 
-        explicit QuadTreeManager(float physicalSize = 100.f, glm::vec2 center = glm::vec2(0, 0)) {
+        explicit QuadTreeManager(float physicalSize = 1000.f, glm::vec2 center = glm::vec2(0, 0)) {
             rootNode.reset(new Node<T>());
             rootNode->depth=0;
+            this->center = center;
+            this->physicalSize = physicalSize;
+
+
         }
 
         void clearItems(){
@@ -72,7 +94,7 @@ namespace QuadTree {
                 parent = current;
                 depth++;
 
-                if (position.y > quad_center.y) {
+                if (position.y < quad_center.y) {
                     // Top left
                     if (position.x < quad_center.x) {
                         current = parent->addchild(0, depth);
