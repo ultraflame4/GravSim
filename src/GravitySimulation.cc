@@ -101,6 +101,8 @@ void GravitySimulation::update() {
     bodies_mutex.lock();
 
     quadTreeGenTimer.tick(true);
+    quadTreeManager.center.x = cameraPos->x;
+    quadTreeManager.center.y = cameraPos->y;
     quadTreeManager.clearItems();
     for (const auto &bodyp: physicalBodies) {
         auto node = quadTreeManager.CreateNodeFromPosition(bodyp.pos, 5);
@@ -215,7 +217,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 
 
         glm::vec2 currentPos = parentSize* QuadTree::IndexToQuadCorner(index) + parentPosition;
-        debugLines.DrawSquare(currentPos, parentSize,{0,1,1});
+        debugLines.DrawSquare(currentPos, parentSize,{0,1,1},3);
 
         // Set current as new parent to descend down the tree
         parent = current;

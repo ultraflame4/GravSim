@@ -61,6 +61,7 @@ public:
     int model_loc{};
     int view_loc{};
     int proj_loc{};
+    glm::vec3* cameraPos;
 
     float gravityConstant = 500.f;
     VertexObject *vo{};

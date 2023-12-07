@@ -155,6 +155,7 @@ protected:
     void Load() override {
         logger->info("Hello world!");
         simulation.load();
+        simulation.cameraPos = &cameraPos;
         Line::load();
         AddBody(-200, 10, 1 + 5, 10);
         AddBody(-50, 0, 2 + 5, 20);
