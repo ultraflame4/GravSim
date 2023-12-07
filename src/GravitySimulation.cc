@@ -198,7 +198,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
             index = parent->index+1; // Set next index to the parent's sibling
             parent = parent->parent;
             parentSize*=2;
-            parentPosition -= parentSize*QuadTree::IndexToVector(index-1);
+            parentPosition -= parentSize* QuadTree::IndexToQuadCorner(index - 1);
             depth--;
             // logger->debug("Ascend to depth {} index {}", depth, index);
             continue;
@@ -214,7 +214,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
         }
 
 
-        glm::vec2 currentPos = parentSize*QuadTree::IndexToVector(index) + parentPosition;
+        glm::vec2 currentPos = parentSize* QuadTree::IndexToQuadCorner(index) + parentPosition;
         debugLines.DrawSquare(currentPos, parentSize,{0,1,1});
 
         // Set current as new parent to descend down the tree

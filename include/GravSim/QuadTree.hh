@@ -13,22 +13,91 @@
 
 namespace QuadTree {
 
+    struct Square {
+        glm::vec2 center;
+        float size;
+
+        Square(const glm::vec2 &center, float size) : center(center), size(size) {}
+
+        float getHalfSize() const {
+            return size / 2;
+        }
+
+        inline glm::vec2 getTop() const {
+            glm::vec2 a = center;
+            a.y += getHalfSize();
+            return a;
+        }
+
+        inline glm::vec2 getBottom() {
+            glm::vec2 a = center;
+            a.y -= getHalfSize();
+            return a;
+        }
+
+        inline glm::vec2 getLeft() {
+            glm::vec2 a = center;
+            a.x -= getHalfSize();
+            return a;
+        }
+
+        inline glm::vec2 getRight() {
+            glm::vec2 a = center;
+            a.x += getHalfSize();
+            return a;
+        }
+
+        bool collidePoint(glm::vec2 pos) {
+            float halfSize = size / 2;
+            float rightX = center.x + halfSize;
+            float leftX = center.x - halfSize;
+            float topY = center.y + halfSize;
+            float botY = center.y - halfSize;
+            if (pos.x > rightX || pos.x < leftX) return false;
+            if (pos.y > topY || pos.y < botY) return false;
+            return true;
+        }
+
+
+        int getCollideQuadIndex(glm::vec2 pos) {
+            float halfSize = size / 2;
+            // top
+            if (pos.y > center.y) {
+                // Top left
+                if (pos.x < center.x) {
+                    return 0;
+                }
+                // top right
+                return 1;
+            }
+            // bottom left
+            if (pos.x < center.x) {
+                return 2;
+            }
+            // bottom right
+            return 3;
+        }
+
+
+    };
+
     template<typename T>
     class Node {
     private:
         bool isEmpty;
     public:
         std::unique_ptr<Node<T>> children[4];
-        int depth=0;
+        int depth = 0;
         int index;
-        Node<T>* parent;
+        Node<T> *parent;
         std::vector<T> items;
+
         bool empty() {
             return isEmpty;
         }
 
         Node<T> *addchild(int index, int _depth, bool force = false) {
-            std::unique_ptr<Node<T>>& child = children[index];
+            std::unique_ptr<Node<T>> &child = children[index];
             if (force) {
                 child.reset();
             }
@@ -43,9 +112,9 @@ namespace QuadTree {
             return child.get();
         }
 
-        void clearItems(){
+        void clearItems() {
             items.clear();
-            for (const auto& child: children) {
+            for (const auto &child: children) {
                 if (child != nullptr && !child->isEmpty) {
                     child->clearItems();
                 }
@@ -62,16 +131,20 @@ namespace QuadTree {
         }
 
 
-
     };
 
-    inline glm::vec2 IndexToVector(int index) {
+    inline glm::vec2 IndexToQuadCorner(int index) {
         switch (index) {
-            case 0: return glm::vec2(-.5,-.5);
-            case 1: return glm::vec2(.5,-.5);
-            case 2: return glm::vec2(-.5,.5);
-            case 3: return glm::vec2(.5,.5);
-            default: break;
+            case 0:
+                return glm::vec2(-.5, .5);
+            case 1:
+                return glm::vec2(.5, .5);
+            case 2:
+                return glm::vec2(-.5, -.5);
+            case 3:
+                return glm::vec2(.5, -.5);
+            default:
+                break;
         }
         throw std::invalid_argument("Index is more than 3 ! (0-4 only)");
     }
@@ -79,63 +152,56 @@ namespace QuadTree {
 
     template<typename T>
     class QuadTreeManager {
+    private:
+        std::shared_ptr<spdlog::logger> logger = logging::get<QuadTreeManager>();
     public:
         std::unique_ptr<Node<T>> rootNode;
         float physicalSize;
         glm::vec2 center;
 
-        explicit QuadTreeManager(float physicalSize = 5000.f, glm::vec2 center = glm::vec2(0, 0)) {
+        explicit QuadTreeManager(float initialSize = 500.f, glm::vec2 center = glm::vec2(0, 0)) {
             rootNode.reset(new Node<T>());
-            rootNode->depth=0;
+            rootNode->depth = 0;
             this->center = center;
-            this->physicalSize = physicalSize;
+            this->physicalSize = initialSize;
 
 
         }
 
-        void clearItems(){
+        void clearItems() {
             rootNode->clearItems();
         }
 
         Node<T> *CreateNodeFromPosition(glm::vec2 position, int maxDepth) {
-            glm::vec2 quad_center = center;
-            float halfSize = physicalSize / 2;
+
+
             // pointer to the current quad
             QuadTree::Node<T> *parent = rootNode.get();
             // pointer used when indexing children of search quad
             QuadTree::Node<T> *current = rootNode.get();
+            Square quad(center, physicalSize);
 
             int depth = rootNode->depth;
             while (current != nullptr && depth <= maxDepth) {
                 parent = current;
+                int child_quad_index = quad.getCollideQuadIndex(position);
+//                logger->debug("Quad index: {}", child_quad_index)
+                current = parent->addchild(child_quad_index, depth);
 
-
-                if (position.y < quad_center.y) {
-                    // Top left
-                    if (position.x < quad_center.x) {
-                        current = parent->addchild(0, depth);
-                        quad_center.x -= halfSize;
-                    }
-                        // top right
-                    else {
-                        current = parent->addchild(1, depth);
-                        quad_center.x += halfSize;
-                    }
-                    quad_center.y -= halfSize;
-                } else {
-                    // bottom left
-                    if (position.x < quad_center.x) {
-                        current = parent->addchild(2, depth);
-                        quad_center.x -= halfSize;
-                    }
-                        // bottom right
-                    else {
-                        current = parent->addchild(3, depth);
-                        quad_center.x += halfSize;
-                    }
-                    quad_center.y += halfSize;
+                if (child_quad_index % 2 == 0) {
+                    quad.center.x -= quad.getHalfSize();
+                }else{
+                    quad.center.x += quad.getHalfSize();
                 }
-                halfSize /= 2;
+
+                if (child_quad_index <= 1) {
+                    quad.center.y += quad.getHalfSize();
+                }
+                else{
+                    quad.center.y -= quad.getHalfSize();
+                }
+
+                quad.size /= 2;
                 depth++;
             }
             return parent;
