@@ -110,13 +110,14 @@ void GravitySimulation::update() {
     }
     quadTreeGenTimer.tick();
 
-
+    physicsTimer.tick(true);
     std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
         auto &body = this->vertex(bodyp);
         UpdateGravBodyPhysics(bodyp, bodyp.index);
         body.x = bodyp.pos.x;
         body.y = bodyp.pos.y;
     });
+    physicsTimer.tick();
 
 //    for (int i = 0; i < bodies.size(); ++i) {
 //        auto &body = bodies[i];

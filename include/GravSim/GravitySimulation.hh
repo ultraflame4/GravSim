@@ -50,6 +50,8 @@ struct GravBodyPhysical {
 class GravitySimulation {
 public:
     Timer quadTreeGenTimer;
+    Timer physicsTimer;
+
     std::vector<GravBodyVertex> bodies;
     std::vector<GravBodyPhysical> physicalBodies;
     Shader shader;

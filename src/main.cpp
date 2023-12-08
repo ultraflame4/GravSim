@@ -205,6 +205,8 @@ protected:
         if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("QuadTree genTime: %f", simulation.quadTreeGenTimer.delta);
             ImGui::Text("QuadTree genAvgTime: %f", simulation.quadTreeGenTimer.avg_delta);
+            ImGui::Text("Physics Time: %f", simulation.physicsTimer.delta);
+            ImGui::Text("Physics AvgTime: %f", simulation.physicsTimer.avg_delta);
             ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
             ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
             ImGui::Checkbox("Debug Velocity", &simulation.debug);
