@@ -157,6 +157,7 @@ protected:
         simulation.load();
         simulation.cameraPos = &cameraPos;
         Line::load();
+        DebugLineFactory::load();
         AddBody(-200, 10, 1 + 5, 10);
         AddBody(-50, 0, 2 + 5, 20);
         AddBody(800, 0, 1 + 5, 10);

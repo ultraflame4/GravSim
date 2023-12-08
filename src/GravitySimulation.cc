@@ -152,8 +152,8 @@ void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
 
     if (debug) {
         drawDebugLines(view, proj);
-
     }
+    debugLines.Draw();
 }
 
 int GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
@@ -184,7 +184,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 
     for (int i = 0; i < physicalBodies.size(); ++i) {
         auto &bodyp = physicalBodies[i];
-        debugLines.DrawRay(bodyp.pos, bodyp.vel, {.4f, .9f, .1f});
+        debugLines.CreateRay(bodyp.pos, bodyp.vel, {.4f, .9f, .1f});
     }
 
     QuadTree::Node<GravBodyPhysical *>* parent = quadTreeManager.rootNode.get();
@@ -218,7 +218,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 
 
         glm::vec2 currentPos = parentSize* QuadTree::IndexToQuadCorner(index) + parentPosition;
-        debugLines.DrawSquare(currentPos, parentSize,{0,1,1},3);
+        debugLines.CreateSquare(currentPos, parentSize, {0, 1, 1}, 3);
 
         // Set current as new parent to descend down the tree
         parent = current;
