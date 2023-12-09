@@ -106,6 +106,8 @@ public:
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(*view));
         glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(*proj));
         vo->draw();
+        delete[] lineVertices;
+        delete[] triangles;
 
     }
 
