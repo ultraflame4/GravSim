@@ -12,6 +12,7 @@
 
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
+#include "GravSim/Raycast.hh"
 
 GravitySimulation::GravitySimulation(Window &window) : window(window) {}
 
@@ -220,7 +221,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
         glm::vec2 currentPos = parentSize* QuadTree::IndexToQuadCorner(index) + parentPosition;
         debugLines.CreateSquare(currentPos, parentSize, {0, 1, 1}, 3);
 
-        // Set current as new parent to descend down the tree
+        // Set current as new parent to subdivide down the tree
         parent = current;
         parentPosition = currentPos;
         parentSize/=2;
