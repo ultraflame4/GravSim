@@ -222,7 +222,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
         current = childQuad;
         index = 0;
         depth++;
-        if (depth > 1) {
+        if (depth > 3) {
             break;
         }
         // logger->debug("Descend to depth {} index {}", depth, index);

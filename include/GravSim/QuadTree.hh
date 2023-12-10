@@ -82,7 +82,7 @@ namespace QuadTree {
          * @return A square representing the parent
          */
         Square getparent(int quad_index){
-            Square copy(center, size)
+            Square copy(center, size);
             copy.size*=2;
             if (quad_index % 2 == 0) {
                 copy.center.x += copy.getHalfSize();
