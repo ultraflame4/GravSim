@@ -59,7 +59,7 @@ namespace QuadTree {
         }
 
 
-        int getCollideQuadIndex(glm::vec2 pos) {
+        int getchild_index(glm::vec2 pos) {
             float halfSize = size / 2;
             // top
             if (pos.y > center.y) {
@@ -78,7 +78,7 @@ namespace QuadTree {
             return 3;
         }
 
-        Square subdivide(int childIndex) const{
+        Square getchild(int childIndex) const{
             Square copy(center, size);
             if (childIndex % 2 == 0) {
                 copy.center.x -= getHalfSize();
@@ -94,6 +94,10 @@ namespace QuadTree {
             }
             copy.size/=2;
             return copy;
+        }
+
+        Square getchild(glm::vec2 pos){
+            return getchild(getchild_index(pos));
         }
 
 
@@ -189,39 +193,19 @@ namespace QuadTree {
         }
 
 
-        Node<T> *CreateNodeFromPosition(glm::vec2 position, int maxDepth) {
-
-
+        Node<T> *GetOrCreateNode(glm::vec2 position, int maxDepth) {
             // pointer to the current quad
-            QuadTree::Node<T> *parent = rootNode.get();
-            // pointer used when indexing children of search quad
             QuadTree::Node<T> *current = rootNode.get();
             Square quad(center, physicalSize);
 
             int depth = rootNode->depth;
-            while (current != nullptr && depth <= maxDepth) {
-                parent = current;
-                int child_quad_index = quad.getCollideQuadIndex(position);
-//                logger->debug("Quad index: {}", child_quad_index)
-                current = parent->addchild(child_quad_index, depth);
-
-                if (child_quad_index % 2 == 0) {
-                    quad.center.x -= quad.getHalfSize();
-                }else{
-                    quad.center.x += quad.getHalfSize();
-                }
-
-                if (child_quad_index <= 1) {
-                    quad.center.y += quad.getHalfSize();
-                }
-                else{
-                    quad.center.y -= quad.getHalfSize();
-                }
-
-                quad.size /= 2;
+            while ( depth <= maxDepth) {
+                int child_quad_index = quad.getchild_index(position);
+                quad = quad.getchild(child_quad_index);
+                current = current->addchild(child_quad_index, depth);
                 depth++;
             }
-            return parent;
+            return current;
         }
     };
 }

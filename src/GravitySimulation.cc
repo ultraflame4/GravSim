@@ -105,7 +105,7 @@ void GravitySimulation::update() {
     quadTreeManager.center.y = cameraPos->y;
     quadTreeManager.clearItems();
     for (const auto &bodyp: physicalBodies) {
-        auto node = quadTreeManager.CreateNodeFromPosition(bodyp.pos, 8);
+        auto node = quadTreeManager.GetOrCreateNode(bodyp.pos, 8);
         node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
     }
     quadTreeGenTimer.tick();
