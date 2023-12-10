@@ -13,6 +13,8 @@
 
 namespace QuadTree {
 
+
+
     struct Square {
         glm::vec2 center;
         float size;
@@ -21,30 +23,6 @@ namespace QuadTree {
 
         float getHalfSize() const {
             return size / 2;
-        }
-
-        inline glm::vec2 getTop() const {
-            glm::vec2 a = center;
-            a.y += getHalfSize();
-            return a;
-        }
-
-        inline glm::vec2 getBottom() {
-            glm::vec2 a = center;
-            a.y -= getHalfSize();
-            return a;
-        }
-
-        inline glm::vec2 getLeft() {
-            glm::vec2 a = center;
-            a.x -= getHalfSize();
-            return a;
-        }
-
-        inline glm::vec2 getRight() {
-            glm::vec2 a = center;
-            a.x += getHalfSize();
-            return a;
         }
 
         bool collidePoint(glm::vec2 pos) {
@@ -57,7 +35,6 @@ namespace QuadTree {
             if (pos.y > topY || pos.y < botY) return false;
             return true;
         }
-
 
         int getchild_index(glm::vec2 pos) {
             float halfSize = size / 2;
@@ -106,7 +83,7 @@ namespace QuadTree {
     template<typename T>
     class Node {
     private:
-        bool isEmpty = true;
+        bool _isEmpty = true;
     public:
         std::unique_ptr<Node<T>> children[4];
         int depth = 0;
@@ -114,8 +91,8 @@ namespace QuadTree {
         Node<T> *parent;
         std::vector<T> items;
 
-        bool empty() {
-            return isEmpty;
+        bool IsEmpty() {
+            return _isEmpty;
         }
 
         Node<T> *addchild(int index, int _depth, bool force = false) {
@@ -129,7 +106,7 @@ namespace QuadTree {
                 child->index = index;
                 child->depth = _depth;
             }
-            isEmpty = false;
+            _isEmpty = false;
 
             return child.get();
         }
@@ -137,7 +114,7 @@ namespace QuadTree {
         void clearItems() {
             items.clear();
             for (const auto &child: children) {
-                if (child != nullptr && !child->isEmpty) {
+                if (child != nullptr && !child->_isEmpty) {
                     child->clearItems();
                 }
             }
@@ -145,15 +122,47 @@ namespace QuadTree {
             for (int i = 0; i < 4; ++i) {
                 auto child = children[i].get();
                 if (child != nullptr) {
-                    if (!child->isEmpty) deleteSelf = false;
+                    if (!child->_isEmpty) deleteSelf = false;
                 }
             }
 
-            isEmpty = deleteSelf;
+            _isEmpty = deleteSelf;
+        }
+    };
+
+    template<typename T>
+    struct Quad{
+
+        Node<T>* node;
+        Square square;
+
+
+        Quad<T> addchild(int index, bool force=false){
+            node->addchild(index, node->depth+1, force);
+            return getchild(index);
         }
 
+        Quad<T> addchild(glm::vec2 pos, bool force = false){
+            return addchild(square.getchild_index(pos),  force);
+        }
+        Quad<T> getchild(int index){
+            return Quad<T>(node->children[index].get(),square.getchild(index));
+        }
+        Quad<T> getchild(glm::vec2 pos){
+            return getchild(square.getchild_index(pos));
+        }
+        bool collidePoint(glm::vec2 pos){
+            return square.collidePoint(pos);
+        }
+        bool IsEmpty(){
+            return node == nullptr || node->IsEmpty();
+        }
 
+        static inline Quad<T> fromRootNode(Node<T>* node, glm::vec2 center, float rootSize){
+            return Quad<T>(node, Square(center, rootSize));
+        }
     };
+
 
     inline glm::vec2 IndexToQuadCorner(int index) {
         switch (index) {
@@ -193,17 +202,12 @@ namespace QuadTree {
         }
 
 
-        Node<T> *GetOrCreateNode(glm::vec2 position, int maxDepth) {
-            // pointer to the current quad
-            QuadTree::Node<T> *current = rootNode.get();
-            Square quad(center, physicalSize);
+        Quad<T> GetOrCreateQuad(glm::vec2 position, int maxDepth) {
 
-            int depth = rootNode->depth;
-            while ( depth <= maxDepth) {
-                int child_quad_index = quad.getchild_index(position);
-                quad = quad.getchild(child_quad_index);
-                current = current->addchild(child_quad_index, depth);
-                depth++;
+            Quad<T> current = Quad<T>::fromRootNode(rootNode.get(),center, physicalSize);
+
+            while ( current.node->depth <= maxDepth) {
+                current = current.addchild(position);
             }
             return current;
         }

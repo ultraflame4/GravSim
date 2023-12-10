@@ -105,8 +105,8 @@ void GravitySimulation::update() {
     quadTreeManager.center.y = cameraPos->y;
     quadTreeManager.clearItems();
     for (const auto &bodyp: physicalBodies) {
-        auto node = quadTreeManager.GetOrCreateNode(bodyp.pos, 8);
-        node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
+        auto quad = quadTreeManager.GetOrCreateQuad(bodyp.pos, 8);
+        quad.node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
     }
     quadTreeGenTimer.tick();
 
@@ -210,7 +210,7 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 
         current = parent->children[index].get();
         // If current is null, increase index
-        if (current == nullptr || current->empty()) {
+        if (current == nullptr || current->IsEmpty()) {
             index++;
             // logger->debug("Current Is null. Change to depth {} index {}", depth, index);
             continue;
