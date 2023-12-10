@@ -85,7 +85,7 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     if (std::isnan(currentDist)) normal = up;
     /// Resist penetration
     float pen_depth = collisionDist - currentDist;
-    glm::vec2 pen_res = normal * (pen_depth *.5f + 0.1f);
+    glm::vec2 pen_res = normal * (pen_depth * .5f + 0.1f);
     if (!otherp.phantom) bodyp.pos += pen_res;
     if (!bodyp.phantom) otherp.pos += -pen_res;
 
@@ -93,8 +93,8 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     glm::vec2 incoming = bodyp.vel - otherp.vel;
     float resForce = -glm::dot(incoming, normal);
     float totalMass = otherp.mass + bodyp.mass;
-    if (!otherp.phantom) bodyp.vel += normal * (resForce * otherp.mass/totalMass);
-    if (!bodyp.phantom) otherp.vel += -normal * (resForce * bodyp.mass/totalMass);
+    if (!otherp.phantom) bodyp.vel += normal * (resForce * otherp.mass / totalMass);
+    if (!bodyp.phantom) otherp.vel += -normal * (resForce * bodyp.mass / totalMass);
 }
 
 void GravitySimulation::update() {
@@ -111,12 +111,13 @@ void GravitySimulation::update() {
     quadTreeGenTimer.tick();
 
     physicsTimer.tick(true);
-    std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
-        auto &body = this->vertex(bodyp);
-        UpdateGravBodyPhysics(bodyp, bodyp.index);
-        body.x = bodyp.pos.x;
-        body.y = bodyp.pos.y;
-    });
+    std::for_each(std::execution::par_unseq, physicalBodies.begin(), physicalBodies.end(),
+                  [this](GravBodyPhysical &bodyp) {
+                      auto &body = this->vertex(bodyp);
+                      UpdateGravBodyPhysics(bodyp, bodyp.index);
+                      body.x = bodyp.pos.x;
+                      body.y = bodyp.pos.y;
+                  });
     physicsTimer.tick();
 
 //    for (int i = 0; i < bodies.size(); ++i) {
@@ -172,7 +173,7 @@ int GravitySimulation::AddBody(float x, float y, float radius, float mass, float
             active,
             false
     });
-    bodyp.index = physicalBodies.size()-1;
+    bodyp.index = physicalBodies.size() - 1;
     bodies_mutex.unlock();
     return bodyp.index;
 }
@@ -187,45 +188,43 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
         debugLines.CreateRay(bodyp.pos, bodyp.vel, {.4f, .9f, .1f});
     }
 
-    QuadTree::Node<GravBodyPhysical *>* parent = quadTreeManager.rootNode.get();
-    glm::vec2 parentPosition = quadTreeManager.center;
-    float parentSize = quadTreeManager.physicalSize;
+
+    QuadTree::Quad<GravBodyPhysical *> current = quadTreeManager.GetRootQuad();
+    QuadTree::Quad<GravBodyPhysical *> childQuad = current;
 
     int depth = 0;
-    QuadTree::Node<GravBodyPhysical *>* current;
     int index = 0;
     while (true) {
 
 
         if (index >= 4) {
-            index = parent->index+1; // Set next index to the parent's sibling
-            parent = parent->parent;
-            parentSize*=2;
-            parentPosition -= parentSize* QuadTree::IndexToQuadCorner(index - 1);
+            index = current.node->index + 1; // Set next index to the parent's sibling
+            current = current.getparent();
+
             depth--;
             // logger->debug("Ascend to depth {} index {}", depth, index);
             continue;
         }
-        if (parent == nullptr) break;
+        if (current.IsEmpty()) break;
 
-        current = parent->children[index].get();
+
+        debugLines.CreateSquare(current.square.center, current.square.size, {depth / 8.f, .2f, 1}, 3);
+
+        childQuad = current.getchild(index);
         // If current is null, increase index
-        if (current == nullptr || current->IsEmpty()) {
+        if (childQuad.IsEmpty()) {
             index++;
             // logger->debug("Current Is null. Change to depth {} index {}", depth, index);
             continue;
         }
 
-
-        glm::vec2 currentPos = parentSize* QuadTree::IndexToQuadCorner(index) + parentPosition;
-        debugLines.CreateSquare(currentPos, parentSize, {0, 1, 1}, 3);
-
-        // Set current as new parent to subdivide down the tree
-        parent = current;
-        parentPosition = currentPos;
-        parentSize/=2;
+        // Set child as new current
+        current = childQuad;
         index = 0;
         depth++;
+        if (depth > 1) {
+            break;
+        }
         // logger->debug("Descend to depth {} index {}", depth, index);
     }
 }
@@ -237,12 +236,12 @@ void GravitySimulation::clear() {
     bodies_mutex.unlock();
 }
 
-GravBodyVertex & GravitySimulation::vertex(GravBodyPhysical &bodyp) {
+GravBodyVertex &GravitySimulation::vertex(GravBodyPhysical &bodyp) {
     return bodies[bodyp.index];
 }
 
 void GravitySimulation::resolveFused(GravBodyPhysical &a, GravBodyPhysical &b) {
-    if (!b.phantom) a.pos.x -= a.radius/2;
-    if (!a.phantom) b.pos.x += b.radius/2;
+    if (!b.phantom) a.pos.x -= a.radius / 2;
+    if (!a.phantom) b.pos.x += b.radius / 2;
 }
 
