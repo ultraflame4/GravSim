@@ -12,7 +12,6 @@
 
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
-#include "GravSim/Raycast.hh"
 
 GravitySimulation::GravitySimulation(Window &window) : window(window) {}
 
@@ -49,6 +48,22 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
     if (!otherp.phantom) bodyp.Accelerate(dir_norm, sharedForce * .5f * window.updateTimer.delta);
 }
 
+void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
+    if (!bodyp.active) return;
+
+    for (int j = 0; j < bodies.size(); ++j) {
+        if (index == j) continue; // Skip self
+        auto &otherp = physicalBodies[j];
+        if (!otherp.active) continue;
+        if (collision) ApplyCollisionForces(bodyp, otherp);
+        if (gravity)ApplyGravityForce(bodyp, otherp);
+    }
+
+    bodyp.pos += bodyp.vel * window.updateTimer.delta;
+    bodyp.last_pos = bodyp.pos;
+
+}
+
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
     glm::vec2 posA = bodyp.pos + bodyp.vel * window.updateTimer.delta;
@@ -80,22 +95,6 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     float totalMass = otherp.mass + bodyp.mass;
     if (!otherp.phantom) bodyp.vel += normal * (resForce * otherp.mass/totalMass);
     if (!bodyp.phantom) otherp.vel += -normal * (resForce * bodyp.mass/totalMass);
-}
-
-void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
-    if (!bodyp.active) return;
-
-    for (int j = 0; j < bodies.size(); ++j) {
-        if (index == j) continue; // Skip self
-        auto &otherp = physicalBodies[j];
-        if (!otherp.active) continue;
-        if (collision) ApplyCollisionForces(bodyp, otherp);
-        if (gravity)ApplyGravityForce(bodyp, otherp);
-    }
-
-    bodyp.pos += bodyp.vel * window.updateTimer.delta;
-    bodyp.last_pos = bodyp.pos;
-
 }
 
 void GravitySimulation::update() {

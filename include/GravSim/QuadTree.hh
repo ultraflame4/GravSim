@@ -188,44 +188,6 @@ namespace QuadTree {
             rootNode->clearItems();
         }
 
-        // Raycast for quad trees. Return all none empty nodes / quads
-        Node<T> *Raycast(glm::vec2 origin, glm::vec2 direction, int maxDepth){
-            QuadTree::Node<T> *current = rootNode.get();
-            QuadTree::Node<T> *child = rootNode.get();
-            Square quad(center,physicalSize);
-            glm::vec2 head = origin;
-            glm::vec2 dir = glm::normalize(direction);
-
-            int depth = 0;
-            while (current != nullptr) {
-
-                int childIndex = quad.getCollideQuadIndex(head);
-                child = current->children[childIndex];
-                Square childQuad = quad.subdivide(childIndex);
-
-                if (child == nullptr || child->empty()){
-                    // If empty, advance ray
-                    head += dir * childQuad.size;
-                    continue;
-                }
-
-                // Descending to child! todo test
-
-                // If raycast head isn,t in the child (new current) quad, stop descending and ascend back up!
-                if (!childQuad.collidePoint(head)) {
-                    current = current->parent;
-                    continue;
-                }
-
-
-                depth++;
-                current = child;
-                quad=childQuad;
-                head = origin;
-
-
-            }
-        }
 
         Node<T> *CreateNodeFromPosition(glm::vec2 position, int maxDepth) {
 
