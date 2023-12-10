@@ -83,7 +83,6 @@ namespace QuadTree {
          */
         Square getparent(int quad_index){
             Square copy(center, size);
-            copy.size*=2;
             if (quad_index % 2 == 0) {
                 copy.center.x += copy.getHalfSize();
             }else{
@@ -96,6 +95,7 @@ namespace QuadTree {
             else{
                 copy.center.y += copy.getHalfSize();
             }
+            copy.size*=2;
 
             return copy;
         }
@@ -110,7 +110,7 @@ namespace QuadTree {
         std::unique_ptr<Node<T>> children[4];
         int depth = 0;
         int index;
-        Node<T> *parent;
+        Node<T> *parent = nullptr;
         std::vector<T> items;
 
         bool IsEmpty() {

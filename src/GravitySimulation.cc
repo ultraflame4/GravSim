@@ -198,7 +198,9 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
 
 
         if (index >= 4) {
-            index = current.node->index + 1; // Set next index to the parent's sibling
+            // Set next index to the parent's sibling
+            index = current.node->index + 1;
+            // Ascend
             current = current.getparent();
 
             depth--;
@@ -206,9 +208,6 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
             continue;
         }
         if (current.IsEmpty()) break;
-
-
-        debugLines.CreateSquare(current.square.center, current.square.size, {depth / 8.f, .2f, 1}, 3);
 
         childQuad = current.getchild(index);
         // If current is null, increase index
@@ -218,13 +217,13 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
             continue;
         }
 
+        debugLines.CreateSquare(childQuad.square.center, childQuad.square.size, {depth / 8.f, .2f, 1}, 3);
+
         // Set child as new current
         current = childQuad;
         index = 0;
         depth++;
-        if (depth > 3) {
-            break;
-        }
+
         // logger->debug("Descend to depth {} index {}", depth, index);
     }
 }
