@@ -216,8 +216,11 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
             // logger->debug("Current Is null. Change to depth {} index {}", depth, index);
             continue;
         }
-
-        debugLines.CreateSquare(childQuad.square.center, childQuad.square.size, {depth / 8.f, .2f, 1}, 3);
+        float r = sin(depth+1);
+        float g = cos(depth);
+        r = r / 2 + .5f;
+        g = g / 2 + .5f;
+        debugLines.CreateSquare(childQuad.square.center, childQuad.square.size, {r, g, 1}, 3);
 
         // Set child as new current
         current = childQuad;
