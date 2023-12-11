@@ -148,7 +148,7 @@ void GravitySimulation::update() {
     quadTreeGenTimer.tick();
 
     physicsTimer.tick(true);
-    std::for_each(std::execution::par_unseq, physicalBodies.begin(), physicalBodies.end(),
+    std::for_each(std::execution::par, physicalBodies.begin(), physicalBodies.end(),
                   [this](GravBodyPhysical &bodyp) {
                       auto &body = this->vertex(bodyp);
                       UpdateGravBodyPhysics(bodyp, bodyp.index);
