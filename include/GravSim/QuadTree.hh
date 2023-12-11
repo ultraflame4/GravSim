@@ -234,10 +234,10 @@ namespace QuadTree {
          * DDA Line Raycast for direct descendents of the quad.
          * @param quad The quad to raycast.
          * @param head Where the ray starts. Not that this value is a reference and will change!
-         * @param direction Direction of the ray
+         * @param direction Direction of the ray. Not that this value is a reference and will change!
          * @return
          */
-        Quad<T> RaycastQuad(Quad<T> quad, glm::vec2& head, glm::vec2 direction){
+        Quad<T> RaycastQuad(Quad<T> quad, glm::vec2& head, glm::vec2& direction){
             glm::vec2 dxy = direction / quad.square.size;
             int steps = std::max(abs(dxy.x), abs(dxy.y));
             glm::vec2 xy_inc = dxy / (float) steps;
@@ -253,9 +253,10 @@ namespace QuadTree {
             Quad<T> current = GetRootQuad();
             Quad<T> last = Quad<T>::GetEmpty();
             glm::vec2 head = origin;
+            glm::vec2 direction_ = direction;
             while (!current.IsEmpty()) {
                 last = current;
-                current = RaycastQuad(current, head, direction);
+                current = RaycastQuad(current, head, direction_);
             }
             return last;
         }
