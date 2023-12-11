@@ -100,11 +100,11 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 
         quad.square.colliding= true;
 //        logger->debug("Node d{} s{} {},{}",quad.node->depth,quad.square.size,quad.square.center.x,quad.square.center.y);
-        for (auto otherp : quad.node->items) {
-            if (&bodyp == otherp){
+        for (auto otherp_index : quad.node->items) {
+            if (bodyp.index == otherp_index){
                 continue;
             }
-            ApplyCollisionForces(bodyp, *otherp);
+            ApplyCollisionForces(bodyp, physicalBodies[otherp_index]);
         }
 
     }
@@ -140,7 +140,7 @@ void GravitySimulation::update() {
 
     for (const auto &bodyp: physicalBodies) {
         auto quad = quadTreeManager.GetOrCreateQuad(bodyp.pos, depth);
-        quad.node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
+        quad.node->items.push_back(bodyp.index);
     }
 
 
@@ -225,8 +225,8 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
     }
 
 
-    QuadTree::Quad<GravBodyPhysical *> current = quadTreeManager.GetRootQuad();
-    QuadTree::Quad<GravBodyPhysical *> childQuad = current;
+    QuadTree::Quad<int> current = quadTreeManager.GetRootQuad();
+    QuadTree::Quad<int> childQuad = current;
 
     int depth = 0;
     int index = 0;

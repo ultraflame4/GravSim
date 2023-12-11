@@ -93,7 +93,7 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger = logging::get<GravitySimulation>();
-    QuadTree::QuadTreeManager<GravBodyPhysical*> quadTreeManager;
+    QuadTree::QuadTreeManager<int> quadTreeManager;
 
     void UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index);
 
