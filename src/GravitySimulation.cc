@@ -116,7 +116,7 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 
 void GravitySimulation::update() {
 
-    const float cellSize = 200;
+    const float cellSize = 300;
 
     bodies_mutex.lock();
     quadTreeGenTimer.tick(true);
