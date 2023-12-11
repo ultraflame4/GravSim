@@ -92,12 +92,12 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
     }
 
     if (collision){
-        auto quad = quadTreeManager.Raycast(bodyp.pos, bodyp.vel);
+        auto quad = quadTreeManager.Raycast(bodyp.pos, bodyp.vel* window.updateTimer.delta);
 
         if (quad.IsEmpty()) {
             return;
         }
-
+        float size = physicalBodies.size();
         quad.square.colliding= true;
 //        logger->debug("Node d{} s{} {},{}",quad.node->depth,quad.square.size,quad.square.center.x,quad.square.center.y);
         for (auto otherp_index : quad.node->items) {
@@ -140,6 +140,7 @@ void GravitySimulation::update() {
 
     for (const auto &bodyp: physicalBodies) {
         auto quad = quadTreeManager.GetOrCreateQuad(bodyp.pos, depth);
+//        logger->debug("Body index: {}", bodyp.index);
         quad.node->items.push_back(bodyp.index);
     }
 

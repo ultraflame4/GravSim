@@ -137,13 +137,13 @@ namespace QuadTree {
         void clearItems() {
             items.clear();
             for (const auto &child: children) {
-                if (child != nullptr && !child->_hasChildren) {
+                if (child != nullptr && !child->IsEmpty()) {
                     child->clearItems();
                 }
             }
             bool deleteSelf = true;
-            for (int i = 0; i < 4; ++i) {
-                auto child = children[i].get();
+            for (auto & i : children) {
+                auto child = i.get();
                 if (child != nullptr) {
                     if (!child->_hasChildren) deleteSelf = false;
                 }
