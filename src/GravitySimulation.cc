@@ -115,16 +115,35 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 }
 
 void GravitySimulation::update() {
-    bodies_mutex.lock();
 
+    const float cellSize = 200;
+
+    bodies_mutex.lock();
     quadTreeGenTimer.tick(true);
-    quadTreeManager.center.x = cameraPos->x;
-    quadTreeManager.center.y = cameraPos->y;
-    quadTreeManager.clearItems();
+    glm::vec2 totalPos(0, 0);
+    glm::vec2 start(0, 0);
+    glm::vec2 end(0, 0);
     for (const auto &bodyp: physicalBodies) {
-        auto quad = quadTreeManager.GetOrCreateQuad(bodyp.pos, 8);
+        totalPos += bodyp.pos;
+        start.x = std::min(start.x,bodyp.pos.x);
+        start.y = std::min(start.y,bodyp.pos.y);
+        end.x = std::max(end.x,bodyp.pos.x);
+        end.y = std::max(end.y,bodyp.pos.y);
+    }
+    glm::vec2 avgPos = totalPos / (float)physicalBodies.size();
+
+    quadTreeManager.center.x = avgPos.x;
+    quadTreeManager.center.y = avgPos.y;
+    quadTreeManager.physicalSize = std::max(abs(end.x - start.x), abs(end.y - start.y));
+    int depth = round(std::log2(quadTreeManager.physicalSize / cellSize));
+    quadTreeManager.clearItems();
+
+    for (const auto &bodyp: physicalBodies) {
+        auto quad = quadTreeManager.GetOrCreateQuad(bodyp.pos, depth);
         quad.node->items.push_back(const_cast<GravBodyPhysical *>(&bodyp));
     }
+
+
     quadTreeGenTimer.tick();
 
     physicsTimer.tick(true);
