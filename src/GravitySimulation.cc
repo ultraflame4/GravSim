@@ -48,22 +48,6 @@ void GravitySimulation::ApplyGravityForce(GravBodyPhysical &bodyp, GravBodyPhysi
     if (!otherp.phantom) bodyp.Accelerate(dir_norm, sharedForce * .5f * window.updateTimer.delta);
 }
 
-void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
-    if (!bodyp.active) return;
-
-    for (int j = 0; j < bodies.size(); ++j) {
-        if (index == j) continue; // Skip self
-        auto &otherp = physicalBodies[j];
-        if (!otherp.active) continue;
-        if (collision) ApplyCollisionForces(bodyp, otherp);
-        if (gravity)ApplyGravityForce(bodyp, otherp);
-    }
-
-    bodyp.pos += bodyp.vel * window.updateTimer.delta;
-    bodyp.last_pos = bodyp.pos;
-
-}
-
 void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPhysical &otherp) {
 
     glm::vec2 posA = bodyp.pos + bodyp.vel * window.updateTimer.delta;
@@ -95,6 +79,39 @@ void GravitySimulation::ApplyCollisionForces(GravBodyPhysical &bodyp, GravBodyPh
     float totalMass = otherp.mass + bodyp.mass;
     if (!otherp.phantom) bodyp.vel += normal * (resForce * otherp.mass / totalMass);
     if (!bodyp.phantom) otherp.vel += -normal * (resForce * bodyp.mass / totalMass);
+}
+
+void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index) {
+    if (!bodyp.active) return;
+
+    for (int j = 0; j < bodies.size(); ++j) {
+        if (index == j) continue; // Skip self
+        auto &otherp = physicalBodies[j];
+        if (!otherp.active) continue;
+        if (gravity)ApplyGravityForce(bodyp, otherp);
+    }
+
+    if (collision){
+        auto quad = quadTreeManager.Raycast(bodyp.pos, bodyp.vel);
+
+        if (quad.IsEmpty()) {
+            return;
+        }
+
+        quad.square.colliding= true;
+//        logger->debug("Node d{} s{} {},{}",quad.node->depth,quad.square.size,quad.square.center.x,quad.square.center.y);
+        for (auto otherp : quad.node->items) {
+            if (&bodyp == otherp){
+                continue;
+            }
+            ApplyCollisionForces(bodyp, *otherp);
+        }
+
+    }
+
+    bodyp.pos += bodyp.vel * window.updateTimer.delta;
+    bodyp.last_pos = bodyp.pos;
+
 }
 
 void GravitySimulation::update() {
@@ -220,7 +237,12 @@ void GravitySimulation::drawDebugLines(glm::mat4 view, glm::mat4 proj) {
         float g = cos(depth);
         r = r / 2 + .5f;
         g = g / 2 + .5f;
-        debugLines.CreateSquare(childQuad.square.center, childQuad.square.size, {r, g, 1}, 3);
+        if (childQuad.square.colliding) {
+            debugLines.CreateSquare(childQuad.square.center, childQuad.square.size, {1, 1, 1}, 30);
+        }
+        else{
+            debugLines.CreateSquare(childQuad.square.center, childQuad.square.size, {r, g, .5}, 3);
+        }
 
         // Set child as new current
         current = childQuad;

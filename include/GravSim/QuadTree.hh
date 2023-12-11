@@ -18,6 +18,7 @@ namespace QuadTree {
     struct Square {
         glm::vec2 center;
         float size;
+        bool colliding = false;
 
         Square(const glm::vec2 &center, float size) : center(center), size(size) {}
 
@@ -105,7 +106,7 @@ namespace QuadTree {
     template<typename T>
     class Node {
     private:
-        bool _isEmpty = true;
+        bool _hasChildren = true;
     public:
         std::unique_ptr<Node<T>> children[4];
         int depth = 0;
@@ -114,7 +115,7 @@ namespace QuadTree {
         std::vector<T> items;
 
         bool IsEmpty() {
-            return _isEmpty;
+            return _hasChildren && items.size() == 0;
         }
 
         Node<T> *addchild(int index, int _depth, bool force = false) {
@@ -128,7 +129,7 @@ namespace QuadTree {
                 child->index = index;
                 child->depth = _depth;
             }
-            _isEmpty = false;
+            _hasChildren = false;
 
             return child.get();
         }
@@ -136,7 +137,7 @@ namespace QuadTree {
         void clearItems() {
             items.clear();
             for (const auto &child: children) {
-                if (child != nullptr && !child->_isEmpty) {
+                if (child != nullptr && !child->_hasChildren) {
                     child->clearItems();
                 }
             }
@@ -144,11 +145,11 @@ namespace QuadTree {
             for (int i = 0; i < 4; ++i) {
                 auto child = children[i].get();
                 if (child != nullptr) {
-                    if (!child->_isEmpty) deleteSelf = false;
+                    if (!child->_hasChildren) deleteSelf = false;
                 }
             }
 
-            _isEmpty = deleteSelf;
+            _hasChildren = deleteSelf;
         }
     };
 
@@ -187,6 +188,10 @@ namespace QuadTree {
         static inline Quad<T> fromRootNode(Node<T>* node, glm::vec2 center, float rootSize){
             return Quad<T>(node, Square(center, rootSize));
         }
+
+        static Quad<T> GetEmpty(){
+            return Quad<T>(nullptr, Square(glm::vec2(0, 0), 0));
+        }
     };
 
 
@@ -221,6 +226,36 @@ namespace QuadTree {
             rootNode->depth = 0;
             this->center = center;
             this->physicalSize = initialSize;
+        }
+
+        /**
+         * DDA Line Raycast for direct descendents of the quad.
+         * @param quad The quad to raycast.
+         * @param origin Origin of the ray
+         * @param direction Direction of the ray
+         * @return
+         */
+        Quad<T> RaycastQuad(Quad<T> quad, glm::vec2 origin, glm::vec2 direction){
+            glm::vec2 dxy = direction / quad.square.size;
+            int steps = std::max(abs(dxy.x), abs(dxy.y));
+            glm::vec2 xy_inc = dxy / (float) steps;
+            glm::vec2 head = origin;
+            for (int i = 0; i <= steps; ++i) {
+                auto child = quad.getchild(head);
+                if (!child.IsEmpty()) return child;
+                head += xy_inc;
+            }
+            return Quad<T>::GetEmpty();
+        }
+
+        Quad<T> Raycast(glm::vec2 origin, glm::vec2 direction){
+            Quad<T> current = GetRootQuad();
+            Quad<T> last = Quad<T>::GetEmpty();
+            while (!current.IsEmpty()) {
+                last = current;
+                current = RaycastQuad(current, origin, direction);
+            }
+            return last;
         }
 
         void clearItems() {
