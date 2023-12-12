@@ -237,10 +237,10 @@ namespace QuadTree {
          * @param direction Direction of the ray. Not that this value is a reference and will change!
          * @return
          */
-        Quad<T> RaycastQuad(Quad<T> quad, glm::vec2& head, glm::vec2& direction){
-            glm::vec2 dxy = direction / quad.square.size;
-            int steps = std::max(abs(dxy.x), abs(dxy.y));
-            glm::vec2 xy_inc = dxy / (float) steps;
+        Quad<T> MarchRayQuad(Quad<T> quad, glm::vec2& head, glm::vec2& direction, int steps, glm::vec2 & xy_inc){
+//            glm::vec2 dxy = direction;
+//            int steps = std::max(abs(dxy.x), abs(dxy.y));
+//            glm::vec2 xy_inc = (direction / (float) steps) * quad.square.size;
             for (int i = 0; i <= steps; ++i) {
                 auto child = quad.getchild(head);
                 if (!child.IsEmpty()) return child;
@@ -254,9 +254,16 @@ namespace QuadTree {
             Quad<T> last = Quad<T>::GetEmpty();
             glm::vec2 head = origin;
             glm::vec2 direction_ = direction;
+
+            // Steps but in virtual units because direction is not relative to square size
+            int length_units = ceil(std::max(abs(direction.x), abs(direction.y)));
+            glm::vec2 xy_inc_units = direction / (float )length_units;
             while (!current.IsEmpty()) {
+                int steps = ceil(length_units / current.square.size);
+                glm::vec2 xy_inc = xy_inc_units * current.square.size;
                 last = current;
-                current = RaycastQuad(current, head, direction_);
+                current = MarchRayQuad(current, head, direction_, steps, xy_inc);
+
             }
             return last;
         }

@@ -94,17 +94,15 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
     if (collision){
         auto quad = quadTreeManager.Raycast(bodyp.pos, bodyp.vel * window.updateTimer.delta);
 
-        if (quad.IsEmpty()) {
-            return;
-        }
-
-        quad.square.colliding= true;
+        if (!quad.IsEmpty()) {
+            quad.square.colliding= true;
 //        logger->debug("Node d{} s{} {},{}",quad.node->depth,quad.square.size,quad.square.center.x,quad.square.center.y);
-        for (auto otherp_index : quad.node->items) {
-            if (bodyp.index == otherp_index){
-                continue;
+            for (auto otherp_index : quad.node->items) {
+                if (bodyp.index == otherp_index){
+                    continue;
+                }
+                ApplyCollisionForces(bodyp, physicalBodies[otherp_index]);
             }
-            ApplyCollisionForces(bodyp, physicalBodies[otherp_index]);
         }
 
     }
