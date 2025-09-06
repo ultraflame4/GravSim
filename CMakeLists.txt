@@ -29,6 +29,7 @@ set(SOURCES
         include/GravSim/utils.hh
 )
 
+add_compile_definitions(GravSim PUBLIC GLM_ENABLE_EXPERIMENTAL)
 
 find_package(spdlog CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
