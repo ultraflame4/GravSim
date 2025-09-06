@@ -4,18 +4,23 @@
   "version-string": "0.0.4",
   "license": "MIT",
   "dependencies": [
-    "glfw3",
-    "spdlog",
-    "magic-enum",
-    "glm",
     {
       "name": "glad",
-      "features": ["gl-api-44", "loader"]
+      "features": [
+        "gl-api-44",
+        "loader"
+      ]
     },
+    "glfw3",
+    "glm",
     {
       "name": "imgui",
-      "features": ["glfw-binding","opengl3-binding"]
-    }
+      "features": [
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    "magic-enum",
+    "spdlog"
   ]
-
 }
