@@ -42,7 +42,7 @@ git clone https://github.com/ultraflame4/GravSim.git --recursive --depth=1
 ```
 2. Use cmake to generate project build files.
 ```shell
-cmake -S . -B build -G Ninja
+cmake -S . -B build -G Ninja --preset=default
 ```
 3. Build the project with.
 ```shell
