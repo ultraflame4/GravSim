@@ -143,7 +143,7 @@ void GravitySimulation::draw(glm::mat4 view, glm::mat4 proj) {
     }
 }
 
-int GravitySimulation::AddBody(float x, float y, float radius, float mass, float color[3], bool active) {
+int GravitySimulation::addBody(float x, float y, float radius, float mass, float color[3], bool active) {
     bodies_mutex.lock();
     bodies.push_back(GravBodyVertex{
             x, y,
