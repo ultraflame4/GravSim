@@ -120,7 +120,7 @@ class SimulationRenderer {
             line.thick       = 1;
 
             line.update_line_vertices();
-            // line.draw(view, proj);
+            line.draw(view, proj);
         }
     }
 };
