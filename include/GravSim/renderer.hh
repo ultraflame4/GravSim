@@ -103,21 +103,15 @@ class SimulationRenderer {
     void debug_draw(glm::mat4 view, glm::mat4 proj, Simulation& sim) {
         auto body_count = sim.bodies.size();
 
-        if (debugLines.size() != body_count) {
-            debugLines.reserve(body_count);
-            debugLines.clear();
-            for (int i = 0; i < body_count; ++i) {
-                auto& line    = debugLines.emplace_back();
-                line.color[0] = 0.4f;
-                line.color[1] = 0.9f;
-                line.color[2] = 0.1f;
-                line.thick    = 1;
-            }
-        }
+        debugLines.resize(body_count);
 
         for (int i = 0; i < body_count; ++i) {
             auto& line  = debugLines[i];
             auto& bodyp = sim.bodies[i];
+
+            line.color[0] = 0.4f;
+            line.color[1] = 0.9f;
+            line.color[2] = 0.1f;
 
             line.direction.x = bodyp.vel.x;
             line.direction.y = bodyp.vel.y;
@@ -125,7 +119,7 @@ class SimulationRenderer {
             line.origin.y    = bodyp.pos.y;
             line.thick       = 1;
             line.update_line_vertices();
-            line.draw(view, proj);
+            // line.draw(view, proj);
         }
     }
 };
