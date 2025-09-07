@@ -2,13 +2,14 @@
 // Created by powew on 21/10/2023.
 //
 
-#include "GravSim/Line.hh"
+#include "GravSim/line.hh"
 #include "GravSim/square.hh"
 #include "GravSim/utils.hh"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <iostream>
+#include <memory>
 
 void Line::load() {
     shader.addShader("./assets/line.vertex.glsl", ShaderType::VERTEX);
@@ -41,7 +42,7 @@ void Line::update_line_vertices() {
     triangles[5] = 0;
 
     if (vo == nullptr) {
-        vo = new VertexObject(sizeof(vertices), vertices, sizeof(float) * 2);
+        vo = std::make_shared<VertexObject>(sizeof(vertices), vertices, sizeof(float) * 2);
         vo->CreateAttrib(2);  // Position
     }
 
@@ -68,5 +69,3 @@ void Line::draw(glm::mat4 view, glm::mat4 proj) {
     glUniform3f(color_loc, color[0], color[1], color[2]);
     vo->draw();
 }
-
-Line::~Line() { delete vo; }

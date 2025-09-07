@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <vector>
-#include "GravSim/Line.hh"
+#include "GravSim/line.hh"
 #include "GravSim/simulation.hh"
 #include "GravSim/vertex_object.hh"
 #include "GravSim/shader.hh"
@@ -118,6 +118,7 @@ class SimulationRenderer {
             line.origin.x    = bodyp.pos.x;
             line.origin.y    = bodyp.pos.y;
             line.thick       = 1;
+
             line.update_line_vertices();
             // line.draw(view, proj);
         }
