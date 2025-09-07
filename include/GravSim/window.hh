@@ -5,7 +5,7 @@
 #include <spdlog/logger.h>
 #include <GLFW/glfw3.h>
 #include <map>
-#include "Timer.hh"
+#include "timer.hh"
 
 
 class Window {
@@ -18,6 +18,8 @@ public:
     void run();
     Timer frameTimer;
     Timer updateTimer;
+
+    int updateTps = 144;
 
     int width;
     int height;

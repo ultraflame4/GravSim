@@ -9,7 +9,7 @@ import testmodel;
 #include "GravSim/window.hh"
 #include "GravSim/GravitySimulation.hh"
 #include "GravSim/utils.hh"
-#include "GravSim/Line.hh"
+#include "GravSim/line.hh"
 #include "GravSim/meta.hh"
 
 class Game : public Window {
@@ -155,6 +155,7 @@ protected:
     void Load() override {
         logger->info("Hello world!");
         logger->info("Module result {}", add(13,45));
+        this->updateTps = 20;
         simulation.load();
         Line::load();
 
@@ -236,6 +237,7 @@ protected:
 
         UpdateSpawningBodyVel();
 
+        simulation.update_positions();
         simulation.draw(view, proj);
 
         targetingLine.active = !spawningGravBodies.empty();

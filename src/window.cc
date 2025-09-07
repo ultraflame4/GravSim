@@ -81,7 +81,7 @@ void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height
 }
 
 void Window::_update_thread() {
-    const int base_tps = 144;
+    const int base_tps = this->updateTps;
     const float delay = 1000.0f / base_tps;
     const int delay_i = std::floor(delay);
     float missed_time = 0;

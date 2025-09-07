@@ -8,7 +8,7 @@
 #include "shader.hh"
 #include "vertex_object.hh"
 #include "window.hh"
-#include "Line.hh"
+#include "line.hh"
 
 struct GravBodyVertex {
     float x;
@@ -69,6 +69,9 @@ public:
     bool collision = true;
     bool debug = false;
 
+    float last_step_time = 0;
+    float last_step_dt = 0;
+
     void clear();
     void load();
 
@@ -81,6 +84,7 @@ public:
      */
     void resolveFused(GravBodyPhysical &a, GravBodyPhysical &b);
 
+    void update_positions();
     void draw(glm::mat4 view, glm::mat4 proj);
 
     int addBody(float x, float y, float radius, float mass, float color[3], bool active = true);
