@@ -4,7 +4,7 @@
 #include "GravSim/simulation.hh"
 #include "GravSim/vertex_object.hh"
 #include "GravSim/shader.hh"
-#include "GravSim/window.hh"
+
 
 struct Vertex {
     float x;
@@ -22,6 +22,8 @@ static_assert(
 class SimulationRenderer {
   public:
     std::vector<Vertex> vertices;
+    /** Additional vertices to draw. */
+    std::vector<Vertex> addVertices;
     Shader shader;
 
   private:
@@ -65,13 +67,14 @@ class SimulationRenderer {
      */
     void update_vertices(Simulation& sim) {
         int vertex_count = sim.bodies.size();
-
+        // Call reserve early to avoid allocation on resize and insert
+        vertices.reserve(vertex_count + addVertices.size());
         vertices.resize(vertex_count);
-
         for (int i = 0; i < sim.bodies.size(); i++) {
             auto& body  = sim.bodies[i];
             vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, 1.0f, 255.0f, 1.0f};
         }
+        vertices.insert(vertices.end(), addVertices.begin(), addVertices.end());
     }
 
     void draw(glm::mat4 view, glm::mat4 proj, int window_width, int window_height) {

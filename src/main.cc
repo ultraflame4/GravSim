@@ -26,6 +26,7 @@ class Game : public Window {
     glm::vec3 cameraMove      = glm::vec3(0, 0, 0);
     glm::mat4 view            = glm::mat4(1.0f);
     glm::mat4 proj;
+
     float current_zoom   = 1.f;
     float target_zoom    = 1.f;
     float zoom_speed     = .1f;
@@ -36,6 +37,16 @@ class Game : public Window {
         float halfW = size * width;
         float halfH = size * height;
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
+    }
+
+    glm::vec2 spawnPosition;
+    glm::vec2 spawnVel;
+
+    void updateSpawnParameters() {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
+        spawnVel      = spawnPosition - pos;
     }
 
   protected:
@@ -49,7 +60,9 @@ class Game : public Window {
         switch (action) {
             case GLFW_RELEASE:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
-                    // TODO
+                    targetingLine.active = false;
+                    renderer->addVertices.clear();
+                    // todo, add to simulation!
                 }
                 if (key == GLFW_KEY_W) cameraMove -= VEC_UP;
                 if (key == GLFW_KEY_A) cameraMove -= VEC_LEFT;
@@ -69,7 +82,53 @@ class Game : public Window {
                     logger->info("Paused enabled: {}", paused);
                 }
 
-                if (key == GLFW_MOUSE_BUTTON_RIGHT) {}
+                if (key == GLFW_MOUSE_BUTTON_RIGHT) {
+                    double xpos, ypos;
+                    targetingLine.active = true;
+                    glfwGetCursorPos(window, &xpos, &ypos);
+                    spawnPosition = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
+
+                    logger->debug(
+                        "Spawning {} object(s) at {},{}",
+                        spawnCount,
+                        spawnPosition.x,
+                        spawnPosition.y
+                    );
+                    renderer->addVertices.reserve(1 + spawnCount);
+                    renderer->addVertices.push_back(
+                        Vertex{spawnPosition.x, spawnPosition.y, spawnRadius, 1.f, .1f, 1.f}
+                    );
+
+                    float dist        = spawnRadius * 2;
+                    float angle       = 0;
+                    float max_angle   = 360 * (std::numbers::pi / 180);
+                    float layer_count = 0;
+                    for (int i = 0; i < spawnCount - 1; ++i) {
+                        // Distance from center
+
+                        // Amount to increase angle by. Should increase just enough such that
+                        // the bodies dont collide!
+                        float dist_2sq = 2 * dist * dist;
+                        float amt =
+                            std::acos((dist_2sq - (4 * spawnRadius * spawnRadius)) / dist_2sq);
+
+                        // Direction offset from spawn position
+                        glm::vec2 dir_off(std::sin(angle), std::cos(angle));
+                        glm::vec2 final_pos = spawnPosition + (dir_off * dist);
+
+                        renderer->addVertices.push_back(
+                            Vertex{final_pos.x, final_pos.y, spawnRadius, 1.f, .1f, 1.f}
+                        );
+
+                        int max_layer_count = std::floor(max_angle / amt);
+                        layer_count++;
+                        if (layer_count >= max_layer_count) {
+                            dist += spawnRadius * 2;
+                            layer_count = 0;
+                        }
+                        angle += amt;
+                    }
+                }
 
                 break;
             default:
@@ -88,9 +147,6 @@ class Game : public Window {
     float spawnRadius   = 10;
     float spawnColor[3] = {1.f, 1.f, 1.f};
     int spawnCount      = 1;
-
-    glm::vec2 spawnPosition;
-    glm::vec2 spawnVel;
 
     void Load() override {
         logger->info("Hello world!");
@@ -173,11 +229,12 @@ class Game : public Window {
         view = glm::lookAt(cameraPos, cameraPos + VEC_FORWARD, VEC_UP);
 
         // simulation.update_positions();
+
         renderer->update_vertices(simulation);
         renderer->draw(view, proj, this->width, this->height);
-
-        // targetingLine.active = !spawningGravBodies.empty();
+        
         if (targetingLine.active) {
+            updateSpawnParameters();
             targetingLine.origin.x    = spawnPosition.x;
             targetingLine.origin.y    = spawnPosition.y;
             targetingLine.direction.x = spawnVel.x;
