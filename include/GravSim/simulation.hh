@@ -55,18 +55,33 @@ class Simulation {
         );
     }
 
-    void step() {
-        std::for_each(
-            std::execution::par_unseq,
-            bodies.begin(),
-            bodies.end(),
-            [this](SimulatedPhysicsBody& bodyp) { updateBody(bodyp, bodyp.data->index); }
-        );
-    }
+    void step() { processChunk(bodies.begin(), bodies.end()); }
 
     void clear() { bodies.clear(); }
 
   private:
+    template <typename ChunkIter>
+    void processChunk(ChunkIter begin, ChunkIter end) {
+        std::for_each(
+            std::execution::par_unseq,
+            begin,
+            end,
+            [this, begin, end](SimulatedPhysicsBody& bodyp) {
+                auto index = bodyp.data->index;
+
+                for (auto inner = begin; inner != end; ++inner) {
+                    SimulatedPhysicsBody& otherp = *inner;
+                    if (index == otherp.data->index) continue;  // Skip self
+
+                    if (enableCollision) applyCollisionForces(bodyp, otherp);
+                    if (enableGravity) applyGravityForce(bodyp, otherp);
+                }
+
+                bodyp.pos += bodyp.vel * stepSize;
+            }
+        );
+    }
+
     void resolveFused(SimulatedPhysicsBody& a, SimulatedPhysicsBody& b) {
         a.pos.x -= a.radius / 2;
         b.pos.x += b.radius / 2;
@@ -113,17 +128,5 @@ class Simulation {
         glm::vec2 dir_norm = glm::normalize(dir);
 
         a.accelerate(dir_norm, sharedForce * .5f * stepSize);
-    }
-
-    void updateBody(SimulatedPhysicsBody& bodyp, int index) {
-        for (int j = 0; j < bodies.size(); ++j) {
-            if (index == j) continue;  // Skip self
-            auto& otherp = bodies[j];
-
-            if (enableCollision) applyCollisionForces(bodyp, otherp);
-            if (enableGravity) applyGravityForce(bodyp, otherp);
-        }
-
-        bodyp.pos += bodyp.vel * stepSize;
     }
 };
