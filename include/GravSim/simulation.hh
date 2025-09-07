@@ -6,6 +6,7 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/glm.hpp>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 struct SimulatedBody {
@@ -33,6 +34,10 @@ class Simulation {
   public:
     // TODO: Swap this out for spatial hashing
     std::vector<SimulatedPhysicsBody> bodies;
+
+    // Bodies to be added into the simulation.
+    std::vector<SimulatedPhysicsBody> spawn_queue;
+
     float stepSize        = .01f;
     float gravityConstant = 500.f;
     bool enableCollision  = true;
@@ -42,9 +47,10 @@ class Simulation {
     Simulation() {}
 
     SimulatedPhysicsBody& spawnBody(glm::vec2 xy, float radius, float mass, Color color) {
+        std::lock_guard<std::mutex> lock(mutex_spawnqueue);
         int index = bodies.size();
 
-        return this->bodies.emplace_back(
+        return this->spawn_queue.emplace_back(
             SimulatedPhysicsBody{
                 xy,
                 glm::vec2(0, 0),
@@ -55,22 +61,52 @@ class Simulation {
         );
     }
 
-    void step() { processChunk(bodies.begin(), bodies.end()); }
+    void step() {
+        if (need_clear) bodies.clear();
+        spawnQueued();
 
-    void clear() { bodies.clear(); }
+        processChunk(bodies);
+    }
+
+    void clear() {
+        std::lock_guard<std::mutex> lock(mutex_spawnqueue);
+        spawn_queue.clear();
+        need_clear = true;
+    }
 
   private:
-    template <typename ChunkIter>
-    void processChunk(ChunkIter begin, ChunkIter end) {
+    std::mutex mutex_spawnqueue;
+
+    /**Whether to clear the spawned bodies. This should not clear the queue */
+    bool need_clear = false;
+
+    /**
+     * @brief Directly adds body into simulation. Will lock.
+     *
+     * @param body
+     */
+    SimulatedPhysicsBody& addBody(SimulatedPhysicsBody body) {
+        return this->bodies.emplace_back(body);
+    }
+
+    void spawnQueued() {
+        if (spawn_queue.empty()) return;
+        std::lock_guard<std::mutex> lock(mutex_spawnqueue);
+        // Append spawn queue to bodies and clear it
+        bodies.reserve(bodies.size() + spawn_queue.size());
+        bodies.insert(bodies.end(), spawn_queue.begin(), spawn_queue.end());
+        spawn_queue.clear();
+    }
+
+    void processChunk(std::vector<SimulatedPhysicsBody>& bodies) {
         std::for_each(
             std::execution::par_unseq,
-            begin,
-            end,
-            [this, begin, end](SimulatedPhysicsBody& bodyp) {
+            bodies.begin(),
+            bodies.end(),
+            [this, bodies](SimulatedPhysicsBody& bodyp) {
                 auto index = bodyp.data->index;
 
-                for (auto inner = begin; inner != end; ++inner) {
-                    SimulatedPhysicsBody& otherp = *inner;
+                for (SimulatedPhysicsBody otherp : bodies) {
                     if (index == otherp.data->index) continue;  // Skip self
 
                     if (enableCollision) applyCollisionForces(bodyp, otherp);

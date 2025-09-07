@@ -73,7 +73,8 @@ class SimulationRenderer {
         vertices.reserve(vertex_count + addVertices.size());
         vertices.resize(vertex_count);
         for (int i = 0; i < sim.bodies.size(); i++) {
-            auto& body  = sim.bodies[i];
+            // Cannot use references here, array may resize at anytime, causing reference to be invalid!
+            auto body  = sim.bodies[i];
             vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, body.data->color};
         }
         vertices.insert(vertices.end(), addVertices.begin(), addVertices.end());
