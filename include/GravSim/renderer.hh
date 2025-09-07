@@ -4,6 +4,7 @@
 #include "GravSim/simulation.hh"
 #include "GravSim/vertex_object.hh"
 #include "GravSim/shader.hh"
+#include "GravSim/window.hh"
 
 struct Vertex {
     float x;
@@ -68,12 +69,12 @@ class SimulationRenderer {
         vertices.resize(vertex_count);
 
         for (int i = 0; i < sim.bodies.size(); i++) {
-            auto& body = sim.bodies[i];
+            auto& body  = sim.bodies[i];
             vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, 1.0f, 255.0f, 1.0f};
         }
     }
 
-    void draw(glm::mat4 view, glm::mat4 proj) {
+    void draw(glm::mat4 view, glm::mat4 proj, int window_width, int window_height) {
         auto* bodiesArr = reinterpret_cast<float*>(vertices.data());
         int stride      = sizeof(Vertex);
         int size        = stride * vertices.size();
@@ -86,6 +87,9 @@ class SimulationRenderer {
         glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj));
+
+        glUniform2f(viewport_loc, window_width, window_height);
+        glUniform1f(feathering_loc, 1);
 
         vo->drawPoints();
     }

@@ -174,7 +174,7 @@ class Game : public Window {
 
         // simulation.update_positions();
         renderer->update_vertices(simulation);
-        renderer->draw(view, proj);
+        renderer->draw(view, proj, this->width, this->height);
 
         // targetingLine.active = !spawningGravBodies.empty();
         if (targetingLine.active) {
