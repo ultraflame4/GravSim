@@ -24,6 +24,8 @@ class SimulationRenderer {
     Shader shader;
 
   private:
+    std::shared_ptr<spdlog::logger> logger = logging::get<SimulationRenderer>();
+
     VertexObject* vo = nullptr;
 
     int feathering_loc;
@@ -66,8 +68,8 @@ class SimulationRenderer {
         vertices.resize(vertex_count);
 
         for (int i = 0; i < sim.bodies.size(); i++) {
-            auto& body  = sim.bodies[i];
-            vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, 1.0f, 1.0f, 1.0f};
+            auto& body = sim.bodies[i];
+            vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, 1.0f, 255.0f, 1.0f};
         }
     }
 
