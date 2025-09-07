@@ -2,16 +2,23 @@
 #include <algorithm>
 #include <execution>
 #include "GravSim/utils.hh"
+#include <glm/fwd.hpp>
 #include <glm/gtx/norm.hpp>
 #include <glm/glm.hpp>
+#include <memory>
 #include <vector>
+
+struct SimulatedBody {
+    int index;
+    Color color;
+};
 
 struct SimulatedPhysicsBody {
     glm::vec2 pos;
     glm::vec2 vel;
     float mass;
     float radius;
-    int index;
+    std::shared_ptr<SimulatedBody> data;
 
     void accelerate(glm::vec2 direction, float forceAmt) {
         vel += direction * (forceAmt / mass);
@@ -33,11 +40,17 @@ class Simulation {
   public:
     Simulation() {}
 
-    SimulatedPhysicsBody& spawnBody(float x, float y, float radius, float mass) {
+    SimulatedPhysicsBody& spawnBody(glm::vec2 xy, float radius, float mass, Color color) {
         int index = bodies.size();
 
         return this->bodies.emplace_back(
-            SimulatedPhysicsBody{glm::vec2(x, y), glm::vec2(0, 0), mass, radius, index}
+            SimulatedPhysicsBody{
+                xy,
+                glm::vec2(0, 0),
+                mass,
+                radius,
+                std::make_shared<SimulatedBody>(SimulatedBody{index, color})
+            }
         );
     }
 
@@ -46,13 +59,11 @@ class Simulation {
             std::execution::par_unseq,
             bodies.begin(),
             bodies.end(),
-            [this](SimulatedPhysicsBody& bodyp) { updateBody(bodyp, bodyp.index); }
+            [this](SimulatedPhysicsBody& bodyp) { updateBody(bodyp, bodyp.data->index); }
         );
     }
 
-    void clear(){
-        bodies.clear();
-    }
+    void clear() { bodies.clear(); }
 
   private:
     void resolveFused(SimulatedPhysicsBody& a, SimulatedPhysicsBody& b) {

@@ -4,6 +4,7 @@
 #include <vector>
 #include "GravSim/line.hh"
 #include "GravSim/simulation.hh"
+#include "GravSim/utils.hh"
 #include "GravSim/vertex_object.hh"
 #include "GravSim/shader.hh"
 
@@ -11,9 +12,7 @@ struct Vertex {
     float x;
     float y;
     float radius;
-    float r;
-    float g;
-    float b;
+    Color color;
 };
 static_assert(
     sizeof(Vertex) == sizeof(float) * 6,
@@ -75,7 +74,7 @@ class SimulationRenderer {
         vertices.resize(vertex_count);
         for (int i = 0; i < sim.bodies.size(); i++) {
             auto& body  = sim.bodies[i];
-            vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, 1.0f, 255.0f, 1.0f};
+            vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, body.data->color};
         }
         vertices.insert(vertices.end(), addVertices.begin(), addVertices.end());
     }

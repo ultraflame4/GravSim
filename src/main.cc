@@ -1,4 +1,5 @@
 #include <glad/glad.h>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <imgui.h>
@@ -65,8 +66,13 @@ class Game : public Window {
                     targetingLine.active = false;
 
                     for (Vertex v : renderer->addVertices) {
-                        auto& body = simulation.spawnBody(v.x, v.y, spawnRadius, spawnMass);
-                        body.vel   = spawnVel;
+                        auto& body = simulation.spawnBody(
+                            glm::vec2(v.x, v.y),
+                            spawnRadius,
+                            spawnMass,
+                            v.color
+                        );
+                        body.vel = spawnVel;
                     }
 
                     renderer->addVertices.clear();
@@ -104,7 +110,15 @@ class Game : public Window {
                     );
                     renderer->addVertices.reserve(1 + spawnCount);
                     renderer->addVertices.push_back(
-                        Vertex{spawnPosition.x, spawnPosition.y, spawnRadius, 1.f, .1f, 1.f}
+                        Vertex{
+                            spawnPosition.x,
+                            spawnPosition.y,
+                            spawnRadius,
+                            spawnColor[0],
+                            spawnColor[1],
+                            spawnColor[2],
+
+                        }
                     );
 
                     float dist        = spawnRadius * 2;
@@ -165,13 +179,13 @@ class Game : public Window {
     }
 
     void Start() override {
-        simulation.spawnBody(-200, 10, 1 + 5, 10);
-        simulation.spawnBody(-50, 0, 2 + 5, 20);
-        simulation.spawnBody(800, 0, 1 + 5, 10);
-        simulation.spawnBody(0, 0, 15, 20);
-        simulation.spawnBody(0, -500, 1 + 5, 10);
-        simulation.spawnBody(200, -100, 4 + 5, 20);
-        simulation.spawnBody(200, -500, 4 + 5, 20);
+        simulation.spawnBody(glm::vec2(-200, 10), 1 + 5, 10, Color{});
+        simulation.spawnBody(glm::vec2(-50, 0), 2 + 5, 20, Color{});
+        simulation.spawnBody(glm::vec2(800, 0), 1 + 5, 10, Color{});
+        simulation.spawnBody(glm::vec2(0, 0), 15, 20, Color{});
+        simulation.spawnBody(glm::vec2(0, -500), 1 + 5, 10, Color{});
+        simulation.spawnBody(glm::vec2(200, -100), 4 + 5, 20, Color{});
+        simulation.spawnBody(glm::vec2(200, -500), 4 + 5, 20, Color{});
     }
 
     void Update(float dt) override {
