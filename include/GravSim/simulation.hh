@@ -33,7 +33,7 @@ class Simulation {
   public:
     std::vector<SimulatedPhysicsBody> bodies;
     float stepSize        = .01f;
-    float gravityConstant = 100.f;
+    float gravityConstant = 500.f;
     bool enableCollision  = true;
     bool enableGravity    = true;
 
