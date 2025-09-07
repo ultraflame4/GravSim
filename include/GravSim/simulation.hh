@@ -20,14 +20,12 @@ struct SimulatedPhysicsBody {
 
 class Simulation {
   public:
-    Simulation(float stepSize) : stepSize(stepSize) {}
-
-    float stepSize;
-
-  private:
     std::vector<SimulatedPhysicsBody> bodies;
+    float stepSize = 1;
 
   public:
+    Simulation() {}
+
     int spawnBody(float x, float y, float radius, float mass) {
         auto& bodyp = this->bodies.emplace_back(
             SimulatedPhysicsBody{glm::vec2(x, y), glm::vec2(x, y), mass, radius}

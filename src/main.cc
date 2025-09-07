@@ -3,26 +3,32 @@
 #include <glm/ext.hpp>
 #include <imgui.h>
 #include <algorithm>
+#include <memory>
 #include <numbers>
+#include "GravSim/renderer.hh"
+#include "GravSim/simulation.hh"
 #include "GravSim/window.hh"
 #include "GravSim/utils.hh"
 #include "GravSim/line.hh"
 #include "GravSim/meta.hh"
 
 class Game : public Window {
-public:
-    Game(int width, int height, const std::string &title)
-        : Window(width, height, title) {}
+  public:
+    Game(int width, int height, const std::string& title) : Window(width, height, title) {}
 
-protected:
-    glm::vec3 cameraPos = glm::vec3(0, 0, 0);
+  protected:
+    Simulation simulation;
+
+    std::unique_ptr<SimulationRenderer> renderer = nullptr;
+
+    glm::vec3 cameraPos       = glm::vec3(0, 0, 0);
     glm::vec3 targetCameraPos = glm::vec3(0, 0, 0);
-    glm::vec3 cameraMove = glm::vec3(0, 0, 0);
-    glm::mat4 view = glm::mat4(1.0f);
+    glm::vec3 cameraMove      = glm::vec3(0, 0, 0);
+    glm::mat4 view            = glm::mat4(1.0f);
     glm::mat4 proj;
-    float current_zoom = 1.f;
-    float target_zoom = 1.f;
-    float zoom_speed = .1f;
+    float current_zoom   = 1.f;
+    float target_zoom    = 1.f;
+    float zoom_speed     = .1f;
     const float max_zoom = 5;
     const float min_zoom = .2f;
 
@@ -32,7 +38,7 @@ protected:
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
     }
 
-protected:
+  protected:
     // ---- EVENTS ----
 
     void OnScroll(double x_offset, double y_offset) override {
@@ -41,58 +47,47 @@ protected:
 
     void OnInput(int key, int action, int mods) override {
         switch (action) {
-        case GLFW_RELEASE:
-            if (key == GLFW_MOUSE_BUTTON_RIGHT) {
-                // TODO
-            }
-            if (key == GLFW_KEY_W)
-                cameraMove -= up;
-            if (key == GLFW_KEY_A)
-                cameraMove -= left;
-            if (key == GLFW_KEY_S)
-                cameraMove -= down;
-            if (key == GLFW_KEY_D)
-                cameraMove -= right;
-            break;
-        case GLFW_PRESS:
-            if (key == GLFW_KEY_W)
-                cameraMove += up;
-            if (key == GLFW_KEY_A)
-                cameraMove += left;
-            if (key == GLFW_KEY_S)
-                cameraMove += down;
-            if (key == GLFW_KEY_D)
-                cameraMove += right;
+            case GLFW_RELEASE:
+                if (key == GLFW_MOUSE_BUTTON_RIGHT) {
+                    // TODO
+                }
+                if (key == GLFW_KEY_W) cameraMove -= up;
+                if (key == GLFW_KEY_A) cameraMove -= left;
+                if (key == GLFW_KEY_S) cameraMove -= down;
+                if (key == GLFW_KEY_D) cameraMove -= right;
+                break;
+            case GLFW_PRESS:
+                if (key == GLFW_KEY_W) cameraMove += up;
+                if (key == GLFW_KEY_A) cameraMove += left;
+                if (key == GLFW_KEY_S) cameraMove += down;
+                if (key == GLFW_KEY_D) cameraMove += right;
 
-            if (key == GLFW_KEY_G) {
-            }
-            if (key == GLFW_KEY_C) {
-            }
-            if (key == GLFW_KEY_SPACE) {
-                paused = !paused;
-                logger->info("Paused enabled: {}", paused);
-            }
+                if (key == GLFW_KEY_G) {}
+                if (key == GLFW_KEY_C) {}
+                if (key == GLFW_KEY_SPACE) {
+                    paused = !paused;
+                    logger->info("Paused enabled: {}", paused);
+                }
 
-            if (key == GLFW_MOUSE_BUTTON_RIGHT) {
-            }
+                if (key == GLFW_MOUSE_BUTTON_RIGHT) {}
 
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
     }
 
-protected:
+  protected:
     Line targetingLine;
 
     bool paused = false;
 
     void OnResize() override { proj = createOrtho(current_zoom); }
 
-    float spawnMass = 10;
-    float spawnRadius = 10;
+    float spawnMass     = 10;
+    float spawnRadius   = 10;
     float spawnColor[3] = {1.f, 1.f, 1.f};
-    int spawnCount = 1;
+    int spawnCount      = 1;
 
     glm::vec2 spawnPosition;
     glm::vec2 spawnVel;
@@ -100,31 +95,28 @@ protected:
     void Load() override {
         logger->info("Hello world!");
         this->updateTps = 20;
-        // simulation.load();
+        renderer        = std::make_unique<SimulationRenderer>();
         Line::load();
     }
 
     void Start() override {
-        // addBody(-200, 10, 1 + 5, 10);
-        // addBody(-50, 0, 2 + 5, 20);
-        // addBody(800, 0, 1 + 5, 10);
-        // addBody(0, 0, 15, 500);
-        // addBody(0, -500, 1 + 5, 10);
-        // addBody(200, -100, 4 + 5, 40);
-        // addBody(200, -500, 4 + 5, 40);
+        simulation.spawnBody(-200, 10, 1 + 5, 10);
+        simulation.spawnBody(-50, 0, 2 + 5, 20);
+        simulation.spawnBody(800, 0, 1 + 5, 10);
+        simulation.spawnBody(0, 0, 15, 500);
+        simulation.spawnBody(0, -500, 1 + 5, 10);
+        simulation.spawnBody(200, -100, 4 + 5, 40);
+        simulation.spawnBody(200, -500, 4 + 5, 40);
     }
 
     void Update(float dt) override {
-
-        if (paused)
-            return;
+        if (paused) return;
         // simulation.step();
     }
 
     void OnImGui_Draw() override {
         ImGui::Begin("Simulation");
-        // ImGui::Text("Bodies count: %d",
-        // (int)simulation.physicalBodies.size());
+        ImGui::Text("Bodies count: %d", (int)simulation.bodies.size());
         ImGui::Text("FPS: %f", 1.f / frameTimer.delta);
         ImGui::Text("FPS AVG: %f", 1.f / frameTimer.avg_delta);
         ImGui::Text("TPS: %f", 1.f / updateTimer.delta);
@@ -136,8 +128,7 @@ protected:
             ImGui::Text("Position: %f,%f", cameraPos.x, cameraPos.y);
             ImGui::SliderFloat("Zoom", &target_zoom, min_zoom, max_zoom);
         }
-        if (ImGui::CollapsingHeader("Spawning",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Spawning", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Mass", &spawnMass, 1, 2000);
             ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
@@ -150,8 +141,7 @@ protected:
             //     simulation.clear();
             // }
         }
-        if (ImGui::CollapsingHeader("Trajectory Line",
-                                    ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (ImGui::CollapsingHeader("Trajectory Line", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
             ImGui::SliderFloat("Thickness", &targetingLine.thick, 1, 100);
             ImGui::ColorEdit3("Line Color", targetingLine.color);
@@ -165,17 +155,15 @@ protected:
     }
 
     void Draw(float dt) override {
-
         target_zoom = std::clamp(target_zoom, min_zoom, max_zoom);
         if (abs(current_zoom - target_zoom) < 0.01f) {
             current_zoom = target_zoom;
         } else {
             current_zoom = std::lerp(current_zoom, target_zoom, 10 * dt);
-            proj = createOrtho(current_zoom);
+            proj         = createOrtho(current_zoom);
         }
 
-        targetCameraPos =
-            targetCameraPos + cameraMove * dt * 2000.f * current_zoom;
+        targetCameraPos = targetCameraPos + cameraMove * dt * 2000.f * current_zoom;
         if (abs(length(cameraPos - targetCameraPos)) < (0.01f * current_zoom)) {
             cameraPos = glm::mix(cameraPos, targetCameraPos, 10 * dt);
         } else {
@@ -185,12 +173,13 @@ protected:
         view = glm::lookAt(cameraPos, cameraPos + forward, up);
 
         // simulation.update_positions();
-        // simulation.draw(view, proj);
+        renderer->update_vertices(simulation);
+        renderer->draw(view, proj);
 
         // targetingLine.active = !spawningGravBodies.empty();
         if (targetingLine.active) {
-            targetingLine.origin.x = spawnPosition.x;
-            targetingLine.origin.y = spawnPosition.y;
+            targetingLine.origin.x    = spawnPosition.x;
+            targetingLine.origin.y    = spawnPosition.y;
             targetingLine.direction.x = spawnVel.x;
             targetingLine.direction.y = spawnVel.y;
             targetingLine.update_line_vertices();
