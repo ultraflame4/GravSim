@@ -171,8 +171,16 @@ class Game : public Window {
     }
 
     void Start() override {
-        for (int i = 0; i < 100; i++) {
-            simulation.spawnBody(glm::vec2(0, 0), 10, 10, Color{});
+        int size = 50;
+        for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; ++x) {
+                simulation.spawnBody(
+                    glm::vec2(x - size / 2, y - size / 2) * spawnRadius * 2,
+                    spawnRadius,
+                    10,
+                    Color{}
+                );
+            }
         }
     }
 
