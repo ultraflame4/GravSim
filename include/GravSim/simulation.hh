@@ -37,7 +37,7 @@ class Simulation {
         int index = bodies.size();
 
         return this->bodies.emplace_back(
-            SimulatedPhysicsBody{glm::vec2(x, y), glm::vec2(x, y), mass, radius, index}
+            SimulatedPhysicsBody{glm::vec2(x, y), glm::vec2(0, 0), mass, radius, index}
         );
     }
 
