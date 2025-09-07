@@ -72,7 +72,7 @@ public:
     void clear();
     void load();
 
-    void update();
+    void step();
 
     /**
      * Resolve 2 physical bodies with the same position

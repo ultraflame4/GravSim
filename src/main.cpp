@@ -173,7 +173,7 @@ protected:
     void Update(float dt) override {
 
         if (paused) return;
-        simulation.update();
+        simulation.step();
     }
 
     void OnImGui_Draw() override {

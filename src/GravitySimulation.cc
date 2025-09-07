@@ -97,7 +97,7 @@ void GravitySimulation::UpdateGravBodyPhysics(GravBodyPhysical &bodyp, int index
 
 }
 
-void GravitySimulation::update() {
+void GravitySimulation::step() {
     bodies_mutex.lock();
 
     std::for_each(std::execution::par_unseq, physicalBodies.begin(),physicalBodies.end(),[this](GravBodyPhysical& bodyp){
