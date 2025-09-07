@@ -33,14 +33,16 @@ class Game : public Window {
     const float max_zoom = 5;
     const float min_zoom = .2f;
 
+    glm::vec2 spawnPosition;
+    glm::vec2 spawnVel;
+
+    bool draw_debuglines = false;
+
     glm::mat4 createOrtho(float size, float zNear = .1f, float zFar = 100.0f) {
         float halfW = size * width;
         float halfH = size * height;
         return glm::ortho(-halfW, halfW, -halfH, halfH, zNear, zFar);
     }
-
-    glm::vec2 spawnPosition;
-    glm::vec2 spawnVel;
 
     void updateSpawnParameters() {
         double xpos, ypos;
@@ -145,7 +147,7 @@ class Game : public Window {
   protected:
     Line targetingLine;
 
-    bool paused = false;
+    bool paused = true;
 
     void OnResize() override { proj = createOrtho(current_zoom); }
 
@@ -166,10 +168,10 @@ class Game : public Window {
         simulation.spawnBody(-200, 10, 1 + 5, 10);
         simulation.spawnBody(-50, 0, 2 + 5, 20);
         simulation.spawnBody(800, 0, 1 + 5, 10);
-        simulation.spawnBody(0, 0, 15, 500);
+        simulation.spawnBody(0, 0, 15, 20);
         simulation.spawnBody(0, -500, 1 + 5, 10);
-        simulation.spawnBody(200, -100, 4 + 5, 40);
-        simulation.spawnBody(200, -500, 4 + 5, 40);
+        simulation.spawnBody(200, -100, 4 + 5, 20);
+        simulation.spawnBody(200, -500, 4 + 5, 20);
     }
 
     void Update(float dt) override {
@@ -209,7 +211,7 @@ class Game : public Window {
         if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Checkbox("Enable Gravity [G]", &simulation.enableGravity);
             ImGui::Checkbox("Enable Collisions [C]", &simulation.enableCollision);
-            // ImGui::Checkbox("Debug Velocity", &simulation.debug);
+            ImGui::Checkbox("Debug Velocity", &draw_debuglines);
         }
         ImGui::End();
     }
@@ -232,10 +234,9 @@ class Game : public Window {
 
         view = glm::lookAt(cameraPos, cameraPos + VEC_FORWARD, VEC_UP);
 
-        // simulation.update_positions();
-
         renderer->update_vertices(simulation);
         renderer->draw(view, proj, this->width, this->height);
+        if (draw_debuglines) { renderer->debug_draw(view, proj, simulation); }
 
         if (targetingLine.active) {
             updateSpawnParameters();

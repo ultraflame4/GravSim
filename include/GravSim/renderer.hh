@@ -1,10 +1,11 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <vector>
+#include "GravSim/Line.hh"
 #include "GravSim/simulation.hh"
 #include "GravSim/vertex_object.hh"
 #include "GravSim/shader.hh"
-
 
 struct Vertex {
     float x;
@@ -36,6 +37,8 @@ class SimulationRenderer {
     int model_loc;
     int view_loc;
     int proj_loc;
+
+    std::vector<Line> debugLines;
 
   public:
     SimulationRenderer() {
@@ -95,5 +98,25 @@ class SimulationRenderer {
         glUniform1f(feathering_loc, 1);
 
         vo->drawPoints();
+    }
+
+    void debug_draw(glm::mat4 view, glm::mat4 proj, Simulation& sim) {
+
+        debugLines.resize(sim.bodies.size());
+        for (int i = 0; i < sim.bodies.size(); ++i) {
+            auto& line  = debugLines[i];
+            auto& bodyp = sim.bodies[i];
+
+            line.color[0]    = 0.4f;
+            line.color[1]    = 0.9f;
+            line.color[2]    = 0.1f;
+            line.direction.x = bodyp.vel.x;
+            line.direction.y = bodyp.vel.y;
+            line.origin.x    = bodyp.pos.x;
+            line.origin.y    = bodyp.pos.y;
+            line.thick       = 1;
+            line.update_line_vertices();
+            line.draw(view, proj);
+        }
     }
 };
