@@ -31,6 +31,7 @@ struct SimulatedPhysicsBody {
 
 class Simulation {
   public:
+    // TODO: Swap this out for spatial hashing
     std::vector<SimulatedPhysicsBody> bodies;
     float stepSize        = .01f;
     float gravityConstant = 500.f;
