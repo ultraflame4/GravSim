@@ -12,11 +12,11 @@
 
 const glm::mat4 IdentityMat(1.f);
 
-const glm::vec3 up(0, 1, 0);
-const glm::vec3 down(0, -1, 0);
-const glm::vec3 left(-1, 0, 0);
-const glm::vec3 right(1, 0, 0);
-const glm::vec3 forward(0, 0, -1);
+const glm::vec3 VEC_UP(0, 1, 0);
+const glm::vec3 VEC_DOWN(0, -1, 0);
+const glm::vec3 VEC_LEFT(-1, 0, 0);
+const glm::vec3 VEC_RIGHT(1, 0, 0);
+const glm::vec3 VEC_FORWARD(0, 0, -1);
 
 
 static glm::vec2 screen2WorldPos(glm::vec2 pos, glm::mat4 proj, glm::mat4 view, int width, int height) {
