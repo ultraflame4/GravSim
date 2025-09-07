@@ -33,13 +33,12 @@ class Simulation {
   public:
     Simulation() {}
 
-    int spawnBody(float x, float y, float radius, float mass) {
-        int index   = bodies.size();
-        auto& bodyp = this->bodies.emplace_back(
+    SimulatedPhysicsBody& spawnBody(float x, float y, float radius, float mass) {
+        int index = bodies.size();
+
+        return this->bodies.emplace_back(
             SimulatedPhysicsBody{glm::vec2(x, y), glm::vec2(x, y), mass, radius, index}
         );
-
-        return index;
     }
 
     void step() {
@@ -49,6 +48,10 @@ class Simulation {
             bodies.end(),
             [this](SimulatedPhysicsBody& bodyp) { updateBody(bodyp, bodyp.index); }
         );
+    }
+
+    void clear(){
+        bodies.clear();
     }
 
   private:

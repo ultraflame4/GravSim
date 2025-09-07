@@ -61,6 +61,12 @@ class Game : public Window {
             case GLFW_RELEASE:
                 if (key == GLFW_MOUSE_BUTTON_RIGHT) {
                     targetingLine.active = false;
+
+                    for (Vertex v : renderer->addVertices) {
+                        auto& body = simulation.spawnBody(v.x, v.y, spawnRadius, spawnMass);
+                        body.vel   = spawnVel;
+                    }
+
                     renderer->addVertices.clear();
                     // todo, add to simulation!
                 }
@@ -150,6 +156,7 @@ class Game : public Window {
 
     void Load() override {
         logger->info("Hello world!");
+        updateTps           = 20;
         simulation.stepSize = 1.0f / updateTps;
         renderer            = std::make_unique<SimulationRenderer>();
         Line::load();
@@ -190,12 +197,9 @@ class Game : public Window {
             ImGui::SliderFloat("Radius", &spawnRadius, 5, 500);
             ImGui::ColorEdit3("Color", spawnColor);
             ImGui::SliderInt("Count", &spawnCount, 1, 20);
-            // glm::vec2 text_vel =
-            //     spawningGravBodies.empty() ? glm::vec2(0, 0) : spawnVel;
-            // ImGui::Text("Velocity %f,%f", text_vel.x, text_vel.y);
-            // if (ImGui::Button("Clear Bodies")) {
-            //     simulation.clear();
-            // }
+
+            ImGui::Text("Velocity %f,%f", spawnVel.x, spawnVel.y);
+            if (ImGui::Button("Clear Bodies")) { simulation.clear(); }
         }
         if (ImGui::CollapsingHeader("Trajectory Line", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
@@ -203,8 +207,8 @@ class Game : public Window {
             ImGui::ColorEdit3("Line Color", targetingLine.color);
         }
         if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen)) {
-            // ImGui::Checkbox("Enable Gravity [G]", &simulation.gravity);
-            // ImGui::Checkbox("Enable Collisions [C]", &simulation.collision);
+            ImGui::Checkbox("Enable Gravity [G]", &simulation.enableGravity);
+            ImGui::Checkbox("Enable Collisions [C]", &simulation.enableCollision);
             // ImGui::Checkbox("Debug Velocity", &simulation.debug);
         }
         ImGui::End();
@@ -232,7 +236,7 @@ class Game : public Window {
 
         renderer->update_vertices(simulation);
         renderer->draw(view, proj, this->width, this->height);
-        
+
         if (targetingLine.active) {
             updateSpawnParameters();
             targetingLine.origin.x    = spawnPosition.x;
