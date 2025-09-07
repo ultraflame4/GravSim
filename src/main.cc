@@ -3,9 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <imgui.h>
-#include <algorithm>
+
 #include <memory>
 #include <numbers>
+#include "GravSim/camera.hh"
 #include "GravSim/renderer.hh"
 #include "GravSim/simulation.hh"
 #include "GravSim/window.hh"
@@ -22,17 +23,8 @@ class Game : public Window {
 
     std::unique_ptr<SimulationRenderer> renderer = nullptr;
 
-    glm::vec3 cameraPos       = glm::vec3(0, 0, 0);
-    glm::vec3 targetCameraPos = glm::vec3(0, 0, 0);
-    glm::vec3 cameraMove      = glm::vec3(0, 0, 0);
-    glm::mat4 view            = glm::mat4(1.0f);
-    glm::mat4 proj;
-
-    float current_zoom   = 1.f;
-    float target_zoom    = 1.f;
-    float zoom_speed     = .1f;
-    const float max_zoom = 5;
-    const float min_zoom = .2f;
+    Camera camera;
+    glm::vec3 cameraMove = glm::vec3(0, 0, 0);
 
     glm::vec2 spawnPosition;
     glm::vec2 spawnVel;
@@ -48,16 +40,14 @@ class Game : public Window {
     void updateSpawnParameters() {
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        glm::vec2 pos = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
+        glm::vec2 pos = camera.screen2World(glm::vec2(xpos, ypos));
         spawnVel      = spawnPosition - pos;
     }
 
   protected:
     // ---- EVENTS ----
 
-    void OnScroll(double x_offset, double y_offset) override {
-        target_zoom -= y_offset * zoom_speed;
-    }
+    void OnScroll(double x_offset, double y_offset) override { camera.change_zoom(y_offset); }
 
     void OnInput(int key, int action, int mods) override {
         switch (action) {
@@ -100,7 +90,7 @@ class Game : public Window {
                     double xpos, ypos;
                     targetingLine.active = true;
                     glfwGetCursorPos(window, &xpos, &ypos);
-                    spawnPosition = screen2WorldPos(glm::vec2(xpos, ypos), proj, view, *this);
+                    spawnPosition = camera.screen2World(glm::vec2(xpos, ypos));
 
                     logger->debug(
                         "Spawning {} object(s) at {},{}",
@@ -163,7 +153,7 @@ class Game : public Window {
 
     bool paused = true;
 
-    void OnResize() override { proj = createOrtho(current_zoom); }
+    void OnResize() override { camera.resize_viewport(width, height); }
 
     float spawnMass     = 10;
     float spawnRadius   = 10;
@@ -179,13 +169,9 @@ class Game : public Window {
     }
 
     void Start() override {
-        simulation.spawnBody(glm::vec2(-200, 10), 1 + 5, 10, Color{});
-        simulation.spawnBody(glm::vec2(-50, 0), 2 + 5, 20, Color{});
-        simulation.spawnBody(glm::vec2(800, 0), 1 + 5, 10, Color{});
-        simulation.spawnBody(glm::vec2(0, 0), 15, 20, Color{});
-        simulation.spawnBody(glm::vec2(0, -500), 1 + 5, 10, Color{});
-        simulation.spawnBody(glm::vec2(200, -100), 4 + 5, 20, Color{});
-        simulation.spawnBody(glm::vec2(200, -500), 4 + 5, 20, Color{});
+        for (int i = 0; i < 100; i++) {
+            simulation.spawnBody(glm::vec2(0, 0), 10, 10, Color{});
+        }
     }
 
     void Update(float dt) override {
@@ -204,8 +190,8 @@ class Game : public Window {
         // ImGui::SliderFloat("Gravity Constant", &simulation.gravityConstant,
         //                    -1000.f, 1000.f);
         if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::Text("Position: %f,%f", cameraPos.x, cameraPos.y);
-            ImGui::SliderFloat("Zoom", &target_zoom, min_zoom, max_zoom);
+            ImGui::Text("Position: %f,%f", camera.position.x, camera.position.y);
+            ImGui::SliderFloat("Zoom", &camera.target_zoom, camera.min_zoom, camera.max_zoom);
         }
         if (ImGui::CollapsingHeader("Spawning", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("Right click & drag to spawn bodies");
@@ -231,26 +217,12 @@ class Game : public Window {
     }
 
     void Draw(float dt) override {
-        target_zoom = std::clamp(target_zoom, min_zoom, max_zoom);
-        if (abs(current_zoom - target_zoom) < 0.01f) {
-            current_zoom = target_zoom;
-        } else {
-            current_zoom = std::lerp(current_zoom, target_zoom, 10 * dt);
-            proj         = createOrtho(current_zoom);
-        }
-
-        targetCameraPos = targetCameraPos + cameraMove * dt * 2000.f * current_zoom;
-        if (abs(length(cameraPos - targetCameraPos)) < (0.01f * current_zoom)) {
-            cameraPos = glm::mix(cameraPos, targetCameraPos, 10 * dt);
-        } else {
-            cameraPos = glm::mix(cameraPos, targetCameraPos, 10 * dt);
-        }
-
-        view = glm::lookAt(cameraPos, cameraPos + VEC_FORWARD, VEC_UP);
+        camera.target_position += cameraMove * dt * 2000.f * camera.current_zoom;
+        camera.update(dt);
 
         renderer->update_vertices(simulation);
-        renderer->draw(view, proj, this->width, this->height);
-        if (draw_debuglines) { renderer->debug_draw(view, proj, simulation); }
+        renderer->draw(camera.view, camera.proj, this->width, this->height);
+        if (draw_debuglines) { renderer->debug_draw(camera.view, camera.proj, simulation); }
 
         if (targetingLine.active) {
             updateSpawnParameters();
@@ -259,7 +231,7 @@ class Game : public Window {
             targetingLine.direction.x = spawnVel.x;
             targetingLine.direction.y = spawnVel.y;
             targetingLine.update_line_vertices();
-            targetingLine.draw(view, proj);
+            targetingLine.draw(camera.view, camera.proj);
         }
     }
 };
