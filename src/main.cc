@@ -236,7 +236,7 @@ class Game : public Window {
 
         renderer->update_vertices(simulation);
         renderer->draw(view, proj, this->width, this->height);
-        if (draw_debuglines) { renderer->debug_draw(view, proj, simulation); }
+        // if (draw_debuglines) { renderer->debug_draw(view, proj, simulation); }
 
         if (targetingLine.active) {
             updateSpawnParameters();
