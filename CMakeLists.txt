@@ -14,18 +14,19 @@ configure_file(
 file(COPY assets DESTINATION ${PROJECT_BINARY_DIR})
 
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/*.hh" "${PROJECT_SOURCE_DIR}/include/*.hh")
+
 list(REMOVE_ITEM HEADER_LIST "${PROJECT_SOURCE_DIR}/include/GravSim/meta.hh")
 
 
 set(SOURCES
-        src/main.cpp
+        src/main.cc
         src/logging.cc
         src/window.cc
         src/shader.cc
         src/vertex_object.cc
         src/timer.cc
         src/line.cc
-        src/GravitySimulation.cc
+        
         include/GravSim/utils.hh
 )
 
@@ -40,7 +41,6 @@ find_package(imgui CONFIG REQUIRED)
 
 add_executable(GravSim ${SOURCES} ${HEADER_LIST})
 
-target_sources(GravSim PRIVATE FILE_SET CXX_MODULES FILES src/testmodel.cppm)
 target_compile_features(GravSim PRIVATE cxx_std_23)
 target_include_directories(GravSim PUBLIC ${PROJECT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include/)
 target_link_libraries(GravSim PUBLIC spdlog::spdlog)
