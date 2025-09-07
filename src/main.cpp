@@ -1,3 +1,4 @@
+import testmodel;
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -154,6 +155,7 @@ protected:
 
     void Load() override {
         logger->info("Hello world!");
+        logger->info("Module result {}", add(13,45));
         simulation.load();
         Line::load();
         AddBody(-200, 10, 1 + 5, 10);
@@ -251,6 +253,7 @@ protected:
 int main() {
     logging::get("main()")->info("GravSim version {}", GravSim_VERSION);
     std::string title = "GravSim v";
+    
     title += GravSim_VERSION;
     auto window = std::make_shared<Game>(1000, 800, title);
 

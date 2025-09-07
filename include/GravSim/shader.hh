@@ -28,7 +28,7 @@ public:
 
     void use();
 private:
-    static inline std::shared_ptr<spdlog::logger> logger = logging::get<ShaderType>();
+    static inline std::shared_ptr<spdlog::logger> logger = logging::get<Shader>();
     bool checkCompileSuccess(unsigned int shader);
 
 };
