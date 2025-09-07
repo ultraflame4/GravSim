@@ -101,8 +101,14 @@ class SimulationRenderer {
     }
 
     void debug_draw(glm::mat4 view, glm::mat4 proj, Simulation& sim) {
+        auto body_count = sim.bodies.size();
 
-        debugLines.resize(sim.bodies.size());
+        if (debugLines.size() != body_count) {
+            debugLines.reserve(body_count);
+            debugLines.clear();
+            for (int i = 0; i < sim.bodies.size(); ++i) { debugLines.push_back(Line()); }
+        }
+
         for (int i = 0; i < sim.bodies.size(); ++i) {
             auto& line  = debugLines[i];
             auto& bodyp = sim.bodies[i];

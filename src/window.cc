@@ -59,7 +59,6 @@ Window::Window(int width, int height, const std::string& title) {
 void Window::static_framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     windows_list[window]->framebuffer_size_callback(window, width, height);
 }
-
 void Window::static_key_callback(
     GLFWwindow* window,
     int key,
