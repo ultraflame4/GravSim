@@ -74,7 +74,6 @@ protected:
     void OnInput(int key, int action, int mods) override {
         switch (action) {
             case GLFW_RELEASE:
-
                 if (key == GLFW_MOUSE_BUTTON_RIGHT && !spawningGravBodies.empty()) {
                     for (int bodyIndex: spawningGravBodies) {
                         GravBodyPhysical& body = simulation.physicalBodies[bodyIndex];
@@ -158,6 +157,10 @@ protected:
         logger->info("Module result {}", add(13,45));
         simulation.load();
         Line::load();
+
+    }
+    
+    void Start() override{
         AddBody(-200, 10, 1 + 5, 10);
         AddBody(-50, 0, 2 + 5, 20);
         AddBody(800, 0, 1 + 5, 10);

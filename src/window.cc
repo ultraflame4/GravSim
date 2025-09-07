@@ -107,7 +107,8 @@ void Window::run() {
     updateTimer.tick();
     is_running = true;
     pUpdateThread = new std::thread(&Window::_update_thread, this);
-
+    
+    Start();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

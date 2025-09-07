@@ -35,6 +35,7 @@ protected:
     virtual void OnImGui_Draw() {};
 
     virtual void Load() {};
+    virtual void Start() {};
 
     virtual void Update(float dt) {};
 
