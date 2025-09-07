@@ -79,8 +79,10 @@ class Game : public Window {
                 if (key == GLFW_KEY_S) cameraMove += VEC_DOWN;
                 if (key == GLFW_KEY_D) cameraMove += VEC_RIGHT;
 
-                if (key == GLFW_KEY_G) {}
-                if (key == GLFW_KEY_C) {}
+                if (key == GLFW_KEY_G) { simulation.enableGravity = !simulation.enableGravity; }
+                if (key == GLFW_KEY_C) {
+                    simulation.enableCollision = !simulation.enableCollision;
+                }
                 if (key == GLFW_KEY_SPACE) {
                     paused = !paused;
                     logger->info("Paused enabled: {}", paused);
