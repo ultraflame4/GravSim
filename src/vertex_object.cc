@@ -3,7 +3,7 @@
 //
 #include <glad/glad.h>
 #include <iostream>
-#include "GravSim/VertexObject.hh"
+#include "GravSim/vertex_object.hh"
 #include "GravSim/window.hh"
 
 VertexObject::VertexObject(int byteSize, const float *data, int stride) {

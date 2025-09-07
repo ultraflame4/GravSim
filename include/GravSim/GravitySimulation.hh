@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 #include "shader.hh"
-#include "VertexObject.hh"
+#include "vertex_object.hh"
 #include "window.hh"
 #include "Line.hh"
 

@@ -22,9 +22,9 @@ set(SOURCES
         src/logging.cc
         src/window.cc
         src/shader.cc
-        src/VertexObject.cc
-        src/Timer.cc
-        src/Line.cc
+        src/vertex_object.cc
+        src/timer.cc
+        src/line.cc
         src/GravitySimulation.cc
         include/GravSim/utils.hh
 )

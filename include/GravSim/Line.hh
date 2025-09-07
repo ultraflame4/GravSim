@@ -4,7 +4,7 @@
 
 #pragma once
 #include <glm/glm.hpp>
-#include "VertexObject.hh"
+#include "vertex_object.hh"
 #include "shader.hh"
 
 class Line {
