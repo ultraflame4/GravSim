@@ -12,6 +12,7 @@
 
 struct SimulatedPhysicsBody {
     glm::vec2 pos;
+    glm::vec2 prev_pos;
     glm::vec2 vel;
     float mass;
     float radius;
@@ -41,6 +42,9 @@ class Simulation {
     bool enableCollision  = true;
     bool enableGravity    = true;
 
+    float last_step_delta = 0;
+    float last_step_time  = 0;
+
   public:
     Simulation() {}
     void spawnBody(glm::vec2 xy, float radius, float mass, Color color) {
@@ -50,8 +54,11 @@ class Simulation {
         std::lock_guard<std::mutex> lock(mutex_bodies);
 
         int index = bodies.size();
-        auto body =
-            SimulatedBody{index, color, SimulatedPhysicsBody{xy, vel, mass, radius, idcounter}};
+        auto body = SimulatedBody{
+            index,
+            color,
+            SimulatedPhysicsBody{xy, xy, vel, mass, radius, idcounter}
+        };
         idcounter++;
         this->bodies.push_back(body);
     }
@@ -60,6 +67,10 @@ class Simulation {
         copy_in();
         processChunk(process_buffer);
         copy_out();
+
+        auto now        = glfwGetTime();
+        last_step_delta = now - last_step_time;
+        last_step_time  = now;
     }
 
     void clear() {
@@ -108,6 +119,7 @@ class Simulation {
             [this, bodies](SimulatedPhysicsBody& bodyp) {
                 auto index = bodyp.id;
 
+                bodyp.prev_pos = bodyp.pos;
                 for (SimulatedPhysicsBody otherp : bodies) {
                     if (index == otherp.id) continue;  // Skip self
 

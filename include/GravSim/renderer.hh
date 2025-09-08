@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <vector>
@@ -72,12 +73,23 @@ class SimulationRenderer {
         // Call reserve early to avoid allocation on resize and insert
         vertices.reserve(vertex_count + addVertices.size());
         vertices.resize(vertex_count);
+
+        float now   = glfwGetTime();
+        float dt    = now - sim.last_step_time;
+        float alpha = std::clamp(dt / sim.last_step_delta, 0.f, 1.f);
+
         for (int i = 0; i < sim.bodies.size(); i++) {
             // Cannot use references here, array may resize at anytime, causing reference to be
             // invalid!
-            auto body = sim.bodies[i];
-            vertices[i] =
-                Vertex{body.pbody.pos.x, body.pbody.pos.y, body.pbody.radius, body.color};
+            auto body  = sim.bodies[i];
+            auto pbody = body.pbody;
+
+            auto lerp_pos = glm::lerp(pbody.prev_pos, pbody.pos, alpha);
+
+            vertices[i].x      = lerp_pos.x;
+            vertices[i].y      = lerp_pos.y;
+            vertices[i].radius = pbody.radius;
+            vertices[i].color  = body.color;
         }
         vertices.insert(vertices.end(), addVertices.begin(), addVertices.end());
     }
