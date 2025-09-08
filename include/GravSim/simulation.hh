@@ -61,7 +61,10 @@ class Simulation {
 
     void step() {
         copy_in();
-        processChunk(process_buffer);
+
+        auto compare_buffer = process_buffer;
+
+        processChunk(process_buffer, compare_buffer);
         copy_out();
 
         auto now        = glfwGetTime();
@@ -107,15 +110,24 @@ class Simulation {
         for (int i = 0; i < processed_count; i++) { bodies[i].pbody = process_buffer[i]; }
     }
 
-    void processChunk(std::vector<SimulatedPhysicsBody>& bodies) {
+    /**
+     * @brief Process physics for a chunk
+     *
+     * @param bodies Bodies to process.
+     * @param others Bodies to compare against.
+     */
+    void processChunk(
+        std::vector<SimulatedPhysicsBody>& bodies,
+        std::vector<SimulatedPhysicsBody>& others
+    ) {
         std::for_each(
             std::execution::par_unseq,
             bodies.begin(),
             bodies.end(),
-            [this, bodies](SimulatedPhysicsBody& bodyp) {
+            [this, others](SimulatedPhysicsBody& bodyp) {
                 auto index = bodyp.id;
 
-                for (SimulatedPhysicsBody otherp : bodies) {
+                for (SimulatedPhysicsBody otherp : others) {
                     if (index == otherp.id) continue;  // Skip self
 
                     if (enableCollision) applyCollisionForces(bodyp, otherp);
