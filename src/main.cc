@@ -165,7 +165,7 @@ class Game : public Window {
     void Load() override {
         logger->info("Hello world!");
         updateTps           = 20;
-        simulation.stepSize = 1.0f / updateTps;
+        simulation.stepSize = 1.0f / updateTps * .5f;
         renderer            = std::make_unique<SimulationRenderer>();
         Line::load();
     }
@@ -230,7 +230,7 @@ class Game : public Window {
         camera.target_position += cameraMove * dt * 2000.f * camera.current_zoom;
         camera.update(dt);
 
-        renderer->update_vertices(simulation);
+        renderer->update_vertices(simulation, updateTpsFixedDelta());
         renderer->draw(camera.view, camera.proj, this->width, this->height);
         if (draw_debuglines) { renderer->debug_draw(camera.view, camera.proj, simulation); }
 

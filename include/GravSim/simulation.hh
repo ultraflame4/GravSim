@@ -12,7 +12,6 @@
 
 struct SimulatedPhysicsBody {
     glm::vec2 pos;
-    glm::vec2 prev_pos;
     glm::vec2 vel;
     float mass;
     float radius;
@@ -54,11 +53,8 @@ class Simulation {
         std::lock_guard<std::mutex> lock(mutex_bodies);
 
         int index = bodies.size();
-        auto body = SimulatedBody{
-            index,
-            color,
-            SimulatedPhysicsBody{xy, xy, vel, mass, radius, idcounter}
-        };
+        auto body =
+            SimulatedBody{index, color, SimulatedPhysicsBody{xy, vel, mass, radius, idcounter}};
         idcounter++;
         this->bodies.push_back(body);
     }
@@ -119,7 +115,6 @@ class Simulation {
             [this, bodies](SimulatedPhysicsBody& bodyp) {
                 auto index = bodyp.id;
 
-                bodyp.prev_pos = bodyp.pos;
                 for (SimulatedPhysicsBody otherp : bodies) {
                     if (index == otherp.id) continue;  // Skip self
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <vector>
@@ -68,7 +69,7 @@ class SimulationRenderer {
      *
      * @param sim
      */
-    void update_vertices(Simulation& sim) {
+    void update_vertices(Simulation& sim, float physics_fixed_dt) {
         int vertex_count = sim.bodies.size();
         // Call reserve early to avoid allocation on resize and insert
         vertices.reserve(vertex_count + addVertices.size());
@@ -76,7 +77,7 @@ class SimulationRenderer {
 
         float now   = glfwGetTime();
         float dt    = now - sim.last_step_time;
-        float alpha = std::clamp(dt / sim.last_step_delta, 0.f, 1.f);
+        float alpha = std::clamp(dt / physics_fixed_dt, 0.f, 1.f);
 
         for (int i = 0; i < sim.bodies.size(); i++) {
             // Cannot use references here, array may resize at anytime, causing reference to be
@@ -84,7 +85,8 @@ class SimulationRenderer {
             auto body  = sim.bodies[i];
             auto pbody = body.pbody;
 
-            auto lerp_pos = glm::lerp(pbody.prev_pos, pbody.pos, alpha);
+            auto prev_pos = glm::vec2(vertices[i].x, vertices[i].y);
+            auto lerp_pos = glm::lerp(prev_pos, pbody.pos, alpha);
 
             vertices[i].x      = lerp_pos.x;
             vertices[i].y      = lerp_pos.y;

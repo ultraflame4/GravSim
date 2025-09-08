@@ -7,13 +7,12 @@
 #include <map>
 #include "timer.hh"
 
-
 class Window {
-public:
-    Window(int width, int height, const std::string &title);
+  public:
+    Window(int width, int height, const std::string& title);
 
-    GLFWwindow *window;
-    static inline std::map<GLFWwindow *, Window *> windows_list{};
+    GLFWwindow* window;
+    static inline std::map<GLFWwindow*, Window*> windows_list{};
 
     void run();
     Timer frameTimer;
@@ -24,16 +23,18 @@ public:
     int width;
     int height;
 
-protected:
+    float updateTpsFixedDelta() const { return 1.f / updateTps; }
+
+  protected:
     ~Window() = default;
 
     std::shared_ptr<spdlog::logger> logger;
-    bool is_running = false;
+    bool is_running            = false;
     std::thread* pUpdateThread = nullptr;
 
     virtual void OnResize() {};
     virtual void OnInput(int key, int action, int mods) {};
-    virtual void OnScroll( double x_offset, double y_offset) {};
+    virtual void OnScroll(double x_offset, double y_offset) {};
     virtual void OnImGui_Draw() {};
 
     virtual void Load() {};
@@ -43,26 +44,24 @@ protected:
 
     virtual void Draw(float dt) {};
 
-private:
-
-
+  private:
     static inline bool glfw_initialised = false;
 
     static void Init();
 
-    static void static_framebuffer_size_callback(GLFWwindow *window, int width, int height);
-    static void static_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void static_framebuffer_size_callback(GLFWwindow* window, int width, int height);
+    static void
+    static_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-    static void static_scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+    static void static_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-    void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+    void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
     void InitIMGUI();
 
     static void static_mousebtn_callback(GLFWwindow* window, int key, int action, int mods);
 
     void _update_thread();
-
 };
-GLenum CheckGLErrors_(const char *file, int line);
-#define CheckGLErrors() CheckGLErrors_(__FILE__,__LINE__)
+GLenum CheckGLErrors_(const char* file, int line);
+#define CheckGLErrors() CheckGLErrors_(__FILE__, __LINE__)
