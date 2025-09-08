@@ -7,19 +7,15 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <mutex>
+#include <variant>
 #include <vector>
-
-struct SimulatedBody {
-    int index;
-    Color color;
-};
 
 struct SimulatedPhysicsBody {
     glm::vec2 pos;
     glm::vec2 vel;
     float mass;
     float radius;
-    std::shared_ptr<SimulatedBody> data;
+    int id;
 
     void accelerate(glm::vec2 direction, float forceAmt) {
         vel += direction * (forceAmt / mass);
@@ -29,11 +25,16 @@ struct SimulatedPhysicsBody {
         vel = direction * (forceAmt / mass);
     }
 };
+struct SimulatedBody {
+    int index;
+    Color color;
+    SimulatedPhysicsBody pbody;  // Data since last copy
+};
 
 class Simulation {
   public:
     // TODO: Swap this out for spatial hashing
-    std::vector<SimulatedPhysicsBody> bodies;
+    std::vector<SimulatedBody> bodies;
 
     float stepSize        = .01f;
     float gravityConstant = 500.f;
@@ -42,28 +43,59 @@ class Simulation {
 
   public:
     Simulation() {}
+    void spawnBody(glm::vec2 xy, float radius, float mass, Color color) {
+        spawnBody(xy, glm::vec2(0, 0), radius, mass, color);
+    }
+    void spawnBody(glm::vec2 xy, glm::vec2 vel, float radius, float mass, Color color) {
+        std::lock_guard<std::mutex> lock(mutex_bodies);
 
-    SimulatedPhysicsBody& spawnBody(glm::vec2 xy, float radius, float mass, Color color) {
-        std::lock_guard<std::mutex> lock(mutex_spawnqueue);
         int index = bodies.size();
-
-        return this->bodies.emplace_back(
-            SimulatedPhysicsBody{
-                xy,
-                glm::vec2(0, 0),
-                mass,
-                radius,
-                std::make_shared<SimulatedBody>(SimulatedBody{index, color})
-            }
-        );
+        auto body =
+            SimulatedBody{index, color, SimulatedPhysicsBody{xy, vel, mass, radius, idcounter}};
+        idcounter++;
+        this->bodies.push_back(body);
     }
 
-    void step() { processChunk(bodies); }
+    void step() {
+        copy_in();
+        processChunk(process_buffer);
+        copy_out();
+    }
 
-    void clear() { bodies.clear(); }
+    void clear() {
+        std::lock_guard<std::mutex> lock(mutex_bodies);
+
+        bodies.clear();
+    }
 
   private:
-    std::mutex mutex_spawnqueue;
+    int idcounter;
+
+    std::mutex mutex_bodies;
+
+    // Inner buffer used for calculations.
+    std::vector<SimulatedPhysicsBody> process_buffer;
+    /**
+     * @brief `bodies` into process_buffer for processing
+     *
+     */
+    void copy_in() {
+        std::lock_guard<std::mutex> lock(mutex_bodies);
+
+        process_buffer.resize(bodies.size());
+        for (int i = 0; i < bodies.size(); i++) { process_buffer[i] = bodies[i].pbody; }
+    }
+    /**
+     * @brief Copies calculated result out of process_buffer into `bodies`
+     *
+     */
+    void copy_out() {
+        std::lock_guard<std::mutex> lock(mutex_bodies);
+        auto body_count      = bodies.size();
+        auto processed_count = process_buffer.size();
+        if (body_count < processed_count) { process_buffer.resize(body_count); }
+        for (int i = 0; i < processed_count; i++) { bodies[i].pbody = process_buffer[i]; }
+    }
 
     void processChunk(std::vector<SimulatedPhysicsBody>& bodies) {
         std::for_each(
@@ -71,10 +103,10 @@ class Simulation {
             bodies.begin(),
             bodies.end(),
             [this, bodies](SimulatedPhysicsBody& bodyp) {
-                auto index = bodyp.data->index;
+                auto index = bodyp.id;
 
                 for (SimulatedPhysicsBody otherp : bodies) {
-                    if (index == otherp.data->index) continue;  // Skip self
+                    if (index == otherp.id) continue;  // Skip self
 
                     if (enableCollision) applyCollisionForces(bodyp, otherp);
                     if (enableGravity) applyGravityForce(bodyp, otherp);

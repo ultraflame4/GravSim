@@ -56,13 +56,13 @@ class Game : public Window {
                     targetingLine.active = false;
 
                     for (Vertex v : renderer->addVertices) {
-                        auto& body = simulation.spawnBody(
+                        simulation.spawnBody(
                             glm::vec2(v.x, v.y),
+                            spawnVel,
                             spawnRadius,
                             spawnMass,
                             v.color
                         );
-                        body.vel = spawnVel;
                     }
 
                     renderer->addVertices.clear();

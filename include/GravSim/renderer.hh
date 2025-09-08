@@ -73,9 +73,11 @@ class SimulationRenderer {
         vertices.reserve(vertex_count + addVertices.size());
         vertices.resize(vertex_count);
         for (int i = 0; i < sim.bodies.size(); i++) {
-            // Cannot use references here, array may resize at anytime, causing reference to be invalid!
-            auto body  = sim.bodies[i];
-            vertices[i] = Vertex{body.pos.x, body.pos.y, body.radius, body.data->color};
+            // Cannot use references here, array may resize at anytime, causing reference to be
+            // invalid!
+            auto body = sim.bodies[i];
+            vertices[i] =
+                Vertex{body.pbody.pos.x, body.pbody.pos.y, body.pbody.radius, body.color};
         }
         vertices.insert(vertices.end(), addVertices.begin(), addVertices.end());
     }
@@ -106,8 +108,8 @@ class SimulationRenderer {
         debugLines.resize(body_count);
 
         for (int i = 0; i < body_count; ++i) {
-            auto& line  = debugLines[i];
-            auto& bodyp = sim.bodies[i];
+            auto& line = debugLines[i];
+            auto bodyp = sim.bodies[i].pbody;
 
             line.color[0] = 0.4f;
             line.color[1] = 0.9f;
