@@ -131,7 +131,14 @@ class Game : public Window {
                         glm::vec2 final_pos = spawnPosition + (dir_off * dist);
 
                         renderer->addVertices.push_back(
-                            Vertex{final_pos.x, final_pos.y, spawnRadius, 1.f, .1f, 1.f}
+                            Vertex{
+                                final_pos.x,
+                                final_pos.y,
+                                spawnRadius,
+                                spawnColor[0],
+                                spawnColor[1],
+                                spawnColor[2],
+                            }
                         );
 
                         int max_layer_count = std::floor(max_angle / amt);
