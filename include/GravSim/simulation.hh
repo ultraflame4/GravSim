@@ -134,7 +134,8 @@ class Simulation {
         float currentDist = glm::distance(posA, posB);
         // When nan, currentDist is 0! They fused together. Skip collision check!
         if (std::isnan(currentDist)) {
-            resolveFused(a, b);
+            // disabled because it was causing wonky physics
+            // resolveFused(a, b);
             return;
         }
 
