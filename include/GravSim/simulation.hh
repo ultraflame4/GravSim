@@ -140,33 +140,59 @@ class Simulation {
     }
 
     void applyCollisionForces(SimulatedPhysicsBody& a, SimulatedPhysicsBody& b) {
-        glm::vec2 posA = a.pos + a.vel * stepSize;
-        glm::vec2 posB = b.pos + b.vel * stepSize;
+        glm::vec2 s = a.pos - b.pos;  // relative start pos
+        glm::vec2 v = a.vel - b.vel;  // relative velocity
+        float R     = a.radius + b.radius;
 
-        float collisionDist = a.radius + b.radius;
+        float a_coef = glm::dot(v, v);
+        float b_coef = 2.0f * glm::dot(s, v);
+        float c_coef = glm::dot(s, s) - R * R;
+
+        float tCollide = -1.0f;
+
+        // Already overlapping
+        if (c_coef <= 0.0f) {
+            tCollide = 0.0f;
+        } else if (a_coef > 1e-8f) {
+            float disc = b_coef * b_coef - 4.0f * a_coef * c_coef;
+            if (disc >= 0.0f) {
+                float sqrtD = std::sqrt(disc);
+                float t1    = (-b_coef - sqrtD) / (2.0f * a_coef);
+                float t2    = (-b_coef + sqrtD) / (2.0f * a_coef);
+
+                // pick earliest valid root within this step
+                if (t1 >= 0.0f && t1 <= stepSize)
+                    tCollide = t1;
+                else if (t2 >= 0.0f && t2 <= stepSize)
+                    tCollide = t2;
+            }
+        }
+
+        // If no collision in this step, bail
+        if (tCollide < 0.0f) return;
+
+        // Move both balls to collision point
+        glm::vec2 posA = a.pos + a.vel * tCollide;
+        glm::vec2 posB = b.pos + b.vel * tCollide;
 
         float currentDist = glm::distance(posA, posB);
-        // Skip when nan
-        if (std::isnan(currentDist)) { return; }
-
-        if (currentDist > (collisionDist + 0.1f)) return;
+        if (std::isnan(currentDist)) return;
 
         glm::vec2 normal = glm::normalize(posA - posB);
-        // When a & b distance is 0, they are at the same spot, hence no collision normal, so
-        // just use up vector
-        if (std::isnan(currentDist)) normal = VEC_UP;
-        /// Resist penetration
-        float pen_depth   = collisionDist - currentDist;
-        glm::vec2 pen_res = normal * (pen_depth * .5f + 0.1f);
-        a.pos += pen_res;
-        b.pos += -pen_res;
+        if (std::isnan(normal.x) || std::isnan(normal.y)) normal = VEC_UP;
+
+        // Resist penetration
+        float pen_depth   = R - currentDist;
+        glm::vec2 pen_res = normal * (pen_depth * 0.5f + 0.1f);
+        a.pos             = posA + pen_res;
+        b.pos             = posB - pen_res;
 
         // Collision resolution
         glm::vec2 incoming = a.vel - b.vel;
         float resForce     = -glm::dot(incoming, normal);
         float totalMass    = b.mass + a.mass;
         a.vel += normal * (resForce * b.mass / totalMass);
-        b.vel += -normal * (resForce * a.mass / totalMass);
+        b.vel -= normal * (resForce * a.mass / totalMass);
     }
 
     void applyGravityForce(SimulatedPhysicsBody& a, SimulatedPhysicsBody& b) {
