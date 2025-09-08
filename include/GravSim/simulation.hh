@@ -93,7 +93,10 @@ class Simulation {
         std::lock_guard<std::mutex> lock(mutex_bodies);
         auto body_count      = bodies.size();
         auto processed_count = process_buffer.size();
-        if (body_count < processed_count) { process_buffer.resize(body_count); }
+        if (body_count < processed_count) {
+            process_buffer.resize(body_count);
+            processed_count = body_count;
+        }
         for (int i = 0; i < processed_count; i++) { bodies[i].pbody = process_buffer[i]; }
     }
 
