@@ -139,11 +139,6 @@ class Simulation {
         );
     }
 
-    void resolveFused(SimulatedPhysicsBody& a, SimulatedPhysicsBody& b) {
-        a.pos.x -= a.radius / 2;
-        b.pos.x += b.radius / 2;
-    }
-
     void applyCollisionForces(SimulatedPhysicsBody& a, SimulatedPhysicsBody& b) {
         glm::vec2 posA = a.pos + a.vel * stepSize;
         glm::vec2 posB = b.pos + b.vel * stepSize;
@@ -151,12 +146,8 @@ class Simulation {
         float collisionDist = a.radius + b.radius;
 
         float currentDist = glm::distance(posA, posB);
-        // When nan, currentDist is 0! They fused together. Skip collision check!
-        if (std::isnan(currentDist)) {
-            // disabled because it was causing wonky physics
-            // resolveFused(a, b);
-            return;
-        }
+        // Skip when nan
+        if (std::isnan(currentDist)) { return; }
 
         if (currentDist > (collisionDist + 0.1f)) return;
 
