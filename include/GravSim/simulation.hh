@@ -35,9 +35,6 @@ class Simulation {
     // TODO: Swap this out for spatial hashing
     std::vector<SimulatedPhysicsBody> bodies;
 
-    // Bodies to be added into the simulation.
-    std::vector<SimulatedPhysicsBody> spawn_queue;
-
     float stepSize        = .01f;
     float gravityConstant = 500.f;
     bool enableCollision  = true;
@@ -50,7 +47,7 @@ class Simulation {
         std::lock_guard<std::mutex> lock(mutex_spawnqueue);
         int index = bodies.size();
 
-        return this->spawn_queue.emplace_back(
+        return this->bodies.emplace_back(
             SimulatedPhysicsBody{
                 xy,
                 glm::vec2(0, 0),
@@ -61,42 +58,12 @@ class Simulation {
         );
     }
 
-    void step() {
-        if (need_clear) bodies.clear();
-        spawnQueued();
+    void step() { processChunk(bodies); }
 
-        processChunk(bodies);
-    }
-
-    void clear() {
-        std::lock_guard<std::mutex> lock(mutex_spawnqueue);
-        spawn_queue.clear();
-        need_clear = true;
-    }
+    void clear() { bodies.clear(); }
 
   private:
     std::mutex mutex_spawnqueue;
-
-    /**Whether to clear the spawned bodies. This should not clear the queue */
-    bool need_clear = false;
-
-    /**
-     * @brief Directly adds body into simulation. Will lock.
-     *
-     * @param body
-     */
-    SimulatedPhysicsBody& addBody(SimulatedPhysicsBody body) {
-        return this->bodies.emplace_back(body);
-    }
-
-    void spawnQueued() {
-        if (spawn_queue.empty()) return;
-        std::lock_guard<std::mutex> lock(mutex_spawnqueue);
-        // Append spawn queue to bodies and clear it
-        bodies.reserve(bodies.size() + spawn_queue.size());
-        bodies.insert(bodies.end(), spawn_queue.begin(), spawn_queue.end());
-        spawn_queue.clear();
-    }
 
     void processChunk(std::vector<SimulatedPhysicsBody>& bodies) {
         std::for_each(
