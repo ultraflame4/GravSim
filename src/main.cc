@@ -171,8 +171,8 @@ class Game : public Window {
 
     void Load() override {
         logger->info("Hello world!");
-        updateTps           = 20;
-        simulation.stepSize = 1.0f / updateTps;
+        updateTps           = 120;
+        simulation.stepSize = 1.f / updateTps;
         renderer            = std::make_unique<SimulationRenderer>();
         Line::load();
     }
