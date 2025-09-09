@@ -60,9 +60,12 @@ jobs:
         compiler: llvm
         cmake: true
         ninja: true
+        vcpkg: true
 
     - run: cmake --version
     - run: ninja --version
+    - run: echo $VCPKG_ROOT
+
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
