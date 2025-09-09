@@ -105,6 +105,7 @@ jobs:
         -DGLFW_BUILD_WAYLAND=${{ (runner.os == 'linux' && matrix.display == 'wayland' ) && 'ON' || 'OFF'}}
         -S ${{ github.workspace }}
         -G Ninja
+        --preset=default
 
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
