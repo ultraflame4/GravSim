@@ -52,10 +52,10 @@ jobs:
 
     steps:
     - name: Check base ref
-      run: echo "${{github.event.base_ref}}"
+      run: echo "${{github.event.ref_name}}"
 
     - name: Exit if not on master branch
-      if: endsWith(github.event.base_ref, 'master') == false
+      if: endsWith(github.event.ref_name, 'master') == false
       run: exit -1
     - uses: actions/checkout@v3
       with:
