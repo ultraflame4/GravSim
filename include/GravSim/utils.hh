@@ -40,3 +40,6 @@ struct Color {
     float g = 1.0f;
     float b = 1.0f;
 };
+namespace colors {
+    static const Color WHITE = Color{1.f, 1.f, 1.f};
+}

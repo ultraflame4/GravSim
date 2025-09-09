@@ -178,17 +178,13 @@ class Game : public Window {
     }
 
     void Start() override {
-        int size = 50;
-        for (int y = 0; y < size; ++y) {
-            for (int x = 0; x < size; ++x) {
-                simulation.spawnBody(
-                    glm::vec2(x - size / 2, y - size / 2) * spawnRadius * 2,
-                    spawnRadius,
-                    10,
-                    Color{}
-                );
-            }
-        }
+        simulation.spawnBody(glm::vec2(-200, 10), 1 + 5, 10);
+        simulation.spawnBody(glm::vec2(-50, 0), 2 + 5, 20);
+        simulation.spawnBody(glm::vec2(800, 0), 1 + 5, 10);
+        simulation.spawnBody(glm::vec2(0, 0), 15, 500);
+        simulation.spawnBody(glm::vec2(0, -500), 1 + 5, 10);
+        simulation.spawnBody(glm::vec2(200, -100), 4 + 5, 40);
+        simulation.spawnBody(glm::vec2(200, -500), 4 + 5, 40);
     }
 
     void Update(float dt) override {

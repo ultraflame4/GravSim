@@ -46,10 +46,18 @@ class Simulation {
 
   public:
     Simulation() {}
-    void spawnBody(glm::vec2 xy, float radius, float mass, Color color) {
+
+    void spawnBody(glm::vec2 xy, float radius, float mass, Color color = colors::WHITE) {
         spawnBody(xy, glm::vec2(0, 0), radius, mass, color);
     }
-    void spawnBody(glm::vec2 xy, glm::vec2 vel, float radius, float mass, Color color) {
+
+    void spawnBody(
+        glm::vec2 xy,
+        glm::vec2 vel,
+        float radius,
+        float mass,
+        Color color = colors::WHITE
+    ) {
         std::lock_guard<std::mutex> lock(mutex_bodies);
 
         int index = bodies.size();
