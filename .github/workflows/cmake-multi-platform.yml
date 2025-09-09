@@ -3,9 +3,7 @@
 name: CMake on multiple platforms
 
 on:
-  push:
-    tags:
-    - '*'
+
   workflow_dispatch:
 env: 
     VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
@@ -51,12 +49,7 @@ jobs:
 #            display: x11
 
     steps:
-    - name: Check base ref
-      run: echo "${{github.event.ref_name}}"
-
-    - name: Exit if not on master branch
-      if: endsWith(github.event.ref_name, 'master') == false
-      run: exit -1
+    
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
