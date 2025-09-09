@@ -5,7 +5,7 @@
 #pragma once
 
 #include <memory>
-#include "VertexObject.hh"
+#include "vertex_object.hh"
 
 class Square{
 public:

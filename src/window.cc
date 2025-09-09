@@ -1,4 +1,5 @@
 #include <glad/glad.h>
+#include <iostream>
 #include <GLFW/glfw3.h>
 #include "GravSim/window.hh"
 #include "GravSim/logging.hh"
@@ -15,10 +16,9 @@ void Window::Init() {
     glfw_initialised = true;
 }
 
-Window::Window(int width, int height, const std::string &title) {
+Window::Window(int width, int height, const std::string& title) {
     if (!glfw_initialised) Init();
     logger = logging::get<Window>(title);
-
 
     window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (window == nullptr) {
@@ -27,9 +27,8 @@ Window::Window(int width, int height, const std::string &title) {
         throw std::runtime_error("Failed to create glfw window!");
     }
 
-
     glfwMakeContextCurrent(window);
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         logger->critical("Failed to initialize GLAD");
         throw std::runtime_error("Failed to initialize GLAD!");
     }
@@ -42,72 +41,71 @@ Window::Window(int width, int height, const std::string &title) {
     glEnable(GL_BLEND);
     CheckGLErrors();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glfwSwapInterval(0);
+    //    glfwSwapInterval(0);
     CheckGLErrors();
-    this->width = width;
+    this->width  = width;
     this->height = height;
     glfwSetFramebufferSizeCallback(window, static_framebuffer_size_callback);
     glfwSetKeyCallback(window, static_key_callback);
     glfwSetMouseButtonCallback(window, static_mousebtn_callback);
     glfwSetScrollCallback(window, static_scroll_callback);
+
     windows_list[window] = this;
 
     InitIMGUI();
     CheckGLErrors();
 }
 
-void Window::static_framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+void Window::static_framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     windows_list[window]->framebuffer_size_callback(window, width, height);
 }
-
-void Window::static_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+void Window::static_key_callback(
+    GLFWwindow* window,
+    int key,
+    int scancode,
+    int action,
+    int mods
+) {
     windows_list[window]->OnInput(key, action, mods);
 }
 
-void Window::static_mousebtn_callback(GLFWwindow *window, int key, int action, int mods) {
+void Window::static_mousebtn_callback(GLFWwindow* window, int key, int action, int mods) {
     windows_list[window]->OnInput(key, action, mods);
 }
 
-
-void Window::static_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+void Window::static_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     windows_list[window]->OnScroll(xoffset, yoffset);
 }
 
-void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    this->width = width;
+void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    this->width  = width;
     this->height = height;
     glViewport(0, 0, width, height);
     this->OnResize();
 }
 
 void Window::_update_thread() {
-    const int base_tps = 144;
-    const float delay = 1000.0f / base_tps;
-    const int delay_i = std::floor(delay);
-    float missed_time = 0;
+    const int base_tps = this->updateTps;
+    const float delay  = 1.0f / base_tps;
+
+    float next_update = 0;
     while (is_running) {
-        missed_time += updateTimer.delta * 1000 / delay;
-
-        int extra = std::floor(missed_time);
-        missed_time -= extra;
-
-        int total_cycles = extra + 1;
-        for (int i = 0; i < total_cycles; ++i) {
-            Update(updateTimer.tick());
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(delay_i));
+        float now = glfwGetTime();
+        if (next_update > now) { continue; }
+        Update(updateTimer.tick());
+        next_update = now + delay;
     }
 }
 
 void Window::run() {
-    framebuffer_size_callback(window, width, height); // Call once at the start
+    framebuffer_size_callback(window, width, height);  // Call once at the start
     Load();
     frameTimer.tick();
     updateTimer.tick();
-    is_running = true;
+    is_running    = true;
     pUpdateThread = new std::thread(&Window::_update_thread, this);
 
+    Start();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -138,22 +136,24 @@ void Window::run() {
 }
 
 void Window::InitIMGUI() {
-// Setup Dear ImGui context
+    // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window,
-                                 true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplGlfw_InitForOpenGL(
+        window,
+        true
+    );  // Second param install_callback=true will install GLFW callbacks
+        // and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
 }
 
-
 std::shared_ptr<spdlog::logger> logger = logging::get("OpenGl");
 
-GLenum CheckGLErrors_(const char *file, int line) {
+GLenum CheckGLErrors_(const char* file, int line) {
     GLenum errorCode;
     while ((errorCode = glGetError()) != GL_NO_ERROR) {
         std::string error;

@@ -1,7 +1,8 @@
-# GravSim [WIP]
+# GravSim
 Gravity simulation for circular objects using [Newton's law of universal gravitation](https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation)
 and some other physics formulas
 
+**This branch will focus on refactoring, and just generally improvements.**
 
 https://github.com/ultraflame4/GravSim/assets/34125174/11dfd9a1-0f8b-4d17-b473-81c1e6b61f97
 
@@ -41,7 +42,7 @@ git clone https://github.com/ultraflame4/GravSim.git --recursive --depth=1
 ```
 2. Use cmake to generate project build files.
 ```shell
-cmake -S . -B build -G Ninja
+cmake -S . -B build -G Ninja --preset=default
 ```
 3. Build the project with.
 ```shell

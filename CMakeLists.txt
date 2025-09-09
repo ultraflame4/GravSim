@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.26)
-# Setup vcpkg script with CMake (note: should be placed before project() call)
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
+cmake_minimum_required(VERSION 3.28)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(GravSim
-        VERSION 0.0.8
+        VERSION 0.0.9
         LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 23)
 
 configure_file(
         "${GravSim_SOURCE_DIR}/include/GravSim/meta.hh.in"
@@ -15,27 +14,30 @@ configure_file(
 file(COPY assets DESTINATION ${PROJECT_BINARY_DIR})
 
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/*.hh" "${PROJECT_SOURCE_DIR}/include/*.hh")
+
 list(REMOVE_ITEM HEADER_LIST "${PROJECT_SOURCE_DIR}/include/GravSim/meta.hh")
 
 
 set(SOURCES
-        src/main.cpp
+        src/main.cc
         src/logging.cc
         src/window.cc
         src/shader.cc
-        src/VertexObject.cc
-        src/Timer.cc
-        src/Line.cc
-        src/GravitySimulation.cc
+        src/vertex_object.cc
+        src/timer.cc
+        src/line.cc
+        
         include/GravSim/utils.hh
 )
 
+add_compile_definitions(GravSim PUBLIC GLM_ENABLE_EXPERIMENTAL)
 
 find_package(spdlog CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+
 
 add_executable(GravSim ${SOURCES} ${HEADER_LIST})
 

@@ -1,0 +1,17 @@
+SortIncludes: false
+IndentWidth: 4
+AccessModifierOffset: -2
+ColumnLimit: 96
+NamespaceIndentation: All
+
+AlignConsecutiveAssignments: true
+AlignAfterOpenBracket: BlockIndent
+BinPackParameters: false
+BinPackArguments: false
+
+
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+AllowShortBlocksOnASingleLine: true
+
+BasedOnStyle:  Google
