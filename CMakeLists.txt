@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(GravSim
-        VERSION 0.0.9
+        VERSION 0.0.10
         LANGUAGES CXX)
 
 configure_file(
